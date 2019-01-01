@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import ipfs from './ipfs'
-
+import crypt from'./crypto'
 import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
