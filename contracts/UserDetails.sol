@@ -6,8 +6,7 @@ contract userDetails{
 
     //create mapping between user address and aadhaar card no.
     mapping(uint => address) public aadhaarToOwner;
-    
-    //accept aadhaar card no.  
+     
     function link(uint _aadhaar) public{
         //ensure user can call this function only once
         require(aadhaarToOwner[_aadhaar] == 0x0000000000000000000000000000000000000000,"Aadhar Card already exists");
