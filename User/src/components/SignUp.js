@@ -4,7 +4,7 @@ import '../css/open-sans.css'
 import '../css/pure-min.css'
 import '../App.css'
 const Web3 = require('web3')
-const web3 = new Web3('http://localhost:7545')
+const web3 = new Web3('http://localhost:8545')
 
 export class SignUp extends Component {
     constructor(props) {
@@ -42,7 +42,7 @@ export class SignUp extends Component {
        */
 
 
-      const contractAddress = '0x0D41F1ea976B3a7A9371EC2ce4A5AAfdBfb1aa31'
+      const contractAddress = '0x223Ea4EF697297f9109ed187A2139746A94D00c5'
       const ABI = [{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"}],"name":"getInfo","outputs":[{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"},{"name":"_password","type":"string"}],"name":"login","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"userInfo","outputs":[{"name":"name","type":"string"},{"name":"phone","type":"uint256"},{"name":"user","type":"address"},{"name":"password","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhar","type":"uint256"},{"name":"_name","type":"string"},{"name":"_phone","type":"uint256"},{"name":"_password","type":"string"}],"name":"setInfo","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_type","type":"string"}],"name":"setType","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"}],"name":"getAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"accountType","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"user","type":"address"},{"indexed":false,"name":"name","type":"string"},{"indexed":false,"name":"phone","type":"uint256"},{"indexed":false,"name":"aadhar","type":"uint256"}],"name":"addressLinked","type":"event"}]
      // console.log('constract Address : ',contractAddress)
       var UserDetailsContract = new web3.eth.Contract(ABI, contractAddress)
@@ -96,7 +96,7 @@ export class SignUp extends Component {
           const txObject = {
               nonce : web3.utils.toHex(txCount),
               from:result.address,
-              to: "0x0D41F1ea976B3a7A9371EC2ce4A5AAfdBfb1aa31",         //all paramters should be in Hex
+              to: "0x223Ea4EF697297f9109ed187A2139746A94D00c5",         //all paramters should be in Hex
               gasLimit : web3.utils.toHex(4700000),
               gasPrice : web3.utils.toHex(web3.utils.toWei('0','gwei')),
               data : encoded_tx

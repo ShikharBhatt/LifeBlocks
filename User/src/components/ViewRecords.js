@@ -4,7 +4,9 @@ import '../css/open-sans.css'
 import '../css/pure-min.css'
 import '../App.css'
 const Web3 = require('web3')
-const web3 = new Web3('http://localhost:7545')
+const web3 = new Web3('http://localhost:8545')
+import ipfs from '../ipfs'
+import {decrypt} from '../crypto'
 
 export class ViewRecords extends Component {
     constructor(props) {
@@ -20,7 +22,8 @@ export class ViewRecords extends Component {
         buffer: null,
         userAddress : '',
         recordsId :[],
-        selectValue: ''
+        selectValue: '',
+        masterkey: ''
       };
   
  //     this.onSignUp = this.onSignUp.bind(this);
@@ -29,8 +32,25 @@ export class ViewRecords extends Component {
         this.createSelectList = this.createSelectList.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.Change = this.Change.bind(this);
+        this.view = this.view.bind(this);
       }
+
+    
+    view(ipfs_hash,masterkey)
+    {
+      ipfs.cat(ipfs_hash, function (err, file) {
+        if (err) {
+              throw err
+            }
+            console.log(file)
+            console.log(file.toString('base64'))
+            var decrypted = decrypt(file,masterkey)
+            console.log(decrypted)
+        })
+    }
+
   
+
     componentWillMount() {
     
         // Instantiate contract once web3 provided.
@@ -47,22 +67,22 @@ export class ViewRecords extends Component {
        */
 
 
-      const contractAddress = '0x83C7F9415C49eF48e51682c0feB4549bb465aB69'
-      const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"Hospital","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
+      const contractAddress = '0xC9a4459A515844CE981eD092E2c5401087c8e902'
+      const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"}]
       //console.log('constract Address : ',contractAddress)
       var RecordUploaderContract = new web3.eth.Contract(ABI, contractAddress)
       //console.log(RecordUploaderContract)
       this.RecordUploaderContract = RecordUploaderContract
         
-      var add = '0xFB23cd312F5Da28dAeD5E6c7D76DA1c2Cf9c977F'
+      var add = '0xF1CB5385a4632bD7565E4bEFCdE129c4DF4d400f'
         this.setState({
             userAddress : add,
-            aadhaar : '123'
+            aadhaar : '1234567890'
         });
 
         this.RecordUploaderContract.methods.retrieve(1234567890).call(
             {from:this.state.userAddress}, function(error, x){
-             
+                
                 this.setState({
                     recordsId : x
                 })
@@ -78,12 +98,15 @@ export class ViewRecords extends Component {
         event.preventDefault();
         this.RecordUploaderContract.methods.viewRecord(this.state.value).call(
             {from:this.state.userAddress}, function(error, x){
-             
+              alert('called')
                 this.setState({
-                    ipfs : x[0]
+                    ipfs : x[0],
+                    masterkey : x[3]
                 })
-                alert('ipfs : '+x[0])
+                alert('ipfs : '+x[0]+ 'masterkey :'+x[3])
+                this.view(this.state.ipfs, this.state.masterkey)
             }.bind(this))
+
         
     }
   
@@ -257,7 +280,7 @@ export class ViewRecords extends Component {
                   <input type='submit' /><br/>
                 </form> */}
                <p>Your Record:</p>
-              <img src={`https://ipfs.io/ipfs/${this.state.ipfs}`} alt=""/>
+              {/* <img src={`https://ipfs.io/ipfs/${this.state.ipfs}`} alt=""/> */}
                </div>
             </div>
           </main>

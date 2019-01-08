@@ -6,7 +6,7 @@ import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
 const Web3 = require('web3')
-const web3 = new Web3('http://localhost:7545')
+const web3 = new Web3('http://localhost:8545')
 
 
 

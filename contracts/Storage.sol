@@ -13,6 +13,7 @@ contract Storage{
         string ipfsHash;
         string rtype;
         address Hospital;
+        string masterkey;
     }
     
     Record[] public records;
@@ -22,7 +23,8 @@ contract Storage{
     
     mapping(address => uint) public OwnerRecordCount;
     
-    address userDetailsInterfaceAddress = //enter deployed userDetails contract Address here;
+    //enter deployed userDetails contract Address here
+    address userDetailsInterfaceAddress = "0x223Ea4EF697297f9109ed187A2139746A94D00c5"; 
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
     
 
@@ -48,6 +50,6 @@ contract Storage{
     }
 
     function viewRecord(uint i) external view returns(string, string, address){
-        return (records[i].ipfsHash,records[i].rtype,records[i].Hospital);
+        return (records[i].ipfsHash,records[i].rtype,records[i].Hospital,records[i].masterkey);
     }
 }

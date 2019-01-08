@@ -6,6 +6,9 @@ contract userDetails{
 
     //create mapping between user address and aadhaar card no.
     mapping(uint => address) public aadhaarToOwner;
+
+    // create mappoing between user address and pgp key file stored on ipfs
+    mapping(address => string) public ownerToKey;
      
     function link(uint _aadhaar) public{
         //ensure user can call this function only once
@@ -29,4 +32,9 @@ contract userDetails{
     function getAddress(uint _aadhaar) external view returns(address){
        return(aadhaarToOwner[_aadhaar]); 
     }
+
+    function keymap(string key_ipfs) public{
+        require(bytes(ownerToKey[msg.sender]).length == 0,"Key pair for user already exists");
+        ownerToKey[msg.sender] = key_ipfs;
+    } 
 }
