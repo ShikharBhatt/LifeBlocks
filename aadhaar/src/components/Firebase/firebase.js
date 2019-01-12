@@ -2,12 +2,12 @@ import app from 'firebase/app';
 import 'firebase/auth';
 
 const config = {
-    apiKey: process.env.REACT_APP_API_KEY,
-    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-    databaseURL: process.env.REACT_APP_DATABASE_URL,
-    projectId: process.env.REACT_APP_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+    apiKey: "AIzaSyAKFfHgewDLrGJ7lNxow7Bv8EsQYlvppYY",
+    authDomain: "lifeblocks-426b3.firebaseapp.com" ,
+    databaseURL: "https://lifeblocks-426b3.firebaseio.com",
+    projectId: "lifeblocks-426b3",
+    storageBucket: "lifeblocks-426b3.appspot.com",
+    messagingSenderId: "243586073401",
 };
 
 class Firebase{
@@ -18,8 +18,9 @@ class Firebase{
     }
 
     getPhone = (aadhaar) => {
+        alert("Aadhaar" + aadhaar)
         var ref = app.database.ref('uidai');
-        ref.child('uidai').orderByChild('aadhaar_no').equalTo(aadhaar).on("value", function(snapshot) {
+        ref.orderByChild('aadhaar_no').equalTo(aadhaar).on("value", function(snapshot) {
             console.log(snapshot.val());
         });
     }

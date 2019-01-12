@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { FirebaseContext } from '../Firebase';
 
 import * as ROUTES from '../../constants/routes';
 
 const SignUpPage = () => (
     <div>
         <h1>SignUp</h1>
-        <SignUpForm />
+        <FirebaseContext.Consumer>
+      {firebase => <SignUpForm firebase={firebase} />}
+    </FirebaseContext.Consumer>
     </div>
 );
 
@@ -23,7 +26,12 @@ class SignUpForm extends Component{
     }
 
     onSubmit = event => {
+       const { aadhaar, error } = this.state;
 
+       this.props.firebase
+        .getPhone(aadhaar);
+
+        event.preventDefault();
     };
 
     onChange = event => {
