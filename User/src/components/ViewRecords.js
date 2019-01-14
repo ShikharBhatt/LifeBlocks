@@ -42,10 +42,12 @@ export class ViewRecords extends Component {
         if (err) {
               throw err
             }
-            console.log(file)
-            console.log(file.toString('base64'))
+            console.log("file retrieved: " + file)
+            console.log("file type: " + typeof file)
+            //  console.log("file string version: " + file.toString('base64'))
             var decrypted = decrypt(file,masterkey)
-            console.log(decrypted)
+            console.log(" decrypted file:" + decrypted)
+            console.log("file type: " + typeof decrypted)
         })
     }
 

@@ -18,34 +18,43 @@ export function encrypt(data){
         const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
 
         // encrpyt given text
-        const encrypted = Buffer.concat([cipher.update(data, 'utf8'), cipher.final()]);
-
+        const encrypted = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+        console.log('encrypted text: ' + encrypted)
         // extract the auth tag
         //const tag = cipher.getAuthTag();
+        const output = salt.toString('hex') + ':' + iv.toString('hex') + ':' + encrypted;
+        console.log('output: ' + output);
 
         // generate output
-        return [masterkey, Buffer.concat([salt, iv, encrypted]).toString('base64')];
+        return [masterkey, output];
 }
 
 export function decrypt(data, masterkey){
     try{
         // base64 decoding
-        const bData = Buffer.from(data, 'base64');
+        const bData = Buffer.from(data, 'hex');
+        console.log(bData.toString('hex'));
 
-        // convert data to buffers
-        const salt = bData.slice(0, 64);
-        const iv = bData.slice(64, 80);
-        const text = bData.slice(80);
-    
+        const parts = bData.split(':');
+        console.log("parts: " + parts);
+
+        const salt_r = new Buffer(parts[0], 'hex');
+        console.log(salt_r.toString('base64'));
+
+        const iv_r = new Buffer(parts[1], 'hex');
+        console.log(iv_r.toString('base64'));
+        
+        const text = parts[2];
+
         // derive key using; 32 byte key length
-        const key = crypto.pbkdf2Sync(masterkey, salt , 1000, 32, 'sha512');
+        const key_r = crypto.pbkdf2Sync(masterkey, salt_r , 1000, 32, 'sha512');
 
         // AES 256 GCM Mode
-        const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+        const decipher = crypto.createDecipheriv('aes-256-cbc', key_r, iv_r);
         //decipher.setAuthTag(tag);
     
         // encrypt the given text
-        const decrypted = decipher.update(text, 'binary', 'utf8') + decipher.final('utf8');
+        const decrypted = decipher.update(text, 'hex', 'utf8') + decipher.final('utf8');
     
         return decrypted;
     }
