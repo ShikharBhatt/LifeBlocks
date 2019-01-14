@@ -20,7 +20,7 @@ class Signin extends Component{
     render(){
         return(
             <div className="form-inline">
-                <h2>Sign Up</h2>
+                <h2>Sign-In</h2>
                 <div className="form-group">
 
                 {/* Sign Up  Form */}

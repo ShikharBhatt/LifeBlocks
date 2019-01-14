@@ -20,22 +20,19 @@ class Signup extends Component{
         event.preventDefault()
         console.log("Got aadhaar", this.state.aadhaar)
         firebaseApp.database().ref('/uidai/').orderByChild('aadhaar_no').equalTo(this.state.aadhaar).once('value').then(function(snapshot) {
-          // alert("Parent")
-           snapshot.forEach(function(child){
-               var value = child.val()
-              // alert("Child")
-               console.log(value)
-            //    this.setState({
-            //        phone:value.phone
-            //    })
+          
+        snapshot.forEach(function(child){
+            var value = child.val()
+
             window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container'); 
-            firebase.auth().signInWithPhoneNumber("+91"+value.phone, window.recaptchaVerifier)
-            .then(function(confirmationResult) { 
+
+            firebaseApp.auth().signInWithPhoneNumber("+91"+value.phone, window.recaptchaVerifier)
+                .then(function(confirmationResult) { 
                 window.confirmationResult = confirmationResult; 
-                //a(confirmationResult); 
-                })
+        
+            })
         })           
-          })
+})
 
     }
     myFunction = function() { 
