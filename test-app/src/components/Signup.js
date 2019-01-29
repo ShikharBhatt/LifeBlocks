@@ -87,11 +87,7 @@ class Signup extends Component{
             alert('login process successfull!\n redirecting');
             alert('<a href="javascript:alert(\'hi\');">alert</a>')
            
-            this.RecordUploaderContract.methods.link('7911755205').call(
-                {from:'0xFE4a659639fd0b385d852a8a6f57046Dc8a99fBE'}, function(error, x){
-                  //alert('Name: '+x[0] + '\nPhone:'+x[1]+'\nUser Address:'+x[2])
-                
-                })              
+                      
                 window.location.href="/signin";
             }, function(error) { 
             alert(error); 
