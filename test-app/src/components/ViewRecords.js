@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 // import '../css/oswald.css'
 // import '../css/open-sans.css'
-// import '../css/pure-min.css'
+import '../css/pure-min.css'
 import '../App.css'
 import ipfs from '../ipfs'
 import {decrypt} from '../crypto'
@@ -172,48 +172,10 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
                     <option value=""  disabled selected>Select Record</option>
        {this.createSelectList()}
                     </select>
+                    <br></br>
                     <input type='submit' />
                 </form>
-                {/* <form onSubmit={this.onSignUp} autoComplete="off">
-                  <label>Name:</label><br/> 
-                    <input 
-                      type='text' 
-                      name="name"
-                      value={this.state.name}
-                      onChange={this.handleSignUpChange}
-                      autoComplete="false" 
-                    required />
-                    <br />
-                    <label>Aadhaar Number :</label><br/> 
-                    <input 
-                      type='text'
-                      name="aadhaar"
-                      value={this.state.aadhaar}
-                      onChange={this.handleSignUpChange}
-                      autoComplete="false" 
-                    required/>
-                    <br />
-                    <label>Phone</label><br/> 
-                    <input 
-                      type='number' 
-                      name="phone"
-                      value={this.state.phone}
-                      onChange={this.handleSignUpChange}
-                      autoComplete="false" 
-                    required/>
-                    <br />
-                    <label>Password</label> <br/>
-                    <input 
-                      type='password' 
-                      name="password"
-                      value={this.state.password}
-                      onChange={this.handleSignUpChange}
-                      autoComplete="false" 
-                    required/>
-                    <br />
-                    
-                  <input type='submit' /><br/>
-                </form> */}
+                
                <p>Your Record:</p>
               <div id="itemPreview" ></div>
                </div>

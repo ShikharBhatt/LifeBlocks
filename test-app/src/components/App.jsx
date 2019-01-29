@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {logUser} from '../actions';
 import {browserHistory} from "react-router";
 import '../App.css';
+import '../css/pure-min.css';
 import {ViewRecords} from './ViewRecords';
 // import {Provider} from 'react-redux';
 // import {createStore} from 'redux';
@@ -41,18 +42,19 @@ class App extends Component{
     render(){
         console.log(this.props.user.aadhaar)
         return(
-            <div>
-            <div>App</div>
-            <div>My Aadhaar:{this.props.user.aadhaar}</div>
-            <button
-                className="btn btn-danger"
-                onClick={()=>this.SignOut()}
-            >
-
-           
+            <div className="App">
+        <nav className="navbar pure-menu pure-menu-horizontal">
+          <a href="#" className="pure-menu-heading pure-menu-link">User Application</a>
+          <a href="#" className="pure-menu-heading pure-menu-link">ID:{this.props.user.aadhaar}</a>
+          <a href="#" className="pure-menu-heading pure-menu-link" onClick={()=>this.SignOut()}>           
                 SignOut
-            </button>
+           </a>
+        </nav>
+            <div>
+            {/* <div>App</div>
+            <div>My Aadhaar:{this.props.user.aadhaar}</div> */}
             <ViewRecords/>
+            </div>
             </div>
         )
     }
