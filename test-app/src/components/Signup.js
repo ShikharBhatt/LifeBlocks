@@ -16,6 +16,7 @@ class Signup extends Component{
            
         }
         this.SignUp = this.SignUp.bind(this)
+        this.linkAadhaar = this.linkAadhaar.bind(this)
         this.myFunction = this.myFunction.bind(this)
     }
 
@@ -41,10 +42,11 @@ class Signup extends Component{
       instantiateContract() {
        
         const contractAddress = '0x0d41f1ea976b3a7a9371ec2ce4a5aafdbfb1aa31'
+        
         const ABI = [{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"login","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"key_ipfs","type":"string"}],"name":"keymap","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"link","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"ownerToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"aadhaarToOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_aadhaar","type":"uint256"}],"name":"addressLinked","type":"event"}]
-        //console.log('constract Address : ',contractAddress)
+        
         var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)
-        //console.log(RecordUploaderContract)
+        
         this.RecordUploaderContract = RecordUploaderContract
         
         this.state.web3.eth.getAccounts((error, accounts) => {
@@ -55,14 +57,16 @@ class Signup extends Component{
         })
         this.setState({ currentAddress: this.acc })  
 
-        //console.log(this.state.currentAddress)
+        //console.log(this.RecordUploaderContract)
      
       }
 
       
     SignUp(event){                      //function handling the signup event
+      
         event.preventDefault()
-        console.log("Got aadhaar", this.state.aadhaar)
+
+        //getting phone number for the entered aadhaar number
         firebaseApp.database().ref('/uidai/').orderByChild('aadhaar_no').equalTo(this.state.aadhaar).once('value').then(function(snapshot) {
         
         snapshot.forEach(function(child){
@@ -70,29 +74,59 @@ class Signup extends Component{
 
             window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container'); 
             
+            //send OTP to the phone number
             firebaseApp.auth().signInWithPhoneNumber("+91"+value.phone, window.recaptchaVerifier)
-                .then(function(confirmationResult) { 
+                .then(function(confirmationResult) { //wait for OTP verification
                 window.confirmationResult = confirmationResult; 
-        
+                
                 })
             })           
         })
 
     }
-    myFunction = function() { 
-            window.confirmationResult.confirm(document.getElementById("verificationcode").value) 
-            .then(function(result) {
-                //add the aadhaar to address mapping using SC
-             
-            alert('login process successfull!\n redirecting');
-            alert('<a href="javascript:alert(\'hi\');">alert</a>')
+
+    //link aadhaar to account address using Smart Contract
+    linkAadhaar(){
+        var success = 0
+        this.state.web3.eth.getAccounts((error, accounts) => {
+       
+            this.RecordUploaderContract.methods.link(this.state.aadhaar).send(
+                {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
+                  
+                if(!error)
+                {
+                   
+                    alert('Transaction Hash:'+txHash)
+                }
+                  
+                else
+                    console.log(error)
+                }) 
+            })
+    
+   
+        
+    }
+
+    //confirm OTP function and call to linkAadhaar function
+    myFunction = function() {
+         
+        let callLinkAadhaar = this.linkAadhaar        
+      
+        window.confirmationResult.confirm(document.getElementById("verificationcode").value) 
+            .then(function(result) {       
+            alert('signup process successfull!\n redirecting');
            
-                      
-                window.location.href="/signin";
-            }, function(error) { 
-            alert(error); 
-            }); 
-            };
+            callLinkAadhaar()
+                window.location.href = '/signin'
+
+            }, 
+
+            function(error) { 
+                alert(error); 
+            });
+             
+    };
 
 
     render(){
@@ -117,15 +151,20 @@ class Signup extends Component{
                         <input
                             className="btn btn-primary"
                             type="submit"
+                            
                         />  
                         
                     </form>
-                    <form>
-                    <input type="text" id="verificationcode"  />
-                        <input type="button" value="Submit" onClick={this.myFunction} />
-				</form>
-
+                    
+                    
                     <div id="recaptcha-container"></div>
+
+                    <div id="OTP">
+                        <form>
+                        <input type="text" id="verificationcode"  />
+                            <input type="button" value="Submit" onClick={this.myFunction} />
+                    </form>
+                    </div>
                     <div><Link to={'/signin'}>Already Signed Up? Sign In Here</Link></div>
                 </div>
             </div>
