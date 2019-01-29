@@ -14,6 +14,7 @@ class Signin extends Component{
 
     SignIn(event){                      //function handling the signup event
         event.preventDefault()
+        
         console.log("Got aadhaar", this.state.aadhaar)
     }
 

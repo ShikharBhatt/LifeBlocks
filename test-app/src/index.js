@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
-import {firebaseApp} from './firebase';
+//import {firebaseApp} from './firebase';
 import {Router, Route, browserHistory} from 'react-router';
 import './index.css';
 import App from './components/App';
@@ -25,8 +25,8 @@ const store = createStore(reducer)
 
 ReactDOM.render(
     <Provider store={store}>
-    <Router path="/" history={browserHistory}>
-        <Route path="/app" component={App} />
+    <Router path="/signup" history={browserHistory}>
+        <Route path="/app" component={App} default/>
         <Route path="/signin" component={Signin} />
         <Route path="/signup" component={Signup} />
     </Router>

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Link} from 'react-router';
 import {firebaseApp} from '../firebase';
 import * as firebase from 'firebase'
+import getWeb3 from '../utils/getWeb3'
 
 class Signup extends Component{
     constructor(props){
@@ -9,38 +10,89 @@ class Signup extends Component{
 
         this.state={            //declaring state variables
             aadhaar:"",
-            currenAddress:null,
+            web3:null,
+            currentAddress:null,
             phone:null
+           
         }
         this.SignUp = this.SignUp.bind(this)
         this.myFunction = this.myFunction.bind(this)
     }
 
+
+    componentWillMount() {
+        // Get network provider and web3 instance.
+        // See utils/getWeb3 for more info.
+    
+        getWeb3
+        .then(results => {
+          this.setState({
+            web3: results.web3
+          })
+    
+          // Instantiate contract once web3 provided.
+          this.instantiateContract()
+        })
+        .catch(() => {
+          console.log('Error finding web3.')
+        })
+      }
+    
+      instantiateContract() {
+       
+        const contractAddress = '0x0d41f1ea976b3a7a9371ec2ce4a5aafdbfb1aa31'
+        const ABI = [{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"login","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"key_ipfs","type":"string"}],"name":"keymap","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"link","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"ownerToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"aadhaarToOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_aadhaar","type":"uint256"}],"name":"addressLinked","type":"event"}]
+        //console.log('constract Address : ',contractAddress)
+        var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)
+        //console.log(RecordUploaderContract)
+        this.RecordUploaderContract = RecordUploaderContract
+        
+        this.state.web3.eth.getAccounts((error, accounts) => {
+            console.log(accounts[0]);
+            this.acc = accounts[0]
+            console.log(this.acc)
+            this.setState({ currentAddress: this.acc })  
+        })
+        this.setState({ currentAddress: this.acc })  
+
+        //console.log(this.state.currentAddress)
+     
+      }
+
+      
     SignUp(event){                      //function handling the signup event
         event.preventDefault()
         console.log("Got aadhaar", this.state.aadhaar)
         firebaseApp.database().ref('/uidai/').orderByChild('aadhaar_no').equalTo(this.state.aadhaar).once('value').then(function(snapshot) {
-          
+        
         snapshot.forEach(function(child){
             var value = child.val()
 
             window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container'); 
-
+            
             firebaseApp.auth().signInWithPhoneNumber("+91"+value.phone, window.recaptchaVerifier)
                 .then(function(confirmationResult) { 
                 window.confirmationResult = confirmationResult; 
         
-            })
-        })           
-})
+                })
+            })           
+        })
 
     }
     myFunction = function() { 
             window.confirmationResult.confirm(document.getElementById("verificationcode").value) 
-            .then(function(result) { 
+            .then(function(result) {
+                //add the aadhaar to address mapping using SC
+             
             alert('login process successfull!\n redirecting');
             alert('<a href="javascript:alert(\'hi\');">alert</a>')
-            window.location.href="/signin";
+           
+            this.RecordUploaderContract.methods.link('7911755205').call(
+                {from:'0xFE4a659639fd0b385d852a8a6f57046Dc8a99fBE'}, function(error, x){
+                  //alert('Name: '+x[0] + '\nPhone:'+x[1]+'\nUser Address:'+x[2])
+                
+                })              
+                window.location.href="/signin";
             }, function(error) { 
             alert(error); 
             }); 
