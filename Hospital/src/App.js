@@ -5,6 +5,8 @@ import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
+import getWeb3 from './utils/getWeb3'
+
 const Web3 = require('web3')
 const web3 = new Web3('http://localhost:8545')
 
@@ -34,9 +36,18 @@ class App extends Component {
   componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
+    getWeb3
+    .then(results => {
+      this.setState({
+        web3: results.web3
+      })
 
       // Instantiate contract once web3 provided.
       this.instantiateContract()
+    })
+    .catch(() => {
+      console.log('Error finding web3.')
+    })
   
   }
 
