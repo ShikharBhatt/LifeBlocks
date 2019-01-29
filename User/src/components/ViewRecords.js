@@ -4,7 +4,7 @@ import '../css/open-sans.css'
 import '../css/pure-min.css'
 import '../App.css'
 const Web3 = require('web3')
-const web3 = new Web3('http://localhost:8545')
+const web3 = new Web3('http://localhost:7545')
 import ipfs from '../ipfs'
 import {decrypt} from '../crypto'
 
@@ -23,7 +23,8 @@ export class ViewRecords extends Component {
         userAddress : '',
         recordsId :[],
         selectValue: '',
-        masterkey: ''
+        masterkey: '',
+        newHash:''
       };
   
  //     this.onSignUp = this.onSignUp.bind(this);
@@ -46,9 +47,20 @@ export class ViewRecords extends Component {
             console.log("file type: " + typeof file)
             //  console.log("file string version: " + file.toString('base64'))
             var decrypted = decrypt(file,masterkey)
+            this.setState({
+              newHash:decrypted
+            })
+// var data = [];
+// for (var i = 0; i < decrypted.length; i++){  
+//     data.push(decrypted.charCodeAt(i));
+// }
+
+//document.getElementById("itemPreview").src = "data:image/png;base64," + data
+
+document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
             console.log(" decrypted file:" + decrypted)
             console.log("file type: " + typeof decrypted)
-        })
+        }.bind(this))
     }
 
   
@@ -69,20 +81,20 @@ export class ViewRecords extends Component {
        */
 
 
-      const contractAddress = '0xC9a4459A515844CE981eD092E2c5401087c8e902'
+      const contractAddress = '0x83C7F9415C49eF48e51682c0feB4549bb465aB69'
       const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"}]
       //console.log('constract Address : ',contractAddress)
       var RecordUploaderContract = new web3.eth.Contract(ABI, contractAddress)
       //console.log(RecordUploaderContract)
       this.RecordUploaderContract = RecordUploaderContract
         
-      var add = '0xF1CB5385a4632bD7565E4bEFCdE129c4DF4d400f'
+     // var add = '0xF1CB5385a4632bD7565E4bEFCdE129c4DF4d400f'
         this.setState({
-            userAddress : add,
+            userAddress : "0xFE4a659639fd0b385d852a8a6f57046Dc8a99fBE",
             aadhaar : '1234567890'
         });
 
-        this.RecordUploaderContract.methods.retrieve(1234567890).call(
+        this.RecordUploaderContract.methods.retrieve(5361815322).call(
             {from:this.state.userAddress}, function(error, x){
                 
                 this.setState({
@@ -282,7 +294,7 @@ export class ViewRecords extends Component {
                   <input type='submit' /><br/>
                 </form> */}
                <p>Your Record:</p>
-              {/* <img src={`https://ipfs.io/ipfs/${this.state.ipfs}`} alt=""/> */}
+              <div id="itemPreview" ></div>
                </div>
             </div>
           </main>
