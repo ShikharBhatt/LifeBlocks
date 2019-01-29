@@ -9,7 +9,7 @@ import App from './components/App';
 import Signin from './components/Signin';
 import Signup from './components/Signup';
 import reducer from './reducers';
-import {logUser} from './actions';
+//import {logUser} from './actions';
 
 
 const store = createStore(reducer)
@@ -25,7 +25,7 @@ const store = createStore(reducer)
 
 ReactDOM.render(
     <Provider store={store}>
-    <Router path="/signup" history={browserHistory}>
+    <Router path="/" history={browserHistory}>
         <Route path="/app" component={App} default/>
         <Route path="/signin" component={Signin} />
         <Route path="/signup" component={Signup} />

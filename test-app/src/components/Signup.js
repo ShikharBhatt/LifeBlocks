@@ -87,25 +87,20 @@ class Signup extends Component{
 
     //link aadhaar to account address using Smart Contract
     linkAadhaar(){
-        var success = 0
         this.state.web3.eth.getAccounts((error, accounts) => {
        
             this.RecordUploaderContract.methods.link(this.state.aadhaar).send(
                 {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
                   
                 if(!error)
-                {
-                   
+                {                   
                     alert('Transaction Hash:'+txHash)
                 }
                   
                 else
                     console.log(error)
                 }) 
-            })
-    
-   
-        
+            })       
     }
 
     //confirm OTP function and call to linkAadhaar function
