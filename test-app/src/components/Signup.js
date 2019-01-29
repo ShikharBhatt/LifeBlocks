@@ -3,6 +3,7 @@ import {Link} from 'react-router';
 import {firebaseApp} from '../firebase';
 import * as firebase from 'firebase'
 import getWeb3 from '../utils/getWeb3'
+import '../App.css'
 
 class Signup extends Component{
     constructor(props){
