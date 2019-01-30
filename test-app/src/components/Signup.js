@@ -146,7 +146,24 @@ class Signup extends Component{
                         
                         <input
                             className="btn btn-primary"
-                            type="submit"
+                              // const contract = require('truffle-contract')
+    // const simpleStorage = contract(SimpleStorageContract)
+    // simpleStorage.setProvider(this.state.web3.currentProvider)
+  
+    // // Get accounts
+    // this.state.web3.eth.getAccounts((error, accounts) => {
+    //   simpleStorage.deployed().then((instance) => {
+    //     this.simpleStorageInstance = instance
+    //     this.setState({ account: accounts[0] })
+    //     // Get the value from the contract to prove it worked.
+    //     return this.simpleStorageInstance.get.call(accounts[0])
+    //   }).then((ipfsHash) => {
+    //     // Update state with the result.
+    //     return this.setState({ ipfsHash })
+    //   })
+    // })
+  //}
+  type="submit"
                             
                         />  
                         
@@ -155,12 +172,17 @@ class Signup extends Component{
                     
                     <div id="recaptcha-container"></div>
 
-                    <div id="OTP">
+                   
                         <form>
                         <input type="text" id="verificationcode"  />
-                            <input type="button" value="Submit" onClick={this.myFunction} />
+                            <input
+                            className="jj" 
+                            type="button" 
+                            className="btn btn-primary" 
+                            value="Submit" onClick={this.myFunction} 
+                        />
                     </form>
-                    </div>
+                  
                     <div><Link to={'/signin'}>Already Signed Up? Sign In Here</Link></div>
                 </div>
             </div>

@@ -114,6 +114,18 @@ input[type=text], select ,[type=number],[type=password]{
   box-sizing: border-box;
 }
 
+.jj{
+  width: 40%;
+  background-color: #2C3e5e;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+}
+
 input[type=submit] {
   width: 40%;
   background-color: #2C3e5e;
