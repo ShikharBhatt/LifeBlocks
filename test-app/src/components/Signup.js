@@ -154,7 +154,7 @@ class Signup extends Component{
                     
                     <div id="recaptcha-container"></div>
 
-                    <div id="OTP">
+                    <div id="OTP" style="hidden">
                         <form>
                         <input type="text" id="verificationcode"  />
                             <input type="button" value="Submit" onClick={this.myFunction} />
