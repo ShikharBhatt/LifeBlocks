@@ -1,0 +1,7 @@
+{ address: '0x5578Ec2cb3994BC87823802071241726EBC40FDF',
+  privateKey: '0x55f8f475ba59b726f4b1edf4a90ac326f752016c41c35a95004bd1480ca08210',
+  signTransaction: [Function],
+  sign: [Function],
+  encrypt: [Function] }
+
+// export privateKey in shell
