@@ -8,7 +8,7 @@ import './App.css'
 import getWeb3 from './utils/getWeb3'
 
 const Web3 = require('web3')
-const web3 = new Web3('http://localhost:8545')
+const web3 = new Web3('http://localhost:7545')
 
 console.log(web3)
 
@@ -58,7 +58,7 @@ class App extends Component {
      * Normally these functions would be called in the context of a
      * state management library, but for convenience I've placed them here.
      */
-    const contractAddress = '0xC9a4459A515844CE981eD092E2c5401087c8e902'
+    const contractAddress = '0x83C7F9415C49eF48e51682c0feB4549bb465aB69'
     const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"}]    //console.log('constract Address : ',contractAddress)
     var RecordUploaderContract = new web3.eth.Contract(ABI, contractAddress)
     //console.log(RecordUploaderContract)
@@ -124,14 +124,14 @@ class App extends Component {
         masterkey);
   
         let encoded_tx = txBuilder.encodeABI();
-        var addrHosp = "0x1723644554461041bA53fdfCDe6B3fd6C63C165F"
-        var privHosp = "0x90ba9023601f8c1e97da1f59058a484389f320d565f975dd6471f3d345434f12"
+        var addrHosp = "0xFB23cd312F5Da28dAeD5E6c7D76DA1c2Cf9c977F"
+        var privHosp = "0x05dd9541d286146c393a60ea7f23d7f8ed14abd84728c00419d9cfbb2493f140"
         web3.eth.getTransactionCount(addrHosp, (err , txCount) => {
           //Transaction Object
           const txObject = {
               nonce : web3.utils.toHex(txCount),
               from:addrHosp,
-              to: "0xC9a4459A515844CE981eD092E2c5401087c8e902",         //all paramters should be in Hex
+              to: "0x83C7F9415C49eF48e51682c0feB4549bb465aB69",         //all paramters should be in Hex
               gasLimit : web3.utils.toHex(4700000),
               gasPrice : web3.utils.toHex(web3.utils.toWei('0','gwei')),
               data : encoded_tx
@@ -159,14 +159,12 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-          <a href="#" className="pure-menu-heading pure-menu-link">IPFS File Upload DApp</a>
+          <a href="#" className="pure-menu-heading pure-menu-link">Hospital Record Upload</a>
         </nav>
 
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1">
-              <h1>Your Image</h1>
-              <p>This image is stored on IPFS & The Ethereum Blockchain!</p>
               <h2>My Hospital</h2>
               <form onSubmit={this.onSubmit} >
                 <label>Enter User Aadhaar :</label><br/> 

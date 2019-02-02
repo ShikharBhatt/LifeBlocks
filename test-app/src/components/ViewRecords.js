@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import '../css/oswald.css'
-import '../css/open-sans.css'
+// import '../css/oswald.css'
+// import '../css/open-sans.css'
 import '../css/pure-min.css'
 import '../App.css'
-const Web3 = require('web3')
-const web3 = new Web3('http://localhost:7545')
 import ipfs from '../ipfs'
 import {decrypt} from '../crypto'
+const Web3 = require('web3')
+const web3 = new Web3('http://localhost:7545')
 
 export class ViewRecords extends Component {
     constructor(props) {
@@ -123,85 +123,6 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
 
         
     }
-  
-    // handleSignUpChange(event){
-      
-    //   this.setState({
-    //     [event.target.name] : event.target.value,
-    //   });
-    // }
-  
-    // onSignUp(event){
-    //   event.preventDefault();
-    //  alert('Name : '+ this.state.name+ '\nAadhaar : '+this.state.aadhaar +'\nPassword :' + this.state.password)
-  
-    //   var passHash = web3.utils.keccak256(this.state.password)  //generate hash for the password
-  
-    //   alert('Pass hash : '+ passHash)
-  
-  
-    // var result = web3.eth.accounts.create()   //create the account for the user
-    //   this.setState({
-    //     password: passHash,
-    //   });
-    //  this.publicKey = result.address
-    
-    //  console.log('Public Key : '+ result.address + '\nPrivate key:' + result.privateKey)
-    
-    //   const txBuilder = this.UserDetailsContract.methods.setInfo(
-    //     this.state.aadhaar,
-    //     this.state.name,
-    //     this.state.phone,
-    //     this.state.password);
-  
-    //     let encoded_tx = txBuilder.encodeABI();
-  
-    //     web3.eth.getTransactionCount(result.address, (err , txCount) => {
-    //       //Transaction Object
-    //       const txObject = {
-    //           nonce : web3.utils.toHex(txCount),
-    //           from:result.address,
-    //           to: "0x0D41F1ea976B3a7A9371EC2ce4A5AAfdBfb1aa31",         //all paramters should be in Hex
-    //           gasLimit : web3.utils.toHex(4700000),
-    //           gasPrice : web3.utils.toHex(web3.utils.toWei('0','gwei')),
-    //           data : encoded_tx
-    //       }
-    //       alert(result.privateKey)
-    //       web3.eth.accounts.signTransaction(txObject, result.privateKey, function (error, signedTx) {
-    //         if (error) {
-    //         console.log(error);
-    //         // handle error
-    //     } else {
-    // web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-    //         .on('receipt', function (receipt) {
-    //             console.log(receipt.transactionHash)
-    //      })
-    //     }    
-     
-    //       })
-    //   })
-      
-    //   this.publicKey = ''
-    //   this.setState({
-    //     name : '',
-    //     password: '',
-    //     aadhaar : '',
-    //     phone : '',
-    //   });
-    // }
-  
-    
-    // onSubmit(event) {
-  
-    //   event.preventDefault()
-    
-    //   this.UserDetailsContract.methods.getInfo(1234567890).call(
-    //     {from:this.publicKey}, function(error, x){
-    //       alert('Name: '+x[0] + '\nPhone:'+x[1]+'\nUser Address:'+x[2])
-        
-    //     })  
-    // }
-  
     createSelectList(){
     
      //var x = document.getElementById("mySelect");
@@ -251,48 +172,10 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
                     <option value=""  disabled selected>Select Record</option>
        {this.createSelectList()}
                     </select>
+                    <br></br>
                     <input type='submit' />
                 </form>
-                {/* <form onSubmit={this.onSignUp} autoComplete="off">
-                  <label>Name:</label><br/> 
-                    <input 
-                      type='text' 
-                      name="name"
-                      value={this.state.name}
-                      onChange={this.handleSignUpChange}
-                      autoComplete="false" 
-                    required />
-                    <br />
-                    <label>Aadhaar Number :</label><br/> 
-                    <input 
-                      type='text'
-                      name="aadhaar"
-                      value={this.state.aadhaar}
-                      onChange={this.handleSignUpChange}
-                      autoComplete="false" 
-                    required/>
-                    <br />
-                    <label>Phone</label><br/> 
-                    <input 
-                      type='number' 
-                      name="phone"
-                      value={this.state.phone}
-                      onChange={this.handleSignUpChange}
-                      autoComplete="false" 
-                    required/>
-                    <br />
-                    <label>Password</label> <br/>
-                    <input 
-                      type='password' 
-                      name="password"
-                      value={this.state.password}
-                      onChange={this.handleSignUpChange}
-                      autoComplete="false" 
-                    required/>
-                    <br />
-                    
-                  <input type='submit' /><br/>
-                </form> */}
+                
                <p>Your Record:</p>
               <div id="itemPreview" ></div>
                </div>
@@ -303,3 +186,5 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
     }
   }
   
+
+  export default ViewRecords;

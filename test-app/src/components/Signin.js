@@ -3,6 +3,11 @@ import {Link} from 'react-router';
 import {firebaseApp} from '../firebase';
 import * as firebase from 'firebase'
 import getWeb3 from '../utils/getWeb3'
+import {connect} from 'react-redux';
+import {logUser} from '../actions';
+import '../App.css'
+import {browserHistory} from "react-router";
+
 
 class Signin extends Component{
     constructor(props){
@@ -23,7 +28,7 @@ class Signin extends Component{
     componentWillMount() {
         // Get network provider and web3 instance.
         // See utils/getWeb3 for more info.
-    
+        alert(this.props.user.aadhaar)
         getWeb3
         .then(results => {
           this.setState({
@@ -77,9 +82,9 @@ class Signin extends Component{
         //     })           
         // })
 
-        this.state.web3.eth.getAccounts((error, accounts) => {
+        this.state.web3.eth.getAccounts((error, accounts) => {  //get the account from metamask
             this.RecordUploaderContract.methods.login(this.state.aadhaar).call(
-                {from:accounts[0]},function(error, x){
+                {from:accounts[0]},function(error, x){  //check if account exists
                   if(error){
                     alert('Wrong')
                     return
@@ -87,19 +92,20 @@ class Signin extends Component{
                   if(x === true){
                     alert('Login Successfull')
                     this.RecordUploaderContract.methods.getAddress(this.state.aadhaar).call(
-                        {from:accounts[0]},function(error, add){
+                        {from:accounts[0]},function(error, add){ //get account address from SC
                           if(error){
                             alert('Wrong')
                             return
                           }
                           if(add === accounts[0]){
                             alert('Login Successfull')
-                            window.location.href='/app'
-                          }
+                            this.props.dispatch(logUser(this.state.aadhaar))    //if login successful then store aadhaar in app state
+                            browserHistory.push("/app");        // go to app page
+                        }
                           else{
                             alert('Details Incorrect')
                           }
-                       })
+                       }.bind(this))
                   }
                   else{
                     alert('Details Incorrect')
@@ -219,8 +225,8 @@ class Signin extends Component{
                             className="form-control"
                             type="text"
                             placeholder="Aadhaar Number" 
-                            // pattern=".{10,10}"
-                            // min="0000000001"
+                            pattern=".{10,10}"
+                            min="0000000001"
                             onChange={event => this.setState({aadhaar:event.target.value})}
                             required={true}
                         />
@@ -236,12 +242,22 @@ class Signin extends Component{
                     
                     <div id="recaptcha-container"></div>
 
-                    <div id="OTP">
-                        <form>
-                        <input type="text" id="verificationcode"  />
-                            <input type="button" value="Submit" onClick={this.myFunction} />
+                    
+                    <form>
+                            <input 
+                                type="text" 
+                                id="verificationcode"  
+                                pattern=".{6,6}"
+                                min="000001"
+                                placeholder="Enter OTP"
+                            />
+                            <input 
+                                className="btn btn-primary" 
+                                type="submit" 
+                                onClick={this.myFunction} 
+                            />
                     </form>
-                    </div>
+                  
                     <div><Link to={'/signup'}>New User? Sign Up Here</Link></div>
                 </div>
             </div>
@@ -249,4 +265,12 @@ class Signin extends Component{
     }
 }
 
-export default Signin;
+
+function mapStateToProps(state){
+    
+    return{
+        user:state
+    }
+}
+
+export default connect(mapStateToProps, null)(Signin);
