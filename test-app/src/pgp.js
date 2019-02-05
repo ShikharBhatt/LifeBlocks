@@ -5,13 +5,22 @@ const openpgp = require('openpgp');
 //openpgp.initWorker({ path:'openpgp.worker.js' });
 
 export function registerkey(address,seedphrase) {
-    const {privateKeyArmored, publicKeyArmored} = openpgp.generateKey({
+    
+    let privateKeyArmored,publicKeyArmored;
+
+    openpgp.generateKey({
         userIds: [{address}],
         curve: 'p256',
         passphrase: seedphrase
+    }).then((key) => {
+        privateKeyArmored = key.privateKeyArmored;
+        publicKeyArmored = key.publicKeyArmored;
     })
 
+    console.log("private key: "+privateKeyArmored)
+    console.log("public key: "+publicKeyArmored)
     const pgpkeys = {privateKeyArmored, publicKeyArmored};
+    console.log("pgpkeys: "+pgpkeys)
 
     const ipfsHash = ipfs.add(JSON.stringify(pgpkeys));
 

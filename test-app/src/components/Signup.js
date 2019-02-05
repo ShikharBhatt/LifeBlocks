@@ -91,8 +91,9 @@ class Signup extends Component{
     linkAadhaar(){
         this.state.web3.eth.getAccounts((error, accounts) => {
 
-            let ipfsHash = registerkey(accounts[0],"kailash_chutiya_hai")
+            let ipfsHash = registerkey(accounts[0],"create_keypair")
             console.log("ipfs: "+ipfsHash);
+            alert("ipfs: "+ipfsHash)
             // this.RecordUploaderContract.methods.link(this.state.aadhaar).send(
             //     {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
                   
@@ -117,8 +118,8 @@ class Signup extends Component{
             alert('signup process successfull!\n redirecting');
            
             callLinkAadhaar()
-                window.location.href = '/signin'
-
+                //window.location.href = '/signin'
+                alert("success")
             }, 
 
             function(error) { 
