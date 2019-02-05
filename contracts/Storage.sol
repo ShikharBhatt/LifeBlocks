@@ -10,7 +10,6 @@ contract userDetailsInterface{
 contract Storage{
 
     struct Record{
-        string name;
         string ipfsHash;
         string rtype;
         address Hospital;
@@ -29,10 +28,10 @@ contract Storage{
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
     
 
-    function upload(uint _aadhar, string _ipfsHash, string _type, string _name) public{
+    function upload(uint _aadhar,string _ipfsHash,string _type) public{
         //add require condition to check if address is of type hospital
        address addr = userdetails.getAddress(_aadhar);
-       uint id = records.push(Record(_name,_ipfsHash,_type,msg.sender));
+       uint id = records.push(Record(_ipfsHash,_type,msg.sender));
        RecordtoOwner[id] = addr;
        OwnerRecordCount[addr]++;
     } 
@@ -50,7 +49,7 @@ contract Storage{
         return recordId;
     }
 
-    function viewRecord(uint i) external view returns(string, string, string, address){
-        return (records[i].name,records[i].ipfsHash,records[i].rtype,records[i].Hospital,records[i].masterkey);
+    function viewRecord(uint i) external view returns(string, string, address){
+        return (records[i].ipfsHash,records[i].rtype,records[i].Hospital,records[i].masterkey);
     }
 }
