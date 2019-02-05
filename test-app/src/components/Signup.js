@@ -4,6 +4,7 @@ import {firebaseApp} from '../firebase';
 import * as firebase from 'firebase'
 import getWeb3 from '../utils/getWeb3'
 import '../App.css'
+import {registerkey} from '../pgp'
 
 class Signup extends Component{
     constructor(props){
@@ -89,19 +90,21 @@ class Signup extends Component{
     //link aadhaar to account address using Smart Contract
     linkAadhaar(){
         this.state.web3.eth.getAccounts((error, accounts) => {
-       
-            this.RecordUploaderContract.methods.link(this.state.aadhaar).send(
-                {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
+
+            let ipfsHash = registerkey(accounts[0],"kailash_chutiya_hai")
+            console.log("ipfs: "+ipfsHash);
+            // this.RecordUploaderContract.methods.link(this.state.aadhaar).send(
+            //     {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
                   
-                if(!error)
-                {                   
-                    alert('Transaction Hash:'+txHash)
-                }
+            //     if(!error)
+            //     {                   
+            //         alert('Transaction Hash:'+txHash)
+            //     }
                   
-                else
-                    console.log(error)
-                }) 
-            })       
+            //     else
+            //         console.log(error)
+            //     }) 
+             })       
     }
 
     //confirm OTP function and call to linkAadhaar function
@@ -120,7 +123,7 @@ class Signup extends Component{
 
             function(error) { 
                 alert(error); 
-            });
+            })
              
     };
 
