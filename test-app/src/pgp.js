@@ -4,27 +4,38 @@ import ipfs from './ipfs'
 const openpgp = require('openpgp');
 //openpgp.initWorker({ path:'openpgp.worker.js' });
 
-export function registerkey(address,seedphrase) {
+export const registerkey = async(address,seedphrase,callback) => {
     
-    let privateKeyArmored,publicKeyArmored;
-
-    openpgp.generateKey({
+    const {privateKeyArmored,publicKeyArmored} = await openpgp.generateKey({
         userIds: [{address}],
         curve: 'p256',
         passphrase: seedphrase
-    }).then((key) => {
-        privateKeyArmored = key.privateKeyArmored;
-        publicKeyArmored = key.publicKeyArmored;
     })
 
     console.log("private key: "+privateKeyArmored)
     console.log("public key: "+publicKeyArmored)
     const pgpkeys = {privateKeyArmored, publicKeyArmored};
+    console.log("pgprivate: "+pgpkeys.privateKeyArmored)
+    console.log("pgpublic: "+pgpkeys.publicKeyArmored)    
     console.log("pgpkeys: "+pgpkeys)
+    let test = JSON.stringify(pgpkeys);
+    console.log("test: "+test)
+    var buffer = Buffer(test)
+    console.log("Buffer: "+buffer)
 
-    const ipfsHash = ipfs.add(JSON.stringify(pgpkeys));
-
-    return ipfsHash;
+    //let ipfsHash;
+    ipfs.files.add(buffer, (error, result) => {
+        if(error){
+            console.log(error)
+            return "error"
+        }
+        let ipfsHash = result[0].hash
+        console.log("in add: "+ipfsHash)
+        //return ipfsHash
+        callback(ipfsHash);
+    });
+    //console.log("out add: "+ipfsHash);
+    //return ipfsHash;
 }
 
 // function getkeys(address) {
