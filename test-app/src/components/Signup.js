@@ -50,6 +50,7 @@ class Signup extends Component{
         var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)
         
         this.RecordUploaderContract = RecordUploaderContract
+        console.log("contract:"+this.RecordUploaderContract)
         
         this.state.web3.eth.getAccounts((error, accounts) => {
             console.log(accounts[0]);
@@ -94,22 +95,29 @@ class Signup extends Component{
             registerkey(accounts[0],"create_keypair",function(ipfsHash){
                 console.log("callback ipfs: "+ipfsHash);
                 alert("callback ipfs: "+ipfsHash) 
-            })
-            
-            // console.log("ipfs: "+ipfsHash);
-            // alert("ipfs: "+ipfsHash)
-            // this.RecordUploaderContract.methods.link(this.state.aadhaar).send(
-            //     {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
-                  
-            //     if(!error)
-            //     {                   
-            //         alert('Transaction Hash:'+txHash)
-            //     }
-                  
-            //     else
-            //         console.log(error)
-            //     }) 
-             })       
+                
+                //transaction to link aadhaar card to address
+                this.RecordUploaderContract.methods.link(this.state.aadhaar).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
+                    if(!error)  {
+                        console.log("aadhaar link tx: "+txHash)                   
+                        alert('Transaction Hash:'+txHash)
+                    }
+                    else
+                        console.log(error)
+                    })
+                
+                //transaction to link address to pgp keyfile on ipfs
+                this.RecordUploaderContract.methods.keymap(ipfsHash).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
+                    if(!error){
+                        console.log("pgp key link tx: "+txHash)
+                        alert("pgp key link tx: "+txHash)
+                    }
+                    else
+                        console.log(error)
+                })
+            }.bind(this))
+
+        })       
     }
 
     //confirm OTP function and call to linkAadhaar function
