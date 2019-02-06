@@ -16,7 +16,7 @@ import reducer from './reducers';
 const store = createStore(reducer)
 
 var currentState = store.getState()
-alert(currentState.aadhaar)
+alert("index.js")
 if(currentState.aadhaar === null){
     // store.dispatch(logUser(aadhaar))
     browserHistory.replace('/signin')
