@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.24;
 
 import "./UserDetails.sol";
 
@@ -12,6 +12,7 @@ contract Storage{
     struct Record{
         string ipfsHash;
         string rtype;
+        string rname;
         address Hospital;
         string masterkey;
     }
@@ -22,16 +23,16 @@ contract Storage{
     mapping(uint => address) public RecordtoOwner;
     
     mapping(address => uint) public OwnerRecordCount;
-    
+  
     //enter deployed userDetails contract Address here
-    address userDetailsInterfaceAddress = "0x223Ea4EF697297f9109ed187A2139746A94D00c5"; 
+    address userDetailsInterfaceAddress = 0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20; 
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
     
 
-    function upload(uint _aadhar,string _ipfsHash,string _type) public{
+    function upload(uint _aadhar, string _ipfsHash, string _type, string _name, string _masterkey) public{
         //add require condition to check if address is of type hospital
        address addr = userdetails.getAddress(_aadhar);
-       uint id = records.push(Record(_ipfsHash,_type,msg.sender));
+       uint id = records.push(Record(_ipfsHash,_type,_name,msg.sender,_masterkey));
        RecordtoOwner[id] = addr;
        OwnerRecordCount[addr]++;
     } 
@@ -49,7 +50,7 @@ contract Storage{
         return recordId;
     }
 
-    function viewRecord(uint i) external view returns(string, string, address){
-        return (records[i].ipfsHash,records[i].rtype,records[i].Hospital,records[i].masterkey);
+    function viewRecord(uint i) external view returns(string, string, string, address, string){
+        return (records[i].ipfsHash,records[i].rtype,records[i].rname,records[i].Hospital,records[i].masterkey);
     }
 }
