@@ -26,6 +26,7 @@ class App extends Component {
       account: null,
       currentAccount:null,
       userAddress : '',
+      rname:''
     };
     
     this.captureFile = this.captureFile.bind(this);
@@ -58,8 +59,9 @@ class App extends Component {
      * Normally these functions would be called in the context of a
      * state management library, but for convenience I've placed them here.
      */
-    const contractAddress = '0x83C7F9415C49eF48e51682c0feB4549bb465aB69'
-    const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"}]    //console.log('constract Address : ',contractAddress)
+    const contractAddress = '0x78478E7666BCB38B2DdEddfE7cb0BA152301Df07'
+    const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"rname","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_name","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
+    //console.log('constract Address : ',contractAddress)
     var RecordUploaderContract = new web3.eth.Contract(ABI, contractAddress)
     //console.log(RecordUploaderContract)
     this.RecordUploaderContract = RecordUploaderContract
@@ -121,6 +123,7 @@ class App extends Component {
         this.state.aadhaar,
         result[0].hash,
         this.state.type,
+        this.state.rname,
         masterkey);
   
         let encoded_tx = txBuilder.encodeABI();
@@ -131,7 +134,7 @@ class App extends Component {
           const txObject = {
               nonce : web3.utils.toHex(txCount),
               from:addrHosp,
-              to: "0x83C7F9415C49eF48e51682c0feB4549bb465aB69",         //all paramters should be in Hex
+              to: "0x78478E7666BCB38B2DdEddfE7cb0BA152301Df07",         //all paramters should be in Hex
               gasLimit : web3.utils.toHex(4700000),
               gasPrice : web3.utils.toHex(web3.utils.toWei('0','gwei')),
               data : encoded_tx
@@ -178,7 +181,16 @@ class App extends Component {
                   <br /><br/> 
                   <label>Upload Record:</label><br/>
                 <input type='file' onChange={this.captureFile} />
-                <br /><br/> 
+                <br /><br/>
+                <label>Enter Name of Record :</label><br/> 
+                  <input 
+                    type='text' 
+                    name="rname"
+                    value={this.state.rname}
+                    onChange={this.handleInputChange}
+                    autoComplete="false" 
+                  required/>
+                  <br/><br/> 
                 <label>Enter Type of Record :</label><br/> 
                   <input 
                     type='text' 
