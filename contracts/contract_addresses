@@ -1,0 +1,5 @@
+curl --data '{"method":"eth_getTransactionReceipt","params":["tx-hash"],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:7545
+--------------------------------------------------------
+userdetails address: 0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20
+--------------------------------------------------------
+storage address:
