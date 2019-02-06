@@ -28,7 +28,7 @@ class Signin extends Component{
     componentWillMount() {
         // Get network provider and web3 instance.
         // See utils/getWeb3 for more info.
-        alert(this.props.user.aadhaar)
+       // alert(this.props.user.aadhaar)
         getWeb3
         .then(results => {
           this.setState({
@@ -179,7 +179,7 @@ class Signin extends Component{
             }, 
 
             function(error) { 
-                alert(error); 
+               alert(error); 
             })
                 
     }

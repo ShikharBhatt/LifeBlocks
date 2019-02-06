@@ -14,14 +14,12 @@ export function encrypt(data){
         // key geneartion using 1000 rounds of pbkdf2
         const key = crypto.pbkdf2Sync(masterkey, salt, 1000, 32, 'sha512');
         console.log('key: ' + key.toString('base64'));
-        // create Cipher instance of AES 256 GCM mode
+        // create Cipher instance of AES 256 CBC mode
         const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
 
         // encrpyt given text
         const encrypted = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
         console.log('encrypted text: ' + encrypted)
-        // extract the auth tag
-        //const tag = cipher.getAuthTag();
         const output = salt.toString('hex') + ':' + iv.toString('hex') + ':' + encrypted;
         console.log('output: ' + output);
 

@@ -4,6 +4,7 @@ import {firebaseApp} from '../firebase';
 import * as firebase from 'firebase'
 import getWeb3 from '../utils/getWeb3'
 import '../App.css'
+import {registerkey} from '../pgp'
 
 class Signup extends Component{
     constructor(props){
@@ -42,13 +43,14 @@ class Signup extends Component{
     
       instantiateContract() {
        
-        const contractAddress = '0x0D41F1ea976B3a7A9371EC2ce4A5AAfdBfb1aa31'
+        const contractAddress = '0x78478e7666bcb38b2ddeddfe7cb0ba152301df07'
         
         const ABI = [{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"login","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"aadhaarToAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_ipfskey","type":"string"}],"name":"keymap","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"addressToAadhaar","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"link","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"ownerToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_aadhaar","type":"uint256"}],"name":"addressLinked","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_ipfshash","type":"string"}],"name":"keyLinked","type":"event"}]
         
         var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)
         
         this.RecordUploaderContract = RecordUploaderContract
+        console.log("contract:"+this.RecordUploaderContract)
         
         this.state.web3.eth.getAccounts((error, accounts) => {
             console.log(accounts[0]);
@@ -89,21 +91,35 @@ class Signup extends Component{
     //link aadhaar to account address using Smart Contract
     linkAadhaar(){
         this.state.web3.eth.getAccounts((error, accounts) => {
-       
-            this.RecordUploaderContract.methods.link(this.state.aadhaar).send(
-                {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
-                  
-                if(!error)
-                {                   
-                    alert('Transaction Hash:'+txHash)
-                    alert('signup process successfull!\n redirecting');
-           
-                }
-                  
-                else
-                    console.log(error)
-                }) 
-            })       
+
+
+            registerkey(accounts[0],"create_keypair",function(ipfsHash){
+                console.log("callback ipfs: "+ipfsHash);
+                alert("callback ipfs: "+ipfsHash) 
+                
+                //transaction to link aadhaar card to address
+                this.RecordUploaderContract.methods.link(this.state.aadhaar).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
+                    if(!error)  {
+                        console.log("aadhaar link tx: "+txHash)                   
+                        alert('Transaction Hash:'+txHash)
+                    }
+                    else
+                        console.log(error)
+                    })
+                
+                //transaction to link address to pgp keyfile on ipfs
+                this.RecordUploaderContract.methods.keymap(ipfsHash).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){
+                    if(!error){
+                        console.log("pgp key link tx: "+txHash)
+                        alert("pgp key link tx: "+txHash)
+                    }
+                    else
+                        console.log(error)
+                })
+            }.bind(this))
+
+        })       
+
     }
 
     //confirm OTP function and call to linkAadhaar function
@@ -115,13 +131,13 @@ class Signup extends Component{
             .then(function(result) {       
            
             callLinkAadhaar()
-               // window.location.href = '/signin'
-
+                //window.location.href = '/signin'
+                alert("success")
             }, 
 
             function(error) { 
                 alert(error); 
-            });
+            })
              
     };
 
