@@ -8,6 +8,8 @@ import {decrypt} from '../crypto'
 const Web3 = require('web3')
 const web3 = new Web3('http://localhost:7545')
 
+
+
 export class ViewRecords extends Component {
     constructor(props) {
       super(props)
@@ -24,7 +26,8 @@ export class ViewRecords extends Component {
         recordsId :[],
         selectValue: '',
         masterkey: '',
-        newHash:''
+        newHash:'',
+        value:''
       };
   
  //     this.onSignUp = this.onSignUp.bind(this);
@@ -34,8 +37,33 @@ export class ViewRecords extends Component {
         this.onSubmit = this.onSubmit.bind(this);
         this.Change = this.Change.bind(this);
         this.view = this.view.bind(this);
+        this.TableBody = this.TableBody.bind(this);
       }
+    TableBody = (props) => {
+        const rows = props.recordsId.map((row, index) => {
+            return (
+                <tr key={index}>
+                    <td>{row}</td>
+                    {/* <td>{row.job}</td> */}
+                    <td><button
+                            value={row} 
+                        onClick=
+                            {() => {
+                                this.setState({value:row}, function(){
+                                    this.onSubmit()
 
+                                })
+                                
+                            }}
+                        
+                        >View</button></td>
+                </tr>
+                );
+        
+        });
+    
+        return <tbody>{rows}</tbody>
+    }
     
     view(ipfs_hash,masterkey)
     {
@@ -108,8 +136,12 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
             
     }
   
-    onSubmit(event){
-        event.preventDefault();
+    onSubmit(){
+//        event.preventDefault();
+// this.setState({
+//     value:val
+// })
+        alert("Value:"+this.state.value)
         this.RecordUploaderContract.methods.viewRecord(this.state.value).call(
             {from:this.state.userAddress}, function(error, x){
               alert('called')
@@ -144,7 +176,8 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
      return items;
      
  }  
-    
+  
+ 
     
     Change(event){
         this.setState({
@@ -163,11 +196,7 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
               <div className="pure-u-1-1">
 
                 <h2>View My Health Records</h2>
-                <form onSubmit={this.onSubmit}>
-                    {/* <select id="mySelect" name="mySelect"  value={this.state.value} onChange={this.Change}>
-                        <option value=""  disabled selected>Select Record</option>
-                                           
-                    </select> */}
+                {/* <form onSubmit={this.onSubmit}>
                     <select id="select" value={this.state.value} onChange={this.Change}>
                     <option value=""  disabled selected>Select Record</option>
        {this.createSelectList()}
@@ -175,7 +204,8 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
                     <br></br>
                     <input type='submit' />
                 </form>
-                
+                 */}
+                 <this.TableBody recordsId={this.state.recordsId}/>
                <p>Your Record:</p>
               <div id="itemPreview" ></div>
                </div>
