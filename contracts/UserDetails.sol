@@ -15,18 +15,27 @@ contract userDetails{
     mapping(address => string) public ownerToKey;
      
     // function to link aadhaar card to user's ethereum address  
-    function link(uint _aadhaar) public{
+    function link(uint _aadhaar, string _ipfskey) public{
         //ensure user can call this function only once
         //enusres one to one mapping between user's address and aadhaar card
         require(aadhaarToAddress[_aadhaar] == 0x0000000000000000000000000000000000000000,"Aadhar Card already exists");
         require(addressToAadhaar[msg.sender] == 0,"Address already used");
-        
+        require(bytes(ownerToKey[msg.sender]).length == 0,"Key pair for user already exists");
+
         //map msg sender to aadhaar card no.
         aadhaarToAddress[_aadhaar] = msg.sender;
         addressToAadhaar[msg.sender] = _aadhaar;
         
         //fire event for logging
         emit addressLinked(msg.sender, _aadhaar);
+
+
+        //map address to key file on ipfs
+        ownerToKey[msg.sender] = _ipfskey;
+
+        //fire event for logging
+        emit keyLinked(msg.sender, _ipfskey);
+        
     }
     
     function login(uint _aadhaar) external view returns(bool){
@@ -42,12 +51,6 @@ contract userDetails{
     }
 
     function keymap(string _ipfskey) public{
-        require(bytes(ownerToKey[msg.sender]).length == 0,"Key pair for user already exists");
-
-        //map address to key file on ipfs
-        ownerToKey[msg.sender] = _ipfskey;
-
-        //fire event for logging
-        emit keyLinked(msg.sender, _ipfskey);
+        
     } 
 }
