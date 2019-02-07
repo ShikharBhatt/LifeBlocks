@@ -2,7 +2,7 @@ const Tx = require('ethereumjs-tx')
 const Web3 = require('web3');
 const web3 = new Web3('http://104.211.188.197:7545')
 
-const government = '0x266652513c56Fabc34a7080Dd60c7357417cd6c0'
+const government = '0x5578Ec2cb3994BC87823802071241726EBC40FDF'
 
 const privateKeyGovernment = Buffer.from(process.env.PRIVATE_KEY, 'hex')
 
