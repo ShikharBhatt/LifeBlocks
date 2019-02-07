@@ -25,7 +25,7 @@ contract Storage{
     mapping(address => uint) public OwnerRecordCount;
   
     //enter deployed userDetails contract Address here
-    address userDetailsInterfaceAddress = 0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20; 
+    address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
     
 
