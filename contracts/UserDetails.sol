@@ -49,8 +49,4 @@ contract userDetails{
     function getAddress(uint _aadhaar) external view returns(address){
         return(aadhaarToAddress[_aadhaar]); 
     }
-
-    function keymap(string _ipfskey) public{
-        
-    } 
 }
