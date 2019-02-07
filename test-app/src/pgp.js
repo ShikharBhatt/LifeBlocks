@@ -1,9 +1,10 @@
-import { reject } from 'q';
+import { reject, async } from 'q';
 import ipfs from './ipfs'
 
 const openpgp = require('openpgp');
 //openpgp.initWorker({ path:'openpgp.worker.js' });
 
+//function to generate keys
 export const registerkey = async(address,seedphrase,callback) => {
     
     const {privateKeyArmored,publicKeyArmored} = await openpgp.generateKey({
@@ -23,7 +24,6 @@ export const registerkey = async(address,seedphrase,callback) => {
     var buffer = Buffer(test)
     console.log("Buffer: "+buffer)
 
-    //let ipfsHash;
     ipfs.files.add(buffer, (error, result) => {
         if(error){
             console.log(error)
@@ -31,33 +31,57 @@ export const registerkey = async(address,seedphrase,callback) => {
         }
         let ipfsHash = result[0].hash
         console.log("in add: "+ipfsHash)
-        //return ipfsHash
         callback(ipfsHash);
     });
-    //console.log("out add: "+ipfsHash);
-    //return ipfsHash;
 }
 
-// function getkeys(address) {
-    //const ipfsHash = //get ipfshash from smart contract
-    // const pgpkeys = ipfs.cat(ipfsHash);
-    // return pgpkeys;
-// }
+export const getkeys = async(ipfsHash,callback) => {
+    ipfs.cat(ipfsHash,(err, file) => {
+        if (err){
+              throw err
+        }
+        console.log("file retrieved: " + file)
+        console.log("file type: " + typeof file)
+        callback(file)
+    })
+}
 
-// export function key_encrypt(message, address){
-//     const key = getkeys(address);
+export const key_encrypt = async(message, ipfsHash) => {
+    getkeys(ipfsHash,function(key){
+        
+        if(!key){
+            return Error("Key does not exist for this address");
+        }
 
-//     if(!key){
-//         return Error("Key does not exist for this address");
-//     }
+        const pub = (await openpgp.key.readArmored(key.public)).keys
 
-//     return openpgp.encrypt({
-//         message: openpgp.message.fromText(message),
-//         publicKeys: (openpgp.key.readArmored(key.public)).keys,
-//     }).then(ciphertext => {
-//         return ciphertext.data
-//     }).catch(reject)
-// }
+        return openpgp.encrypt({
+            message: openpgp.message.fromText(message),
+            publicKeys: pub,
+        }).then(ciphertext => {
+            return ciphertext.data
+        }).catch(reject)
+    });
+}
 
-//not complete
-//export function key_decrypt(){}
+export const key_decrypt = async(enc_message,seedphrase,ipfsHash) => {
+    getkeys(ipfsHash,function(key){
+        
+        if(!key){
+            return Error("Key does not exist for this address");
+        }
+
+        const { keys } = await openpgp.key.readArmored(walletKey.private)
+        
+        const privKeyObj = keys[0]
+        
+        await privKeyObj.decrypt(seedphrase)
+        
+        openpgp.decrypt({
+            message: await openpgp.message.readArmored(enc_message),
+            privateKeys: [privKeyObj],
+        }).then(plaintext => {
+            return plaintext.data
+        })
+    });
+}

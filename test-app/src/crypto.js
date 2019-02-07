@@ -1,6 +1,9 @@
+import {key_encrypt} from './pgp';
+import { async } from 'q';
+
 var crypto = require('crypto');
 
-export function encrypt(data){
+export const encrypt= async(data, ipfsHash) => {
         // generate 32 bytes random master key    
         const masterkey = crypto.randomBytes(32).toString('Base64');
         console.log('masterkey: ' + masterkey);
@@ -23,8 +26,10 @@ export function encrypt(data){
         const output = salt.toString('hex') + ':' + iv.toString('hex') + ':' + encrypted;
         console.log('output: ' + output);
 
+        const aes_key = await key_encrypt(masterkey,ipfsHash);
+
         // generate output
-        return [masterkey, output];
+        return [aes_key, output];
 }
 
 export function decrypt(data, masterkey){
