@@ -46,42 +46,18 @@ export const getkeys = async(ipfsHash,callback) => {
     })
 }
 
-export const key_encrypt = async(message, ipfsHash) => {
-    getkeys(ipfsHash,function(key){
-        
-        if(!key){
-            return Error("Key does not exist for this address");
-        }
+export const key_encrypt = async(message, key, callback) => {
+    let pub = (await openpgp.key.readArmored(key.public)).keys
 
-        const pub = (await openpgp.key.readArmored(key.public)).keys
-
-        return openpgp.encrypt({
-            message: openpgp.message.fromText(message),
-            publicKeys: pub,
-        }).then(ciphertext => {
-            return ciphertext.data
-        }).catch(reject)
-    });
+    return openpgp.encrypt({
+        message: openpgp.message.fromText(message),
+        publicKeys: pub,
+    }).then(ciphertext => {
+        let cipher = ciphertext.data
+        callback(cipher)
+    }).catch(reject)
 }
 
 export const key_decrypt = async(enc_message,seedphrase,ipfsHash) => {
-    getkeys(ipfsHash,function(key){
-        
-        if(!key){
-            return Error("Key does not exist for this address");
-        }
 
-        const { keys } = await openpgp.key.readArmored(walletKey.private)
-        
-        const privKeyObj = keys[0]
-        
-        await privKeyObj.decrypt(seedphrase)
-        
-        openpgp.decrypt({
-            message: await openpgp.message.readArmored(enc_message),
-            privateKeys: [privKeyObj],
-        }).then(plaintext => {
-            return plaintext.data
-        })
-    });
 }

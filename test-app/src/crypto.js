@@ -1,4 +1,4 @@
-import {key_encrypt} from './pgp';
+import {key_encrypt, key_decrypt} from './pgp';
 import { async } from 'q';
 
 var crypto = require('crypto');
@@ -32,7 +32,10 @@ export const encrypt= async(data, ipfsHash) => {
         return [aes_key, output];
 }
 
-export function decrypt(data, masterkey){
+export const decrypt = async(data, masterkey, ipfsHash, seedphrase) => {
+        
+        const m_key = await key_decrypt(masterkey,seedphrase,ipfsHash)
+        
         // base64 decoding
         console.log(typeof data);
         const bData = Buffer.from(data, 'hex');
@@ -52,7 +55,7 @@ export function decrypt(data, masterkey){
         const text = parts[2];
         console.log("text: "+text);
         // derive key using; 32 byte key length
-        const key_r = crypto.pbkdf2Sync(masterkey, salt_r , 1000, 32, 'sha512');
+        const key_r = crypto.pbkdf2Sync(m_key, salt_r , 1000, 32, 'sha512');
 
         // AES 256 GCM Mode
         const decipher = crypto.createDecipheriv('aes-256-cbc', key_r, iv_r);
