@@ -11,6 +11,7 @@ import App from './components/App';
 import Signin from './components/Signin';
 import Signup from './components/Signup';
 import ViewRecords from './components/ViewRecords'
+import Upload from './components/Upload'
 import reducer from './reducers';
 //import {logUser} from './actions';
 
@@ -38,6 +39,7 @@ ReactDOM.render(
         <Route path="/signin" component={Signin} />
         <Route path="/signup" component={Signup} />
         <Route path="/viewrecord" component={ViewRecords} />
+        <Route path="/upload" component={Upload} />
     </Router>
     {/* </PersistGate> */}
     </Provider>, document.getElementById('root')

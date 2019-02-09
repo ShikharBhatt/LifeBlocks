@@ -1,9 +1,6 @@
-import {key_encrypt, key_decrypt} from './pgp';
-import { async } from 'q';
-
 var crypto = require('crypto');
 
-export const encrypt= async(data, ipfsHash) => {
+export function encrypt(data){
         // generate 32 bytes random master key    
         const masterkey = crypto.randomBytes(32).toString('Base64');
         console.log('masterkey: ' + masterkey);
@@ -17,33 +14,28 @@ export const encrypt= async(data, ipfsHash) => {
         // key geneartion using 1000 rounds of pbkdf2
         const key = crypto.pbkdf2Sync(masterkey, salt, 1000, 32, 'sha512');
         console.log('key: ' + key.toString('base64'));
-        // create Cipher instance of AES 256 CBC mode
+        // create Cipher instance of AES 256 GCM mode
         const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
 
         // encrpyt given text
         const encrypted = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
         console.log('encrypted text: ' + encrypted)
+        // extract the auth tag
+        //const tag = cipher.getAuthTag();
         const output = salt.toString('hex') + ':' + iv.toString('hex') + ':' + encrypted;
         console.log('output: ' + output);
 
-        const aes_key = await key_encrypt(masterkey,ipfsHash);
-
         // generate output
-        return [aes_key, output];
+        return [masterkey, output];
 }
 
-export const decrypt = async(data, masterkey, ipfsHash, seedphrase) => {
-        
-        const m_key = await key_decrypt(masterkey,seedphrase,ipfsHash)
-        
+export function decrypt(data, masterkey){
+    try{
         // base64 decoding
-        console.log(typeof data);
         const bData = Buffer.from(data, 'hex');
-        const bString = bData.toString();
-        console.log("hopefully hex: "+bData);
-        console.log("bString: "+bString); 
+        console.log(bData.toString('hex'));
 
-        const parts = bString.split(':');
+        const parts = bData.split(':');
         console.log("parts: " + parts);
 
         const salt_r = new Buffer(parts[0], 'hex');
@@ -53,9 +45,9 @@ export const decrypt = async(data, masterkey, ipfsHash, seedphrase) => {
         console.log(iv_r.toString('base64'));
         
         const text = parts[2];
-        console.log("text: "+text);
+
         // derive key using; 32 byte key length
-        const key_r = crypto.pbkdf2Sync(m_key, salt_r , 1000, 32, 'sha512');
+        const key_r = crypto.pbkdf2Sync(masterkey, salt_r , 1000, 32, 'sha512');
 
         // AES 256 GCM Mode
         const decipher = crypto.createDecipheriv('aes-256-cbc', key_r, iv_r);
@@ -65,6 +57,13 @@ export const decrypt = async(data, masterkey, ipfsHash, seedphrase) => {
         const decrypted = decipher.update(text, 'hex', 'utf8') + decipher.final('utf8');
     
         return decrypted;
+    }
+    catch(e){
+
+    }
+
+    // error
+    return null;
 }
 
 

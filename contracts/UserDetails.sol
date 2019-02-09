@@ -20,6 +20,7 @@ contract userDetails{
         //enusres one to one mapping between user's address and aadhaar card
         require(aadhaarToAddress[_aadhaar] == 0x0000000000000000000000000000000000000000,"Aadhar Card already exists");
         require(addressToAadhaar[msg.sender] == 0,"Address already used");
+        //ensure key pair has not been generated for user
         require(bytes(ownerToKey[msg.sender]).length == 0,"Key pair for user already exists");
 
         //map msg sender to aadhaar card no.
@@ -48,5 +49,15 @@ contract userDetails{
 
     function getAddress(uint _aadhaar) external view returns(address){
         return(aadhaarToAddress[_aadhaar]); 
+    }
+
+    function getKeyHash(uint _aadhaar) external view returns(string){
+        //ensure user is valid and registered 
+        require(aadhaarToAddress[_aadhaar] != 0x0000000000000000000000000000000000000000,"Account does not exist");
+        require(addressToAadhaar[msg.sender] == 0,"Address already used");
+        //ensure key object exists
+        require(bytes(ownerToKey[aadhaarToAddress[_aadhaar]]).length == 0,"Key pair for user already exists");
+
+        return(ownerToKey[aadhaarToAddress[_aadhaar]]);
     }
 }
