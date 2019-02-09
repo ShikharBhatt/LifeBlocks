@@ -31,7 +31,7 @@ class DefaultLayout extends Component {
   signOut(e) {
     e.preventDefault();
     sessionStorage.removeItem("aadhaar");
-    this.props.history.push("/login");
+    this.props.history.replace("/login");
   }
 
   render() {
