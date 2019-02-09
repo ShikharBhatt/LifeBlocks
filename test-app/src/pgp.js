@@ -47,14 +47,16 @@ export const getKeys = async(ipfsHash,callback) => {
 }
 
 export const keyEncrypt = async(message, key, callback) => {
-    let pub = (await openpgp.key.readArmored(key.public)).keys
+    let pub = (await openpgp.key.readArmored(key.publicKeyArmored)).keys
+    console.log(pub)
 
-    return openpgp.encrypt({
+    openpgp.encrypt({
         message: openpgp.message.fromText(message),
         publicKeys: pub,
     }).then(ciphertext => {
-        let cipher = ciphertext.data
-        callback(cipher)
+        console.log(ciphertext.data)
+        //return ciphertext.data
+        callback(ciphertext.data)
     }).catch(reject)
 }
 

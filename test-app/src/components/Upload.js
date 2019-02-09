@@ -119,34 +119,63 @@ class Upload extends Component {
     console.log(this.buffer);
     var encrypted = encrypt(this.buffer);
     const masterkey = encrypted[0];
+    this.buffer = Buffer(encrypted[1]);
     console.log(masterkey)
     console.log(encrypted);
-    let keyObj
-
+    let keyObj,m_key,record
+    record = this.buffer
     this.state.web3.eth.getAccounts((error, accounts) => {          
           //transaction to link aadhaar card to address
-          this.UserContract.methods.getKeyHash(this.state.aadhaar).call({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error,ipfsHash){ 
-              if(error)  {
-                console.log(error)
-              }
-              else{
-                  getKeys(ipfsHash,function(key){
-                      keyObj = key
-                      console.log("key object: "+keyObj)
-                      console.log("key object type: "+ typeof keyObj)
-                  })                  
-                }
-              })
-      })
-
-
-    this.buffer = Buffer(encrypted[1]);
-    console.log(this.buffer);
-    ipfs.files.add(this.buffer, (error, result) => {
-      if(error) {
-        console.error(error)
-        return
+      this.UserContract.methods.getKeyHash(this.state.aadhaar).call({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error,ipfsHash){ 
+        if(error)  {
+         console.log(error)
       }
+      else{
+        //call function to get pgp key file from retrieved ipfs hash
+        getKeys(ipfsHash,function(key){
+        //in callback function of getKeys 
+          keyObj = JSON.parse(key)
+            console.log("key object: "+keyObj)
+            console.log("key object type: "+ typeof keyObj)
+            console.log("public key : "+keyObj.publicKeyArmored)
+            console.log(Object.getOwnPropertyNames(keyObj))
+            keyEncrypt(masterkey,keyObj,function(cipher){
+              //in callback function of keyEncrypt
+              m_key = cipher
+              console.log("encrypted masterkey: "+m_key)
+
+              console.log(record);
+              ipfs.files.add(record, (error, result) => {
+                if(error) {
+                  console.error(error)
+                  return
+                }
+              this.RecordUploaderContract.methods.upload(this.state.aadhaar, result[0].hash,this.state.type,this.state.name,m_key).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
+                if(!error)  {
+                  console.log("tx: "+txHash)                   
+                  alert('Transaction Hash:'+txHash)
+                }
+                else
+                  console.log(error)
+              }.bind(this))
+              })
+            })
+        })                  
+      }
+    })
+  })
+
+
+    
+
+
+    // this.buffer = Buffer(encrypted[1]);
+    // console.log(this.buffer);
+    // ipfs.files.add(this.buffer, (error, result) => {
+    //   if(error) {
+    //     console.error(error)
+    //     return
+    //   }
 
       // alert('Aadhaar : '+ this.state.aadhaar + '\nIPFSHash : '+ result[0].hash + '\nType : '+ this.state.type)
       // const txBuilder = this.RecordUploaderContract.methods.upload(
@@ -156,7 +185,6 @@ class Upload extends Component {
       //   this.state.rname,
       //   masterkey);
       
-    }) 
   }
 
   render() {
