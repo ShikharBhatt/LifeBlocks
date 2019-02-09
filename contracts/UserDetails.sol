@@ -52,12 +52,6 @@ contract userDetails{
     }
 
     function getKeyHash(uint _aadhaar) external view returns(string){
-        //ensure user is valid and registered 
-        require(aadhaarToAddress[_aadhaar] != 0x0000000000000000000000000000000000000000,"Account does not exist");
-        require(addressToAadhaar[msg.sender] == 0,"Address already used");
-        //ensure key object exists
-        require(bytes(ownerToKey[aadhaarToAddress[_aadhaar]]).length == 0,"Key pair for user already exists");
-
         return(ownerToKey[aadhaarToAddress[_aadhaar]]);
     }
 }
