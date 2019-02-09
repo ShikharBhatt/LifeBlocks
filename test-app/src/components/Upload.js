@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import ipfs from './ipfs'
-import {encrypt} from'./crypto'
-import './css/oswald.css'
-import './css/open-sans.css'
-import './css/pure-min.css'
-import './App.css'
-import getWeb3 from './utils/getWeb3'
-import {keyEncrypt,getKeys} from './pgp'
+import ipfs from '../ipfs'
+import '../css/oswald.css'
+import '../css/open-sans.css'
+import '../css/pure-min.css'
+import '../App.css'
+import getWeb3 from '../utils/getWeb3'
+import {encrypt,decrypt} from '../crypto'
+import {keyEncrypt,getKeys} from '../pgp'
 
 const Web3 = require('web3')
 const web3 = new Web3('http://localhost:7545')
@@ -14,7 +14,7 @@ const web3 = new Web3('http://localhost:7545')
 console.log(web3)
 
 
-class App extends Component {
+class Upload extends Component {
   constructor(props) {
     super(props)
     
@@ -66,6 +66,16 @@ class App extends Component {
     var RecordUploaderContract = new web3.eth.Contract(ABI, contractAddress)
     //console.log(RecordUploaderContract)
     this.RecordUploaderContract = RecordUploaderContract
+    console.log("upload contract: "+this.RecordUploaderContract)
+
+    const contractAddress_u = '0x78478e7666bcb38b2ddeddfe7cb0ba152301df07'
+        
+    const ABI_u = [{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"login","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"aadhaarToAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfskey","type":"string"}],"name":"link","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"addressToAadhaar","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"ownerToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getKeyHash","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_aadhaar","type":"uint256"}],"name":"addressLinked","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_ipfshash","type":"string"}],"name":"keyLinked","type":"event"}]
+             
+    var UserContract = new this.state.web3.eth.Contract(ABI_u, contractAddress_u)
+    
+    this.UserContract = UserContract
+    console.log("user contract:"+this.UserContract)
     
     // const contract = require('truffle-contract')
     // const simpleStorage = contract(SimpleStorageContract)
@@ -115,7 +125,7 @@ class App extends Component {
 
     this.state.web3.eth.getAccounts((error, accounts) => {          
           //transaction to link aadhaar card to address
-          this.RecordUploaderContract.methods.getKeyHash(this.state.aadhaar).call({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error,ipfsHash){ 
+          this.UserContract.methods.getKeyHash(this.state.aadhaar).call({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error,ipfsHash){ 
               if(error)  {
                 console.log(error)
               }
@@ -201,4 +211,4 @@ class App extends Component {
   }
 }
 
-export default App
+export default Upload

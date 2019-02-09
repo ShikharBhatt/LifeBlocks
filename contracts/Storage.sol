@@ -3,7 +3,8 @@ pragma solidity ^0.4.24;
 import "./UserDetails.sol";
 
 contract userDetailsInterface{
-    function getAddress(uint _aadhar) external view returns(address);
+    function getAddress(uint _aadhaar) external view returns(address);
+    function getKeyHash(uint _aadhaar) external view returns(string);
 } 
 
 
@@ -29,16 +30,16 @@ contract Storage{
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
     
 
-    function upload(uint _aadhar, string _ipfsHash, string _type, string _name, string _masterkey) public{
+    function upload(uint _aadhaar, string _ipfsHash, string _type, string _name, string _masterkey) public{
         //add require condition to check if address is of type hospital
-       address addr = userdetails.getAddress(_aadhar);
+       address addr = userdetails.getAddress(_aadhaar);
        uint id = records.push(Record(_ipfsHash,_type,_name,msg.sender,_masterkey));
        RecordtoOwner[id] = addr;
        OwnerRecordCount[addr]++;
     } 
     
-    function retrieve(uint _aadhar) external view returns(uint[]){
-        address addr = userdetails.getAddress(_aadhar);
+    function retrieve(uint _aadhaar) external view returns(uint[]){
+        address addr = userdetails.getAddress(_aadhaar);
         uint counter = 0;
         uint[] memory recordId = new uint[](OwnerRecordCount[addr]);
         for(uint i = 0;i<records.length;i++){

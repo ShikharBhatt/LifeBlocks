@@ -5,6 +5,7 @@ import {browserHistory} from "react-router";
 import '../App.css';
 import '../css/pure-min.css';
 import {ViewRecords} from './ViewRecords';
+import Upload from './Upload';
 // import {Provider} from 'react-redux';
 // import {createStore} from 'redux';
 // import reducer from '../reducers';
@@ -53,7 +54,7 @@ class App extends Component{
             <div>
             {/* <div>App</div>
             <div>My Aadhaar:{this.props.user.aadhaar}</div> */}
-            <ViewRecords/>
+            <Upload/>
             </div>
             </div>
         )
