@@ -72,10 +72,11 @@ componentWillMount() {
 
   
 SignUp(event){                      //function handling the signup event
-  document.getElementById("OTP").style.display="block"
+  event.preventDefault()
+    document.getElementById("OTP").style.display="block"
   
 
-    event.preventDefault()
+   
     alert("In Signup")
     //getting phone number for the entered aadhaar number
     firebaseApp.database().ref('/uidai/').orderByChild('aadhaar_no').equalTo(this.state.aadhaar).once('value').then(function(snapshot) {
@@ -124,8 +125,8 @@ linkAadhaar(){
 }
 
 //confirm OTP function and call to linkAadhaar function
-myFunction = function() {
-     
+myFunction = function(event) {
+     event.preventDefault()
     let callLinkAadhaar = this.linkAadhaar        
     //callLinkAadhaar()
     window.confirmationResult.confirm(document.getElementById("verificationcode").value) 
