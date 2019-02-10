@@ -59,7 +59,7 @@ class Upload extends Component {
      *
      * Normally these functions would be called in the context of a
      * state management library, but for convenience I've placed them here.
-     */
+     */                    //0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20
     const contractAddress = '0xf5e9037A2412db50c74d5A1642D6d3B99Dd90f20'
     const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"rname","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_name","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]    
     //console.log('constract Address : ',contractAddress)
@@ -122,7 +122,13 @@ class Upload extends Component {
     this.buffer = Buffer(encrypted[1]);
     console.log(masterkey)
     console.log(encrypted);
-    let keyObj,m_key,record
+    let keyObj,m_key,record,rn,rt,RUC,web3,aadhaar
+    RUC = this.RecordUploaderContract
+    rt = this.state.type
+    rn = this.state.rname
+    web3 = this.state.web3
+    aadhaar = this.state.aadhaar
+
     record = this.buffer
     this.state.web3.eth.getAccounts((error, accounts) => {          
           //transaction to link aadhaar card to address
@@ -150,19 +156,21 @@ class Upload extends Component {
                   console.error(error)
                   return
                 }
-              this.RecordUploaderContract.methods.upload(this.state.aadhaar, result[0].hash,this.state.type,this.state.name,m_key).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
+              console.log(result[0].hash)
+              alert(result[0].hash)
+              RUC.methods.upload(aadhaar, result[0].hash,rt,rn,'ihEvXhQ1EFKsmAnuYk8pzdDJrQKt').send({from:accounts[0],gasPrice:web3.utils.toHex(web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
                 if(!error)  {
                   console.log("tx: "+txHash)                   
                   alert('Transaction Hash:'+txHash)
                 }
                 else
                   console.log(error)
-              }.bind(this))
+              })
               })
             })
         })                  
       }
-    })
+    }.bind(this))
   })
 
 
