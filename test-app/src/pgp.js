@@ -65,7 +65,7 @@ export const unarmor = async(encMessage,callback) => {
     callback(msg)
 }
 
-export const key_decrypt = async(key,enc_message,seedphrase,callback) => {
+export const keyDecrypt = async(key,enc_message,seedphrase,callback) => {
     const {keys} = await openpgp.key.readArmored(key.privateKeyArmored)
     const privKeyObj = keys[0]
     await privKeyObj.decrypt(seedphrase)

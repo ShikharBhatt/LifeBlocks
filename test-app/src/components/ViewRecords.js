@@ -5,6 +5,7 @@ import '../css/pure-min.css'
 import '../App.css'
 import ipfs from '../ipfs'
 import {decrypt} from '../crypto'
+import { getKeys,keyDecrypt } from '../pgp';
 const Web3 = require('web3')
 const web3 = new Web3('http://localhost:7545')
 
@@ -67,15 +68,36 @@ export class ViewRecords extends Component {
     
     view(ipfs_hash,masterkey)
     {
+      let un_mkey,keyObj
       ipfs.cat(ipfs_hash, function (err, file) {
         if (err) {
               throw err
             }
             console.log("file retrieved: " + file)
             console.log("file type: " + typeof file)
-            
+            this.state.web3.eth.getAccounts((error, accounts) => {          
+                //transaction to link aadhaar card to address
+               this.UserContract.methods.getKeyHash(7911755205).call(
+                 {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((ipfsHash) =>{
+                
+                  getKeys(ipfsHash,function(key){
+                    //in callback function of getKeys 
+                      keyObj = JSON.parse(key)
+                      //console.log(this.state.aadhaar)
+                        console.log("key object: "+keyObj)
+                        console.log("key object type: "+ typeof keyObj)
+                        console.log("public key : "+keyObj.privateKeyArmored)
+                        console.log(Object.getOwnPropertyNames(keyObj))
+                        keyDecrypt(keyObj,masterkey,"create_keypair",function(plain){
+                          //in callback function of keyEncrypt
+                          un_mkey = plain
+                          console.log("encrypted masterkey: "+un_mkey)        
+                        })
+                    })                
+                 })
+            })
             //  console.log("file string version: " + file.toString('base64'))
-            var decrypted = decrypt(file,masterkey)
+            var decrypted = decrypt(file,un_mkey)
             this.setState({
               newHash:decrypted
             })
