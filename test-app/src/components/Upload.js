@@ -63,7 +63,7 @@ class Upload extends Component {
     const contractAddress = '0xf5e9037A2412db50c74d5A1642D6d3B99Dd90f20'
     const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"rname","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_name","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]    
     //console.log('constract Address : ',contractAddress)
-    var RecordUploaderContract = new web3.eth.Contract(ABI, contractAddress)
+    var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)
     //console.log(RecordUploaderContract)
     this.RecordUploaderContract = RecordUploaderContract
     console.log("upload contract: "+this.RecordUploaderContract)
@@ -122,78 +122,48 @@ class Upload extends Component {
     this.buffer = Buffer(encrypted[1]);
     console.log(masterkey)
     console.log(encrypted);
-    let keyObj,m_key,record,rn,rt,RUC,web3,aadhaar
-    RUC = this.RecordUploaderContract
-    rt = this.state.type
-    rn = this.state.rname
-    web3 = this.state.web3
-    aadhaar = this.state.aadhaar
+    let keyObj,m_key,record
 
     record = this.buffer
     this.state.web3.eth.getAccounts((error, accounts) => {          
           //transaction to link aadhaar card to address
-      this.UserContract.methods.getKeyHash(this.state.aadhaar).call({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error,ipfsHash){ 
-        if(error)  {
-         console.log(error)
-      }
-      else{
-        //call function to get pgp key file from retrieved ipfs hash
-        getKeys(ipfsHash,function(key){
-        //in callback function of getKeys 
-          keyObj = JSON.parse(key)
-            console.log("key object: "+keyObj)
-            console.log("key object type: "+ typeof keyObj)
-            console.log("public key : "+keyObj.publicKeyArmored)
-            console.log(Object.getOwnPropertyNames(keyObj))
-            keyEncrypt(masterkey,keyObj,function(cipher){
-              //in callback function of keyEncrypt
-              m_key = cipher
-              console.log("encrypted masterkey: "+m_key)
-
-              console.log(record);
-              ipfs.files.add(record, (error, result) => {
-                if(error) {
-                  console.error(error)
-                  return
-                }
-              console.log(result[0].hash)
-              alert(result[0].hash)
-              RUC.methods.upload(aadhaar, result[0].hash,rt,rn,'ihEvXhQ1EFKsmAnuYk8pzdDJrQKt').send({from:accounts[0],gasPrice:web3.utils.toHex(web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
-                if(!error)  {
-                  console.log("tx: "+txHash)                   
-                  alert('Transaction Hash:'+txHash)
-                }
-                else
-                  console.log(error)
+         this.UserContract.methods.getKeyHash(this.state.aadhaar).call(
+           {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((ipfsHash) =>{
+          
+            getKeys(ipfsHash,function(key){
+              //in callback function of getKeys 
+                keyObj = JSON.parse(key)
+                //console.log(this.state.aadhaar)
+                  console.log("key object: "+keyObj)
+                  console.log("key object type: "+ typeof keyObj)
+                  console.log("public key : "+keyObj.publicKeyArmored)
+                  console.log(Object.getOwnPropertyNames(keyObj))
+                  keyEncrypt(masterkey,keyObj,function(cipher){
+                    //in callback function of keyEncrypt
+                    m_key = cipher
+                    console.log("encrypted masterkey: "+m_key)        
+                  })
+              })                
+           })
+            ipfs.files.add(record, (error, result) => {
+              if(error) {
+                console.error(error)
+                return
+              }
+              else{
+                alert(result[0].hash + this.state.aadhaar+this.state.type+this.state.rname)
+                this.RecordUploaderContract.methods.upload(this.state.aadhaar, result[0].hash,this.state.type,this.state.rname,m_key).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
+              if(!error)  {
+                console.log("tx: "+txHash)                   
+                alert('Transaction Hash:'+txHash)
+              }
+              else
+                console.log(error)
               })
-              })
-            })
-        })                  
-      }
-    }.bind(this))
+            }
+          })     
   })
-
-
-    
-
-
-    // this.buffer = Buffer(encrypted[1]);
-    // console.log(this.buffer);
-    // ipfs.files.add(this.buffer, (error, result) => {
-    //   if(error) {
-    //     console.error(error)
-    //     return
-    //   }
-
-      // alert('Aadhaar : '+ this.state.aadhaar + '\nIPFSHash : '+ result[0].hash + '\nType : '+ this.state.type)
-      // const txBuilder = this.RecordUploaderContract.methods.upload(
-      //   this.state.aadhaar,
-      //   result[0].hash,
-      //   this.state.type,
-      //   this.state.rname,
-      //   masterkey);
-      
-  }
+}
 
   render() {
     return (

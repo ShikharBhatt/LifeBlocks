@@ -54,7 +54,7 @@ class App extends Component{
             <div>
             {/* <div>App</div>
             <div>My Aadhaar:{this.props.user.aadhaar}</div> */}
-            <Upload/>
+            <ViewRecords/>
             </div>
             </div>
         )

@@ -5,3 +5,5 @@
   encrypt: [Function] }
 
 // export privateKey in shell
+----------------------------------------------------------------------------------------
+curl --data '{"jsonrpc":"2.0","method":"parity_addReservedPeer","params":["enode://32406848ca393847dcb65199837f6fc1c2a71cda653a8bcbbb83e542f748181b5fcef062363ddbec1a8dd518e0b311c9b8393ab61ea69805b889e8401c87f4f0@192.168.0.107:30301"],"id":0}' -H "Content-Type: application/json" -X POST localhost:7545

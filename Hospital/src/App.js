@@ -63,7 +63,7 @@ class App extends Component {
     const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"rname","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_name","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
 
     //console.log('constract Address : ',contractAddress)
-    var RecordUploaderContract = new web3.eth.Contract(ABI, contractAddress)
+    var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)
     //console.log(RecordUploaderContract)
     this.RecordUploaderContract = RecordUploaderContract
     
@@ -120,43 +120,58 @@ class App extends Component {
       }
 
       alert('Aadhaar : '+ this.state.aadhaar + '\nIPFSHash : '+ result[0].hash + '\nType : '+ this.state.type)
-      const txBuilder = this.RecordUploaderContract.methods.upload(
-        this.state.aadhaar,
-        result[0].hash,
-        this.state.type,
-        this.state.rname,
-        'oyUL8cuKJvfTqxlf45aFVxvQI6qixU1rRWZRgOq1rq1dAnUBdtCZkvfqwl3lFNdb2UpNBx9nkM7RdxV4FTfObKHuHucTtbwxzYbRkoYMggQsR2NpPp79iKTtFT9OipJ0lUysfbNcDlREqrPdjjBadpeOsm5nPEz0byGj7uK8HuNJvQf1gK5OrlaXlDZAS4aspV2zYo0KpK3slaXMiIyKimqUuxEYTOK6vQFIPrmaZwCeAtF5VM6aOEqh7ojc9GTBS2BkrVPfGJUt917nJmu0FU3zj3HR4Yy7Cv6lt3DTMtGlnmBF3HqTLWbseb9FLfyoEUfuuWPKd6AJXCotr0JC95phz3287dRKMex82e8X6gcVF0XEsHbScV0eWO8ulNRATrkOpbRKHrZaLWzrJyOUvyKBzkXDjI7HhnkdQaSUhVp509VK');
+      
+      this.state.web3.eth.getAccounts((error, accounts) => {
+        this.RecordUploaderContract.methods.upload(this.state.aadhaar,
+          result[0].hash,
+          this.state.type,
+          this.state.rname,
+          'oyUL8cuKJvfTqxlf45aFVxvQI6qixU1rRWZRgOq1rq1dAnUBdtCZkvfqwl3lFNdb2UpNBx9nkM7RdxV4FTfObKHuHucTtbwxzYbRkoYMggQsR2NpPp79iKTtFT9OipJ0lUysfbNcDlREqrPdjjBadpeOsm5nPEz0byGj7uK8HuNJvQf1gK5OrlaXlDZAS4aspV2zYo0KpK3slaXMiIyKimqUuxEYTOK6vQFIPrmaZwCeAtF5VM6aOEqh7ojc9GTBS2BkrVPfGJUt917nJmu0FU3zj3HR4Yy7Cv6lt3DTMtGlnmBF3HqTLWbseb9FLfyoEUfuuWPKd6AJXCotr0JC95phz3287dRKMex82e8X6gcVF0XEsHbScV0eWO8ulNRATrkOpbRKHrZaLWzrJyOUvyKBzkXDjI7HhnkdQaSUhVp509VK').send({from:accounts[0],gas:600000000,gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error,tx){
+            if(error){
+              console.log(error)
+            }
+            else{
+              console.log(tx)
+              alert(tx)
+            }
+          })  
+      })          
+
+     
+      // const txBuilder = this.RecordUploaderContract.methods.upload(
+      //   this.state.aadhaar,
+      //   result[0].hash,
+      //   this.state.type,
+      //   this.state.rname,
+      //   'oyUL8cuKJvfTqxlf45aFVxvQI6qixU1rRWZRgOq1rq1dAnUBdtCZkvfqwl3lFNdb2UpNBx9nkM7RdxV4FTfObKHuHucTtbwxzYbRkoYMggQsR2NpPp79iKTtFT9OipJ0lUysfbNcDlREqrPdjjBadpeOsm5nPEz0byGj7uK8HuNJvQf1gK5OrlaXlDZAS4aspV2zYo0KpK3slaXMiIyKimqUuxEYTOK6vQFIPrmaZwCeAtF5VM6aOEqh7ojc9GTBS2BkrVPfGJUt917nJmu0FU3zj3HR4Yy7Cv6lt3DTMtGlnmBF3HqTLWbseb9FLfyoEUfuuWPKd6AJXCotr0JC95phz3287dRKMex82e8X6gcVF0XEsHbScV0eWO8ulNRATrkOpbRKHrZaLWzrJyOUvyKBzkXDjI7HhnkdQaSUhVp509VK');
   
-        let encoded_tx = txBuilder.encodeABI();
-        var addrHosp = "0xFB23cd312F5Da28dAeD5E6c7D76DA1c2Cf9c977F"
-        var privHosp = "0x05dd9541d286146c393a60ea7f23d7f8ed14abd84728c00419d9cfbb2493f140"
-        web3.eth.getTransactionCount(addrHosp, (err , txCount) => {
-          //Transaction Object
-          const txObject = {
-              nonce : web3.utils.toHex(txCount),
-              from:addrHosp,
-              to: "0x78478E7666BCB38B2DdEddfE7cb0BA152301Df07",         //all paramters should be in Hex
-              gasLimit : web3.utils.toHex(90000000),
-              gasPrice : web3.utils.toHex(web3.utils.toWei('0','gwei')),
-              data : encoded_tx
-          }
-          web3.eth.accounts.signTransaction(txObject, privHosp, function (error, signedTx) {
+      //   let encoded_tx = txBuilder.encodeABI();
+      //   var addrHosp = "0xFB23cd312F5Da28dAeD5E6c7D76DA1c2Cf9c977F"
+      //   var privHosp = "0x05dd9541d286146c393a60ea7f23d7f8ed14abd84728c00419d9cfbb2493f140"
+      //   web3.eth.getTransactionCount(addrHosp, (err , txCount) => {
+      //     //Transaction Object
+      //     const txObject = {
+      //         nonce : web3.utils.toHex(txCount),
+      //         from:addrHosp,
+      //         to: "0x78478E7666BCB38B2DdEddfE7cb0BA152301Df07",         //all paramters should be in Hex
+      //         gasLimit : web3.utils.toHex(90000000),
+      //         gasPrice : web3.utils.toHex(web3.utils.toWei('0','gwei')),
+      //         data : encoded_tx
+      //     }
+      //     web3.eth.accounts.signTransaction(txObject, privHosp, function (error, signedTx) {
            
-              web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-                      .on('receipt', function (receipt) {
-                          console.log(receipt.transactionHash)
-                  })
+      //         web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+      //                 .on('receipt', function (receipt) {
+      //                     console.log(receipt.transactionHash)
+      //             })
         
      
-          })
+      //     })
       })
       // this.RecordUploaderContract.methods.sendHash(result[0].hash,this.state.userAddress).send(
       //   {from:this.state.currentAccount,gas : 4700000,gasPrice:web3.utils.toHex(web3.utils.toWei('100','gwei'))}, function(error, txHash){
       //     alert('Transaction Hash:'+txHash)
-      //   })
-   
-
-    }) 
+      //   }) 
   }
 
   render() {

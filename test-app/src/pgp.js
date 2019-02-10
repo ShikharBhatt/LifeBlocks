@@ -60,6 +60,22 @@ export const keyEncrypt = async(message, key, callback) => {
     }).catch(reject)
 }
 
-export const key_decrypt = async(enc_message,seedphrase,ipfsHash) => {
+export const unarmor = async(encMessage,callback) => {
+    let msg = await openpgp.message.readArmored(encMessage)
+    callback(msg)
+}
 
+export const key_decrypt = async(key,enc_message,seedphrase,callback) => {
+    const {keys} = await openpgp.key.readArmored(key.privateKeyArmored)
+    const privKeyObj = keys[0]
+    await privKeyObj.decrypt(seedphrase)
+
+
+    openpgp.decrypt({
+        message: await openpgp.message.readArmored(enc_message),
+        privateKeys: privKeyObj
+    }).then(plaintext =>{
+        console.log(plaintext.data)
+        callback(plaintext.data)
+    })
 }
