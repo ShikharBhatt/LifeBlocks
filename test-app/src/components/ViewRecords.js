@@ -6,8 +6,7 @@ import '../App.css'
 import ipfs from '../ipfs'
 import {decrypt} from '../crypto'
 import { getKeys,keyDecrypt } from '../pgp';
-const Web3 = require('web3')
-const web3 = new Web3('http://localhost:7545')
+import getWeb3 from '../utils/getWeb3'
 
 
 
@@ -69,7 +68,51 @@ export class ViewRecords extends Component {
     view(ipfs_hash,masterkey)
     {
       let un_mkey,keyObj
-      ipfs.cat(ipfs_hash, function (err, file) {
+
+//       ipfs.cat(ipfs_hash).then((err, file) => {
+//            console.log     if (err) {
+//               throw err
+//             }
+//             console.log("file retrieved: " + file)
+//             console.log("file type: " + typeof file)
+//             this.state.web3.eth.getAccounts((error, accounts) => {          
+//                 //transaction to link aadhaar card to address
+//                this.UserContract.methods.getKeyHash(7911755205).call(
+//                  {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((ipfsHash) =>{
+                
+//                   getKeys(ipfsHash,function(key){
+//                     //in callback function of getKeys 
+//                       keyObj = JSON.parse(key)
+//                       //console.log(this.state.aadhaar)
+//                         console.log("key object: "+keyObj)
+//                         console.log("key object type: "+ typeof keyObj)
+//                         console.log("public key : "+keyObj.privateKeyArmored)
+//                         console.log(Object.getOwnPropertyNames(keyObj))
+//                         keyDecrypt(keyObj,masterkey,"create_keypair",function(plain){
+//                           //in callback function of keyEncrypt
+//                           un_mkey = plain
+//                           console.log("encrypted masterkey: "+un_mkey)        
+//                         })
+//                     })                
+//                  })
+//             })
+//             //  console.log("file string version: " + file.toString('base64'))
+//             var decrypted = decrypt(file,un_mkey)
+//             this.setState({
+//               newHash:decrypted
+//             })
+// // var data = [];
+// // for (var i = 0; i < decrypted.length; i++){  
+// //     data.push(decrypted.charCodeAt(i));
+// // }
+
+// //document.getElementById("itemPreview").src = "data:image/png;base64," + data
+
+// document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
+//             console.log(" decrypted file:" + decrypted)
+//             console.log("file type: " + typeof decrypted)
+//       })
+      ipfs.cat(ipfs_hash,  (err, file) => {
         if (err) {
               throw err
             }
@@ -88,7 +131,7 @@ export class ViewRecords extends Component {
                         console.log("key object type: "+ typeof keyObj)
                         console.log("public key : "+keyObj.privateKeyArmored)
                         console.log(Object.getOwnPropertyNames(keyObj))
-                        keyDecrypt(keyObj,masterkey,"create_keypair",function(plain){
+                        keyDecrypt(keyObj,masterkey,"sumit",function(plain){
                           //in callback function of keyEncrypt
                           un_mkey = plain
                           console.log("encrypted masterkey: "+un_mkey)        
@@ -97,29 +140,50 @@ export class ViewRecords extends Component {
                  })
             })
             //  console.log("file string version: " + file.toString('base64'))
-            var decrypted = decrypt(file,un_mkey)
-            this.setState({
-              newHash:decrypted
+            setTimeout(function(){
+                alert(file+un_mkey)
+                decrypt(file,un_mkey,function(decrypted){
+                    alert("Decrypted:"+decrypted)
+                
+                    // var data = [];
+                    // for (var i = 0; i < decrypted.length; i++){  
+                    //     data.push(decrypted.charCodeAt(i));
+                    // }
+                    
+                    //document.getElementById("itemPreview").src = "data:image/png;base64," + data
+                    
+                    document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
+                                console.log(" decrypted file:" + decrypted)
+                                console.log("file type: " + typeof decrypted)
+    
             })
-// var data = [];
-// for (var i = 0; i < decrypted.length; i++){  
-//     data.push(decrypted.charCodeAt(i));
-// }
-
-//document.getElementById("itemPreview").src = "data:image/png;base64," + data
-
-document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
-            console.log(" decrypted file:" + decrypted)
-            console.log("file type: " + typeof decrypted)
-        }.bind(this))
+                
+            },5000)
+        })
     }
 
   
 
     componentWillMount() {
     
-        // Instantiate contract once web3 provided.
-        this.instantiateContract()
+       
+            // Get network provider and web3 instance.
+            // See utils/getWeb3 for more info.
+            getWeb3
+            .then(results => {
+              this.setState({
+                web3: results.web3
+              })
+        
+              // Instantiate contract once web3 provided.
+              this.instantiateContract()
+            })
+            .catch(() => {
+              console.log('Error finding web3.')
+            })
+          
+          
+        
     }
   
     
@@ -135,10 +199,19 @@ document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
       const contractAddress = '0xf5e9037A2412db50c74d5A1642D6d3B99Dd90f20'
       const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"rname","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_name","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]    
       //console.log('constract Address : ',contractAddress)
-      var RecordUploaderContract = new web3.eth.Contract(ABI, contractAddress)
+      var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)
       //console.log(RecordUploaderContract)
       this.RecordUploaderContract = RecordUploaderContract
         
+
+      const contractAddress_u = '0x78478e7666bcb38b2ddeddfe7cb0ba152301df07'
+        
+      const ABI_u = [{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"login","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"aadhaarToAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfskey","type":"string"}],"name":"link","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"addressToAadhaar","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"ownerToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getKeyHash","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_aadhaar","type":"uint256"}],"name":"addressLinked","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_ipfshash","type":"string"}],"name":"keyLinked","type":"event"}]
+               
+      var UserContract = new this.state.web3.eth.Contract(ABI_u, contractAddress_u)
+      
+      this.UserContract = UserContract
+  
      // var add = '0xF1CB5385a4632bD7565E4bEFCdE129c4DF4d400f'
         this.setState({
             userAddress : "0xFE4a659639fd0b385d852a8a6f57046Dc8a99fBE",
