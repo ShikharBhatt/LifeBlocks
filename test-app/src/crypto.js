@@ -29,11 +29,15 @@ export function encrypt(data){
         return [masterkey, output];
 }
 
-export function decrypt(data, masterkey){
+export function decrypt(data, masterkey,callback){
     try{
+        // const bData = data
+        // console.log(bData)
         // base64 decoding
-        const bData = Buffer.from(data, 'hex');
-        console.log(bData.toString('hex'));
+        const Data = Buffer.from(data,'hex');
+        console.log(Data.toString('utf8'));
+
+        const bData = Data.toString('utf8')
 
         const parts = bData.split(':');
         console.log("parts: " + parts);
@@ -56,7 +60,8 @@ export function decrypt(data, masterkey){
         // encrypt the given text
         const decrypted = decipher.update(text, 'hex', 'utf8') + decipher.final('utf8');
     
-        return decrypted;
+        //return decrypted;
+        callback(decrypted)
     }
     catch(e){
 

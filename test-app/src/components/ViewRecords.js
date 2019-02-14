@@ -30,6 +30,7 @@ export class ViewRecords extends Component {
         value:''
       };
   
+      
  //     this.onSignUp = this.onSignUp.bind(this);
    //   this.handleSignUpChange = this.handleSignUpChange.bind(this);
    //   this.onSubmit = this.onSubmit.bind(this);
@@ -38,6 +39,7 @@ export class ViewRecords extends Component {
         this.Change = this.Change.bind(this);
         this.view = this.view.bind(this);
         this.TableBody = this.TableBody.bind(this);
+
       }
     TableBody = (props) => {
         const rows = props.recordsId.map((row, index) => {
@@ -67,99 +69,46 @@ export class ViewRecords extends Component {
     
     view(ipfs_hash,masterkey)
     {
-      let un_mkey,keyObj
+      let un_mkey,keyObj,decrypted
+      // call to ipfs api to retrieve file
+      ipfs.cat(ipfs_hash,(err,file) => {
+          if(err){
+              throw err;
+          }
+          //print retrieved file
+          console.log("file retrieved: " + file)
+          console.log("file retrieved type: " + typeof file)
 
-//       ipfs.cat(ipfs_hash).then((err, file) => {
-//            console.log     if (err) {
-//               throw err
-//             }
-//             console.log("file retrieved: " + file)
-//             console.log("file type: " + typeof file)
-//             this.state.web3.eth.getAccounts((error, accounts) => {          
-//                 //transaction to link aadhaar card to address
-//                this.UserContract.methods.getKeyHash(7911755205).call(
-//                  {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((ipfsHash) =>{
-                
-//                   getKeys(ipfsHash,function(key){
-//                     //in callback function of getKeys 
-//                       keyObj = JSON.parse(key)
-//                       //console.log(this.state.aadhaar)
-//                         console.log("key object: "+keyObj)
-//                         console.log("key object type: "+ typeof keyObj)
-//                         console.log("public key : "+keyObj.privateKeyArmored)
-//                         console.log(Object.getOwnPropertyNames(keyObj))
-//                         keyDecrypt(keyObj,masterkey,"create_keypair",function(plain){
-//                           //in callback function of keyEncrypt
-//                           un_mkey = plain
-//                           console.log("encrypted masterkey: "+un_mkey)        
-//                         })
-//                     })                
-//                  })
-//             })
-//             //  console.log("file string version: " + file.toString('base64'))
-//             var decrypted = decrypt(file,un_mkey)
-//             this.setState({
-//               newHash:decrypted
-//             })
-// // var data = [];
-// // for (var i = 0; i < decrypted.length; i++){  
-// //     data.push(decrypted.charCodeAt(i));
-// // }
+          //get metamask account address 
+          this.state.web3.eth.getAccounts((error,account) => {
+              console.log(account[0])
+              //call to contract to get ipfs hash of pgp key of the user
+              this.UserContract.methods.getKeyHash(7911755205).call(
+                {from:account[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((ipfsHash) => {
+                    //get pgp key from ipfs
+                    getKeys(ipfsHash, function(key){
+                        keyObj = JSON.parse(key)
+                        console.log("key object: " +keyObj)
+                        console.log("key obj properties: "+Object.getOwnPropertyNames(keyObj))
+                        //call to function to decrypt masterkey using pgp private key
+                        keyDecrypt(keyObj,masterkey,"create_keypair",function(plain){
+                            un_mkey = plain
+                            console.log("unencrypted masterkey : "+un_mkey)
+                            let file_string = Buffer.from(file,'hex')
+                            console.log("file_string: "+file_string)
+                            console.log("file_string type: "+ typeof file_string)
+                            decrypt(file_string,un_mkey,function(decrypted){
+                                console.log("decrypted file: "+decrypted)
 
-// //document.getElementById("itemPreview").src = "data:image/png;base64," + data
-
-// document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
-//             console.log(" decrypted file:" + decrypted)
-//             console.log("file type: " + typeof decrypted)
-//       })
-      ipfs.cat(ipfs_hash,  (err, file) => {
-        if (err) {
-              throw err
-            }
-            console.log("file retrieved: " + file)
-            console.log("file type: " + typeof file)
-            this.state.web3.eth.getAccounts((error, accounts) => {          
-                //transaction to link aadhaar card to address
-               this.UserContract.methods.getKeyHash(7911755205).call(
-                 {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((ipfsHash) =>{
-                
-                  getKeys(ipfsHash,function(key){
-                    //in callback function of getKeys 
-                      keyObj = JSON.parse(key)
-                      //console.log(this.state.aadhaar)
-                        console.log("key object: "+keyObj)
-                        console.log("key object type: "+ typeof keyObj)
-                        console.log("public key : "+keyObj.privateKeyArmored)
-                        console.log(Object.getOwnPropertyNames(keyObj))
-                        keyDecrypt(keyObj,masterkey,"sumit",function(plain){
-                          //in callback function of keyEncrypt
-                          un_mkey = plain
-                          console.log("encrypted masterkey: "+un_mkey)        
+                            document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
+                            })
+                            
                         })
-                    })                
-                 })
-            })
-            //  console.log("file string version: " + file.toString('base64'))
-            setTimeout(function(){
-                alert(file+un_mkey)
-                decrypt(file,un_mkey,function(decrypted){
-                    alert("Decrypted:"+decrypted)
-                
-                    // var data = [];
-                    // for (var i = 0; i < decrypted.length; i++){  
-                    //     data.push(decrypted.charCodeAt(i));
-                    // }
-                    
-                    //document.getElementById("itemPreview").src = "data:image/png;base64," + data
-                    
-                    document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
-                                console.log(" decrypted file:" + decrypted)
-                                console.log("file type: " + typeof decrypted)
-    
-            })
-                
-            },5000)
-        })
+                    })
+                })
+          })
+      })
+
     }
 
   
@@ -211,6 +160,8 @@ export class ViewRecords extends Component {
       var UserContract = new this.state.web3.eth.Contract(ABI_u, contractAddress_u)
       
       this.UserContract = UserContract
+
+      console.log("User Contract: "+ this.UserContract)
   
      // var add = '0xF1CB5385a4632bD7565E4bEFCdE129c4DF4d400f'
         this.setState({
