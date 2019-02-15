@@ -173,33 +173,33 @@ class Login extends Component {
     document.getElementById("OTP").style.display = "block";
     alert("In Signup");
     //getting phone number for the entered aadhaar number
-    // firebaseApp
-    //   .database()
-    //   .ref("/uidai/")
-    //   .orderByChild("aadhaar_no")
-    //   .equalTo(this.state.aadhaar)
-    //   .once("value")
-    //   .then(function(snapshot) {
-    //     snapshot.forEach(function(child) {
-    //       var value = child.val();
+    firebaseApp
+      .database()
+      .ref("/uidai/")
+      .orderByChild("aadhaar_no")
+      .equalTo(this.state.aadhaar)
+      .once("value")
+      .then(function(snapshot) {
+        snapshot.forEach(function(child) {
+          var value = child.val();
 
-    //       window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-    //         "recaptcha-container"
-    //       );
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+            "recaptcha-container"
+          );
 
     //       //     //send OTP to the phone number
-    //       firebaseApp
-    //         .auth()
-    //         .signInWithPhoneNumber(
-    //           "+91" + value.phone,
-    //           window.recaptchaVerifier
-    //         )
-    //         .then(function(confirmationResult) {
-    //           //wait for OTP verification
-    //           window.confirmationResult = confirmationResult;
-    //         });
-    //     });
-    //   });
+          firebaseApp
+            .auth()
+            .signInWithPhoneNumber(
+              "+91" + value.phone,
+              window.recaptchaVerifier
+            )
+            .then(function(confirmationResult) {
+              //wait for OTP verification
+              window.confirmationResult = confirmationResult;
+            });
+        });
+      });
   }
 
   //link aadhaar to account address using Smart Contract
@@ -251,21 +251,21 @@ class Login extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
-    //callLinkAadhaar()
-    verifyLogin()
-    // window.confirmationResult
-    //   .confirm(document.getElementById("verificationcode").value)
-    //   .then(
-    //     function(result) {
-    //       verifyLogin();
-    //       //window.location.href = '/signin'
-    //       alert("success");
-    //     },
+    
+    
+    window.confirmationResult
+      .confirm(document.getElementById("verificationcode").value)
+      .then(
+        function(result) {
+          verifyLogin();
+          //window.location.href = '/signin'
+          alert("success");
+        },
 
-    //     function(error) {
-    //       alert(error);
-    //     }
-    //   );
+        function(error) {
+          alert(error);
+        }
+      );
   };
 
   render() {
