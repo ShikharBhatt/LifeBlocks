@@ -4,21 +4,25 @@ contract Organization{
 
     // struct to store organization details
     struct organization{
-        string org_name;
-        string org_type;
-        uint unique_identifier;
+        string orgName;
+        string orgType;
+        uint uniqueIdentifier;
+        string keyHash;
     }
 
     mapping(address => organization) public orgToAddress;
+    mapping(address => string) public orgToKey;
     
     address[] public orgAddresses;
 
 
-    function orgSignUp(string _name, string _type, uint _identifier) public{
+    function orgSignUp(string _name, string _type, uint _identifier, string _ipfsHash) public{
         
-        orgToAddress[msg.sender].org_name = _name;
-        orgToAddress[msg.sender].org_type = _type;
-        orgToAddress[msg.sender].unique_identifier = _identifier;
+        orgToAddress[msg.sender].orgName = _name;
+        orgToAddress[msg.sender].orgType = _type;
+        orgToAddress[msg.sender].uniqueIdentifier = _identifier;
+        
+        orgToKey[msg.sender] = _ipfsHash;
         
         orgAddresses.push(msg.sender);
     }
@@ -28,14 +32,19 @@ contract Organization{
     }
     
     function getOrgDetails(address _address) external view returns(string, string, uint){
-        return(orgToAddress[_address].org_name,orgToAddress[_address].org_type,orgToAddress[_address].unique_identifier);
+        return(orgToAddress[_address].orgName,orgToAddress[_address].orgType,orgToAddress[_address].uniqueIdentifier);
     }
     
     function getOrgName(address _address) external view returns(string){
-        return(orgToAddress[_address].org_name);
+        return(orgToAddress[_address].orgName);
     }
     
     function getOrgType(address _address) external view returns(string){
-        return(orgToAddress[_address].org_type);
+        return(orgToAddress[_address].orgType);
     }
+    
+    function getKeyHash(address _address) external view returns(string){
+        return(orgToKey[_address]);
+    }
+    
 }
