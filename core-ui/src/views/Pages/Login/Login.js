@@ -251,8 +251,14 @@ class Login extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
+
+    /* comment following line when working with OTP */
+    verifyLogin();
+
     //callLinkAadhaar()
-    verifyLogin()
+
+    /* uncomment the following block when working with OTP */
+
     // window.confirmationResult
     //   .confirm(document.getElementById("verificationcode").value)
     //   .then(
