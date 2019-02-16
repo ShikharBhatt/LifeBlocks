@@ -187,7 +187,7 @@ class Login extends Component {
             "recaptcha-container"
           );
 
-          //     //send OTP to the phone number
+    //       //     //send OTP to the phone number
           firebaseApp
             .auth()
             .signInWithPhoneNumber(
@@ -251,7 +251,8 @@ class Login extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
-    //callLinkAadhaar()
+    
+    
     window.confirmationResult
       .confirm(document.getElementById("verificationcode").value)
       .then(
