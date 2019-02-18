@@ -1,28 +1,19 @@
 import React, { Component } from "react";
 import {
-  Badge,
   Button,
-  ButtonDropdown,
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
   Col,
-  Collapse,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Fade,
-  Form,
-  FormGroup,
-  FormText,
-  FormFeedback,
+  Row,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
+  FormText,
   Label,
-  Row
+  ButtonDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  Dropdown,
+  DropdownItem
 } from "reactstrap";
 
 import ipfs from "../../Dependencies/ipfs";
@@ -378,19 +369,19 @@ class Dashboard extends Component {
                         type="text"
                         name="type"
                         value={this.state.type}
-                        onChange={this.handleInputChange}
+                        // onChange={this.handleInputChange}
                         autoComplete="false"
                         required
                       />
                     </Col>
                     <Col md="3">
-                      {/* <Label htmlFor="ccmonth">Month</Label>
+                      {/* <Label htmlFor="ccmonth">Month</Label> */}
                       <Input type="select" name="type" id="recordType" required>
                         <option value="Routine">Routine</option>
                         <option value="Sensitive">Sensitive</option>
                         <option value="Emergency">Emergency</option>
                         <option value="Claim">Claim</option>
-                      </Input> */}
+                      </Input>
                     </Col>
                     <br />
                   </Row>
@@ -409,80 +400,6 @@ class Dashboard extends Component {
             </div>
           </div>
         </main>
-        <div className="animated fadeIn">
-          <Card>
-            <CardHeader>
-              <strong>Hospital</strong>
-            </CardHeader>
-            <CardBody>
-              <Form
-                action=""
-                method="post"
-                encType="multipart/form-data"
-                className="form-horizontal"
-              >
-                <FormGroup row>
-                  <Col md="3">
-                    <Label htmlFor="text-input">Enter Aadhaar</Label>
-                  </Col>
-                  <Col xs="12" md="9">
-                    <Input
-                      type="text"
-                      id="text-input"
-                      name="text-input"
-                      placeholder="Text"
-                    />
-                    <FormText color="muted">This is a help text</FormText>
-                  </Col>
-                </FormGroup>
-
-                <FormGroup row>
-                  <Col md="3">
-                    <Label htmlFor="input">Record Name</Label>
-                  </Col>
-                  <Col xs="12" md="9">
-                    <Input
-                      type="text"
-                      id="disabled-input"
-                      name="disabled-input"
-                      placeholder="Name"
-                    />
-                  </Col>
-                </FormGroup>
-
-                <FormGroup row>
-                  <Col md="3">
-                    <Label htmlFor="select">Select</Label>
-                  </Col>
-                  <Col xs="12" md="9">
-                    <Input type="select" name="select" id="select">
-                      <option value="Routine">Routine</option>
-                      <option value="Sensitive">Sensitive</option>
-                      <option value="Emergency">Emergency</option>
-                      <option value="Claim">Claim</option>
-                    </Input>
-                  </Col>
-                </FormGroup>
-                <FormGroup row>
-                  <Col md="3">
-                    <Label htmlFor="file-input">File input</Label>
-                  </Col>
-                  <Col xs="12" md="9">
-                    <Input type="file" id="file-input" name="file-input" />
-                  </Col>
-                </FormGroup>
-              </Form>
-            </CardBody>
-            <CardFooter>
-              <Button type="submit" size="sm" color="primary">
-                <i className="fa fa-dot-circle-o" /> Submit
-              </Button>
-              <Button type="reset" size="sm" color="danger">
-                <i className="fa fa-ban" /> Reset
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
       </div>
     );
   }
