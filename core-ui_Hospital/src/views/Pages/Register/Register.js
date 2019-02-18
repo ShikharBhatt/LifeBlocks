@@ -158,6 +158,14 @@ class Register extends Component {
     this.UserDetailsContract = UserDetailsContract;
     console.log("contract:" + this.UserDetailsContract);
 
+    this.UserDetailsContract.getPastEvents(
+      "AllEvents",
+      { formBlock: 0, toBlock: "latest" },
+      (err, events) => {
+        console.log(events.length);
+      }
+    );
+
     this.state.web3.eth.getAccounts((error, accounts) => {
       console.log(accounts[0]);
       this.acc = accounts[0];
