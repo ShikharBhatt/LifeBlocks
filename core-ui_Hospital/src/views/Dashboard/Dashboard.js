@@ -317,7 +317,7 @@ class Dashboard extends Component {
                     </Col>
                     <Col md="4">
                       <input
-                        type="text"
+                        type="number"
                         name="aadhaar"
                         value={this.state.aadhaar}
                         onChange={this.handleInputChange}
@@ -371,7 +371,7 @@ class Dashboard extends Component {
                         type="text"
                         name="type"
                         value={this.state.type}
-                        // onChange={this.handleInputChange}
+                        onChange={this.handleInputChange}
                         autoComplete="false"
                         required
                       />
