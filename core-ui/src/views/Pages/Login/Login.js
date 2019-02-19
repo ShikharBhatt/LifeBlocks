@@ -252,17 +252,6 @@ class Login extends Component {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
     
-    
-    window.confirmationResult
-      .confirm(document.getElementById("verificationcode").value)
-      .then(
-        function(result) {
-          verifyLogin();
-          //window.location.href = '/signin'
-          alert("success");
-        },
-
-
     window.confirmationResult
       .confirm(document.getElementById("verificationcode").value)
       .then(
