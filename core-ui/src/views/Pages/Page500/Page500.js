@@ -144,7 +144,7 @@ class Page500 extends Component {
       (err, events) => {
         console.log("---events---");
         console.log("No of events", events.length);
-        console.log("custom ", events[1].returnValues[0]);
+        console.log("custom ", events[1].blockNumber);
 
         this.setState({ events: events });
         console.log("events in 500", this.state.events);
@@ -172,17 +172,21 @@ class Page500 extends Component {
     // </td>
     //     </tr>);
     //   },
-
-    table.push(
-      <tr key={1}>
-        {/* <td>{this.state.events.length}</td> */}
-        <td>{}</td>
-        <td>{}</td>
-        <td>{this.state.events[1].returnValues[0]}</td>
-        <td>{}</td>
-      </tr>
-    );
-
+    for (let i = 0; i < this.state.events.length; i++) {
+      table.push(
+        <tr key={i}>
+          <td>{this.state.events[i].blockNumber}</td>
+          {/* <td>{this.state.events[i].returnValues[0]}</td> */}
+          <td>
+            {this.state.events[i].event} &nbsp; (
+            {this.state.events[i].returnValues[0]}&nbsp; ==>&nbsp;
+            {this.state.events[i].returnValues[1]})
+          </td>
+          <td>{this.state.events[i].type}</td>
+          {/* <td>{}</td> */}
+        </tr>
+      );
+    }
     return table;
   };
   render() {
@@ -191,7 +195,7 @@ class Page500 extends Component {
       return (
         <div className="animated fadeIn container">
           {/* <Cards events={this.state.events} /> */}
-          <Col xs="12" lg="6">
+          <Col xs="12" lg="12">
             <Card>
               <CardHeader>
                 <i className="fa fa-align-justify" /> Striped Table
@@ -200,9 +204,8 @@ class Page500 extends Component {
                 <Table responsive striped>
                   <thead>
                     <tr>
-                      <th>Username</th>
-                      <th>Date registered</th>
-                      <th>Role</th>
+                      <th>blockNumber</th>
+                      <th>event</th>
                       <th>Status</th>
                     </tr>
                   </thead>
