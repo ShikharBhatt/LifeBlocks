@@ -251,20 +251,20 @@ class Login extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
-    
-    window.confirmationResult
-      .confirm(document.getElementById("verificationcode").value)
-      .then(
-        function(result) {
-          verifyLogin();
-          //window.location.href = '/signin'
-          alert("success");
-        },
+    verifyLogin()
+    // window.confirmationResult
+    //   .confirm(document.getElementById("verificationcode").value)
+    //   .then(
+    //     function(result) {
+    //       verifyLogin();
+    //       //window.location.href = '/signin'
+    //       alert("success");
+    //     },
 
-        function(error) {
-          alert(error);
-        }
-      );
+    //     function(error) {
+    //       alert(error);
+    //     }
+    //   );
   };
 
   render() {
