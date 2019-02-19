@@ -18,7 +18,7 @@ contract Storage{
         string rtype;
         string rname;
         uint date;
-        address Hospital;
+        string Hospital;
         string masterkey;
     }
     
