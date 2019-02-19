@@ -251,15 +251,8 @@ class Login extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
-
-
-    /* comment following line when working with OTP */
-    //verifyLogin();
-
-    //callLinkAadhaar()
-
-    /* uncomment the following block when working with OTP */
-
+    
+    
     window.confirmationResult
       .confirm(document.getElementById("verificationcode").value)
       .then(
@@ -269,6 +262,15 @@ class Login extends Component {
           alert("success");
         },
 
+
+    window.confirmationResult
+      .confirm(document.getElementById("verificationcode").value)
+      .then(
+        function(result) {
+          verifyLogin();
+          //window.location.href = '/signin'
+          alert("success");
+        },
 
         function(error) {
           alert(error);

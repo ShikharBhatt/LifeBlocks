@@ -61,6 +61,7 @@ contract Storage{
     }
 
 
+
     function viewRecord(uint i) external view returns(string, string, string, uint, string, string){
         return (records[i].ipfsHash,records[i].rtype,records[i].rname,records[i].date,records[i].Hospital,records[i].masterkey);
 
