@@ -176,9 +176,9 @@ class Page500 extends Component {
     table.push(
       <tr key={1}>
         {/* <td>{this.state.events.length}</td> */}
-        <td>{console.log("hello" + this.state.events)}</td>
-        <td>{alert("in the table")}</td>
         <td>{}</td>
+        <td>{}</td>
+        <td>{this.state.events[1].returnValues[0]}</td>
         <td>{}</td>
       </tr>
     );
@@ -186,31 +186,34 @@ class Page500 extends Component {
     return table;
   };
   render() {
-    return (
-      <div className="animated fadeIn container">
-        {/* <Cards events={this.state.events} /> */}
-        <Col xs="12" lg="6">
-          <Card>
-            <CardHeader>
-              <i className="fa fa-align-justify" /> Striped Table
-            </CardHeader>
-            <CardBody>
-              <Table responsive striped>
-                <thead>
-                  <tr>
-                    <th>Username</th>
-                    <th>Date registered</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>{this.createTable()}</tbody>
-              </Table>
-            </CardBody>
-          </Card>
-        </Col>
-      </div>
-    );
+    if (this.state.events === null) return <div />;
+    else {
+      return (
+        <div className="animated fadeIn container">
+          {/* <Cards events={this.state.events} /> */}
+          <Col xs="12" lg="6">
+            <Card>
+              <CardHeader>
+                <i className="fa fa-align-justify" /> Striped Table
+              </CardHeader>
+              <CardBody>
+                <Table responsive striped>
+                  <thead>
+                    <tr>
+                      <th>Username</th>
+                      <th>Date registered</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>{this.createTable()}</tbody>
+                </Table>
+              </CardBody>
+            </Card>
+          </Col>
+        </div>
+      );
+    }
   }
 }
 
