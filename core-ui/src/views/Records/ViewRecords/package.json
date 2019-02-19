@@ -1,0 +1,6 @@
+{
+  "name": "ViewRecords",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ViewRecords.js"
+}
