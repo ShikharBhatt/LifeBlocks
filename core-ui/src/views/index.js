@@ -25,7 +25,7 @@ import { CoreUIIcons, Flags, FontAwesome, SimpleLineIcons } from './Icons';
 import { Alerts, Badges, Modals } from './Notifications';
 import { Login, Page404, Page500, Register } from './Pages';
 import { ShareRecords, ViewRecords } from './Records';
-import Widgets from './Widgets';
+
 
 export {
   Badges,
@@ -50,7 +50,6 @@ export {
   Tables,
   Charts,
   Dashboard,
-  Widgets,
   Jumbotrons,
   Switches,
   ProgressBar,
