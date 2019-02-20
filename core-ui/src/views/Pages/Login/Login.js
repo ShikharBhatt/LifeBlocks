@@ -1,11 +1,8 @@
 import React, { Component } from "react";
 import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
-//import { Redirect} from 'react-router';
 import { firebaseApp } from "../../../Dependencies/firebase";
 import * as firebase from "firebase";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
-//import '../App.css'
-import { registerkey } from "../../../Dependencies/pgp";
 import {
   Button,
   Card,
@@ -29,7 +26,6 @@ class Login extends Component {
       //declaring state variables
       aadhaar: "",
       web3: null,
-      currentAddress: null,
       phone: null,
       seedphrase: ""
     };
@@ -60,6 +56,7 @@ class Login extends Component {
   }
 
   instantiateContract() {
+    //User Details contract instantiation
     const contractAddress = "0x78478e7666bcb38b2ddeddfe7cb0ba152301df07";
 
     const ABI = [
@@ -149,6 +146,7 @@ class Login extends Component {
       }
     ];
 
+    //initializing the contract 
     var UserDetailsContract = new this.state.web3.eth.Contract(
       ABI,
       contractAddress
@@ -156,16 +154,6 @@ class Login extends Component {
 
     this.UserDetailsContract = UserDetailsContract;
     console.log("contract:" + this.UserDetailsContract);
-
-    this.state.web3.eth.getAccounts((error, accounts) => {
-      console.log(accounts[0]);
-      this.acc = accounts[0];
-      console.log(this.acc);
-      this.setState({ currentAddress: this.acc });
-    });
-    this.setState({ currentAddress: this.acc });
-    console.log(this.state.web3);
-    //console.log(this.UserDetailsContract)
   }
 
   SignIn(event) {
@@ -187,7 +175,7 @@ class Login extends Component {
             "recaptcha-container"
           );
 
-    //       //     //send OTP to the phone number
+        //send OTP to the phone number
           firebaseApp
             .auth()
             .signInWithPhoneNumber(
@@ -216,6 +204,7 @@ class Login extends Component {
           }
           if (x === true) {
             alert("Login Successfull");
+            //get address from aadhaar number
             this.UserDetailsContract.methods
               .getAddress(this.state.aadhaar)
               .call(
