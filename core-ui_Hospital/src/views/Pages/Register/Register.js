@@ -111,8 +111,8 @@ class Register extends Component {
                           <i className="fa fa-building " />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input type="select" onChange={event => this.setState({ orgType:event.target.value })} required={true}>
-                        <option selected disabled>Select Organization Type</option>
+                      <Input type="select" onChange={event => this.setState({ orgType:event.target.value })} required={true} defaultValue="no-value">
+                        <option value="no-value" disabled>Select Organization Type</option>
                         <option value="Hospital">Hospital</option>
                         <option value="Insurance">Insurance Company</option>
                       </Input>
