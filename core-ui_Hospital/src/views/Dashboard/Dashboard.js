@@ -158,6 +158,8 @@ class Dashboard extends Component {
     return (
       <div className="App">
         <div className="animated fadeIn">
+        <Row className="justify-content-center">
+            <Col md="9" lg="7" xl="6">
           <Card>
           <Form
                 onSubmit={this.onSubmit}
@@ -173,7 +175,7 @@ class Dashboard extends Component {
                 
                 <FormGroup row>
                   <Col md="3">
-                    <Label htmlFor="text-input">Enter patient's Aadhaar :</Label>
+                    <Label htmlFor="text-input">Enter patient's Aadhaar:</Label>
                   </Col>
                   <Col xs="12" md="9">
                     <Input
@@ -189,7 +191,7 @@ class Dashboard extends Component {
 
                 <FormGroup row>
                   <Col md="3">
-                    <Label htmlFor="input">Record Name :</Label>
+                    <Label htmlFor="input">Record Name:</Label>
                   </Col>
                   <Col xs="12" md="9">
                     <Input
@@ -205,11 +207,11 @@ class Dashboard extends Component {
 
                 <FormGroup row>
                   <Col md="3">
-                    <Label htmlFor="select">Record Type :</Label>
+                    <Label htmlFor="select">Record Type:</Label>
                   </Col>
                   <Col xs="12" md="9">
-                    <Input type="select" onChange={event => this.setState({ rtype:event.target.value })} required={true}>
-                      <option selected disabled>Select Record Type</option>
+                    <Input type="select" onChange={event => this.setState({ rtype:event.target.value })} required={true} defaultValue="no-value">
+                      <option value="no-value" disabled>Select Record Type</option>
                       <option value="Routine">Routine</option>
                       <option value="Sensitive">Sensitive</option>
                       <option value="Emergency">Emergency</option>
@@ -220,7 +222,7 @@ class Dashboard extends Component {
                 
                 <FormGroup row>
                   <Col md="3">
-                    <Label htmlFor="file-input">Upload File :</Label>
+                    <Label htmlFor="file-input">Upload File:</Label>
                   </Col>
                   <Col xs="12" md="9">
                     <Input type="file" onChange={this.captureFile} required={true}/>
@@ -230,15 +232,23 @@ class Dashboard extends Component {
             </CardBody>
 
             <CardFooter>
-              <Button type="submit" size="md" color="primary">
+              <Row>
+                <Col md="2" sm="3" xs="6">
+                <Button type="submit" size="md" color="primary">
                 <i className="fa fa-dot-circle-o" /> Submit
               </Button>
-              <Button type="reset" size="md" color="danger">
+                </Col> 
+                <Col md="2" sm="3" xs="6">
+                <Button type="reset" size="md" color="danger">
                 <i className="fa fa-ban" /> Reset
               </Button>
+                </Col>
+              </Row>
             </CardFooter>
             </Form>
           </Card>
+          </Col>
+          </Row>
         </div>
       </div>
     );
