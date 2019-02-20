@@ -27,15 +27,13 @@ class Login extends Component {
 
     this.state = {
       //declaring state variables
-      aadhaar: "",
+      orgId: "",
       web3: null,
       currentAddress: null,
       phone: null,
       seedphrase: ""
     };
-    this.SignIn = this.SignIn.bind(this);
-    this.verifyLogin = this.verifyLogin.bind(this);
-    this.myFunction = this.myFunction.bind(this);
+    this.signIn = this.signIn.bind(this);
   }
 
   componentWillMount() {
@@ -55,224 +53,35 @@ class Login extends Component {
       });
   }
 
-  componentDidMount() {
-    document.getElementById("OTP").style.display = "none";
-  }
 
   instantiateContract() {
-    const contractAddress = "0x78478e7666bcb38b2ddeddfe7cb0ba152301df07";
-
-    const ABI = [
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "login",
-        outputs: [{ name: "", type: "bool" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "uint256" }],
-        name: "aadhaarToAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [{ name: "_ipfskey", type: "string" }],
-        name: "keymap",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [
-          { name: "_aadhaar", type: "uint256" },
-          { name: "_ipfskey", type: "string" }
-        ],
-        name: "link",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "addressToAadhaar",
-        outputs: [{ name: "", type: "uint256" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "getAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "ownerToKey",
-        outputs: [{ name: "", type: "string" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_aadhaar", type: "uint256" }
-        ],
-        name: "addressLinked",
-        type: "event"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_ipfshash", type: "string" }
-        ],
-        name: "keyLinked",
-        type: "event"
-      }
-    ];
-
-    var UserDetailsContract = new this.state.web3.eth.Contract(
-      ABI,
-      contractAddress
-    );
-
-    this.UserDetailsContract = UserDetailsContract;
-    console.log("contract:" + this.UserDetailsContract);
-
-    this.state.web3.eth.getAccounts((error, accounts) => {
-      console.log(accounts[0]);
-      this.acc = accounts[0];
-      console.log(this.acc);
-      this.setState({ currentAddress: this.acc });
-    });
-    this.setState({ currentAddress: this.acc });
-    console.log(this.state.web3);
-    //console.log(this.UserDetailsContract)
+   //Initialize organization contract
+   const orgContractAddress = "0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20"
+   const orgABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"orgAddresses","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"orgToAddress","outputs":[{"name":"orgName","type":"string"},{"name":"orgType","type":"string"},{"name":"uniqueIdentifier","type":"uint256"},{"name":"keyHash","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getKeyHash","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"string"},{"name":"_type","type":"string"},{"name":"_identifier","type":"uint256"},{"name":"_ipfsHash","type":"string"}],"name":"orgSignUp","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"retAddresses","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgName","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgType","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgDetails","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"orgToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"}]
+   var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress)
+   this.orgContract = orgContract
+   console.log("org contract: "+this.orgContract)
   }
 
-  SignIn(event) {
+  signIn(event) {
     event.preventDefault(); //function handling the signup event
-    document.getElementById("OTP").style.display = "block";
-    alert("In Signup");
-    //getting phone number for the entered aadhaar number
-    // firebaseApp
-    //   .database()
-    //   .ref("/uidai/")
-    //   .orderByChild("aadhaar_no")
-    //   .equalTo(this.state.aadhaar)
-    //   .once("value")
-    //   .then(function(snapshot) {
-    //     snapshot.forEach(function(child) {
-    //       var value = child.val();
-
-    //       window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-    //         "recaptcha-container"
-    //       );
-
-    //       //     //send OTP to the phone number
-    //       firebaseApp
-    //         .auth()
-    //         .signInWithPhoneNumber(
-    //           "+91" + value.phone,
-    //           window.recaptchaVerifier
-    //         )
-    //         .then(function(confirmationResult) {
-    //           //wait for OTP verification
-    //           window.confirmationResult = confirmationResult;
-    //         });
-    //     });
-    //   });
-  }
-
-  //link aadhaar to account address using Smart Contract
-  verifyLogin() {
     this.state.web3.eth.getAccounts((error, accounts) => {
-      //get the account from metamask
-      this.UserDetailsContract.methods.login(this.state.aadhaar).call(
-        { from: accounts[0] },
-        function(error, x) {
-          //check if account exists
-          if (error) {
-            alert("Wrong");
-            return;
+      this.orgContract.methods.getOrgDetails(accounts[0]).call({from:accounts[0]},function(error,details){
+          let id = details[2]
+          console.log("id returned: "+id)
+          if(this.state.orgId == id){
+            alert("sign in successful")
+            sessionStorage.setItem("orgId", this.state.orgId);
+            this.props.history.push("/dashboard");
           }
-          if (x === true) {
-            alert("Login Successfull");
-            this.UserDetailsContract.methods
-              .getAddress(this.state.aadhaar)
-              .call(
-                { from: accounts[0] },
-                function(error, add) {
-                  //get account address from SC
-                  if (error) {
-                    alert("Wrong");
-                    return;
-                  }
-                  if (add === accounts[0]) {
-                    alert("Login Successfull");
-
-                    //setting a key value pair ::>> "aadhaar" : this.state.aadhaar
-                    sessionStorage.setItem("aadhaar", this.state.aadhaar);
-                    this.props.history.push("/dashboard");
-
-                    //this.props.dispatch(logUser(this.state.aadhaar))    //if login successful then store aadhaar in app state
-                  } else {
-                    alert("Details Incorrect");
-                  }
-                }.bind(this)
-              );
-          } else {
-            alert("Details Incorrect");
+          else{
+            alert("Incorrect details")
           }
-        }.bind(this)
-      );
-    });
+      }.bind(this))
+    })
   }
-
-  //confirm OTP function and call to linkAadhaar function
-  myFunction = function(event) {
-    event.preventDefault();
-    let verifyLogin = this.verifyLogin;
-    //callLinkAadhaar()
-    verifyLogin();
-    // window.confirmationResult
-    //   .confirm(document.getElementById("verificationcode").value)
-    //   .then(
-    //     function(result) {
-    //       verifyLogin();
-    //       //window.location.href = '/signin'
-    //       alert("success");
-    //     },
-
-    //     function(error) {
-    //       alert(error);
-    //     }
-    //   );
-  };
 
   render() {
-    //checking if already logged in and redirecting to /dashboard (2 ways)
-    if (sessionStorage.getItem("aadhaar") !== null)
-      //return (window.location.href = "/dashboard");
-      this.props.history.push("/dashboard");
     return (
       <div className="app flex-row align-items-center">
         <Container>
@@ -281,23 +90,23 @@ class Login extends Component {
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
-                    <Form onSubmit={this.SignIn}>
+                    <Form id="signIn" onSubmit={this.signIn}>
                       <h1>Login</h1>
-                      <p className="text-muted">Sign In to your account</p>
+                      <p className="text-muted">Sign In to your account</p><br/>
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
-                            <i className="icon-user" />
+                            <i className="fa fa-building" />
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
                           type="text"
-                          placeholder="Aadhaar Number"
+                          placeholder="Organization Identifier"
                           pattern=".{10,10}"
                           min="0000000001"
                           autoComplete="username"
                           onChange={event =>
-                            this.setState({ aadhaar: event.target.value })
+                            this.setState({ orgId: event.target.value })
                           }
                           required={true}
                         />
@@ -310,38 +119,10 @@ class Login extends Component {
                             className="px-4"
                             block
                           >
-                            Get OTP
+                            Submit
                           </Button>
                         </Col>
-                        {/* <Col xs="6" className="text-right">
-                          <Button color="link" className="px-0">Forgot password?</Button>
-                        </Col> */}
                       </Row>
-                    </Form>
-                    <br />
-                    <div id="recaptcha-container" />
-                    <br />
-
-                    <Form id="OTP" onSubmit={this.myFunction}>
-                      <InputGroup className="mb-3">
-                        <InputGroupAddon addonType="prepend">
-                          <InputGroupText>
-                            <i className="icon-user" />
-                          </InputGroupText>
-                        </InputGroupAddon>
-                        <Input
-                          type="text"
-                          pattern=".{6,6}"
-                          min="000000"
-                          id="verificationcode"
-                          placeholder="Enter OTP"
-                          required={true}
-                        />
-                      </InputGroup>
-
-                      <Button color="primary" type="submit" block>
-                        Submit
-                      </Button>
                     </Form>
                   </CardBody>
                 </Card>
