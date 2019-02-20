@@ -25,6 +25,8 @@ class Register extends Component {
   constructor(props) {
     super(props);
 
+
+    //initializing state of the component
     this.state = {
       //declaring state variables
       aadhaar: "",
@@ -33,6 +35,8 @@ class Register extends Component {
       phone: null,
       seedphrase: ""
     };
+
+    //binding functions
     this.SignUp = this.SignUp.bind(this);
     this.linkAadhaar = this.linkAadhaar.bind(this);
     this.myFunction = this.myFunction.bind(this);
@@ -55,14 +59,16 @@ class Register extends Component {
         console.log("Error finding web3.");
       });
   }
-
+  
   componentDidMount() {
     //document.getElementById("OTP").style.display="none"
   }
 
   instantiateContract() {
+    //contract address for user details contract
     const contractAddress = "0x78478e7666bcb38b2ddeddfe7cb0ba152301df07";
 
+    //ABI for UserDetails contract
     const ABI = [
       {
         constant: true,
@@ -150,20 +156,24 @@ class Register extends Component {
       }
     ];
 
+    //instatiate UserDetails Contract
     var UserDetailsContract = new this.state.web3.eth.Contract(
       ABI,
       contractAddress
     );
-
+    
     this.UserDetailsContract = UserDetailsContract;
     console.log("contract:" + this.UserDetailsContract);
-
+    
+    //getting active account from metamask
     this.state.web3.eth.getAccounts((error, accounts) => {
       console.log(accounts[0]);
       this.acc = accounts[0];
       console.log(this.acc);
       this.setState({ currentAddress: this.acc });
     });
+
+    //set metamask address in state
     this.setState({ currentAddress: this.acc });
     console.log(this.state.web3);
     //console.log(this.UserDetailsContract)
@@ -190,7 +200,7 @@ class Register extends Component {
             "recaptcha-container"
           );
 
-          //     //send OTP to the phone number
+          //send OTP to the phone number
           firebaseApp
             .auth()
             .signInWithPhoneNumber(
@@ -207,9 +217,13 @@ class Register extends Component {
 
   //link aadhaar to account address using Smart Contract
   linkAadhaar() {
+
+    //getting active account from metamask
     this.state.web3.eth.getAccounts((error, accounts) => {
       alert("aadhaar:", this.state.aadhaar);
       alert("seedphrase:", this.state.seedphrase);
+
+      //call registerKey function from pgp.js
       registerkey(
         accounts[0],
         this.state.seedphrase,
@@ -218,6 +232,7 @@ class Register extends Component {
           alert("callback ipfs: " + ipfsHash);
           alert(accounts[0]);
           console.log(this.UserDetailsContract);
+
           //transaction to link aadhaar card to address
           this.UserDetailsContract.methods
             .link(this.state.aadhaar, ipfsHash)
@@ -233,7 +248,7 @@ class Register extends Component {
                   console.log("tx: " + txHash);
                   alert("Transaction Hash:" + txHash);
                   alert("Registered Successfully");
-                  window.location.reload(true);
+                  window.location.reload(true);   //if transaction successful then refresh the page
                 } else console.log(error);
               }
             );
@@ -263,6 +278,8 @@ class Register extends Component {
   };
 
   render() {
+
+    //if already login then redirect to dashboard page
     if (sessionStorage.getItem("aadhaar") !== null)
       //  return (window.location.href = "/dashboard");
       this.props.history.push("/dashboard");
