@@ -3,6 +3,7 @@ import { Link, browserHistory } from "react-router-dom";
 import { firebaseApp } from "../../../Dependencies/firebase";
 import * as firebase from "firebase";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
+import {userdetails} from "../../../contract_abi";
 //import '../App.css'
 import { registerkey } from "../../../Dependencies/pgp";
 
@@ -66,96 +67,11 @@ class Register extends Component {
 
   instantiateContract() {
     //contract address for user details contract
-    const contractAddress = "0x78478e7666bcb38b2ddeddfe7cb0ba152301df07";
+    const contractAddress = userdetails.contract_address;
 
     //ABI for UserDetails contract
-    const ABI = [
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "login",
-        outputs: [{ name: "", type: "bool" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "uint256" }],
-        name: "aadhaarToAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [{ name: "_ipfskey", type: "string" }],
-        name: "keymap",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [
-          { name: "_aadhaar", type: "uint256" },
-          { name: "_ipfskey", type: "string" }
-        ],
-        name: "link",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "addressToAadhaar",
-        outputs: [{ name: "", type: "uint256" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "getAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "ownerToKey",
-        outputs: [{ name: "", type: "string" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_aadhaar", type: "uint256" }
-        ],
-        name: "addressLinked",
-        type: "event"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_ipfshash", type: "string" }
-        ],
-        name: "keyLinked",
-        type: "event"
-      }
-    ];
-
+    const ABI = userdetails.abi
+    
     //instatiate UserDetails Contract
     var UserDetailsContract = new this.state.web3.eth.Contract(
       ABI,

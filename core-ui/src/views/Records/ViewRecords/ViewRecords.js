@@ -3,6 +3,7 @@ import ipfs from '../../../Dependencies/ipfs'
 import {decrypt} from '../../../Dependencies/crypto'
 import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
+import {userdetails, storage} from "../../../contract_abi";
 import { Badge, Card, CardBody, CardHeader, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 
@@ -63,15 +64,15 @@ export class ViewRecords extends Component {
   
 
       //Record Uploader Contract Instantiation
-      const contractAddress = '0xf5e9037A2412db50c74d5A1642D6d3B99Dd90f20'
-      const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"rname","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_name","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]    
+      const contractAddress = storage.contract_address
+      const ABI = storage.abi    
       var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)      
       this.RecordUploaderContract = RecordUploaderContract
         
 
       //User Details Contract Instantiation
-      const contractAddress_u = '0x78478e7666bcb38b2ddeddfe7cb0ba152301df07'       
-      const ABI_u = [{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"login","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"aadhaarToAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfskey","type":"string"}],"name":"link","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"addressToAadhaar","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"ownerToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"getKeyHash","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_aadhaar","type":"uint256"}],"name":"addressLinked","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_address","type":"address"},{"indexed":false,"name":"_ipfshash","type":"string"}],"name":"keyLinked","type":"event"}]              
+      const contractAddress_u = userdetails.contract_address       
+      const ABI_u = userdetails.abi              
       var UserContract = new this.state.web3.eth.Contract(ABI_u, contractAddress_u)     
       this.UserContract = UserContract
 
@@ -116,8 +117,9 @@ export class ViewRecords extends Component {
                         obj['ipfsHash'] = y[0]
                         obj['name'] = y[2]
                         obj['type'] = y[1]
-                        obj['hospital'] = y[3]
-                        obj['masterkey'] = y[4]
+                        obj['date'] = y[3]
+                        obj['hospital'] = y[4]
+                        obj['masterkey'] = y[5]
                         
                         
                         myarray.push(obj)
@@ -158,7 +160,7 @@ export class ViewRecords extends Component {
                   <tr key={index}>
                       <td>{this.state.arr[index].name}</td>
                       {/* <td>{row.job}</td> */}
-                      <td></td>
+                      <td>{this.state.arr[index].date}</td>
                       <td>{this.state.arr[index].type}</td>
                       <td>{this.state.arr[index].hospital}</td>
                       <td>
