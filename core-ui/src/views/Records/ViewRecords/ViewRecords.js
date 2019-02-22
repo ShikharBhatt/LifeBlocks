@@ -103,6 +103,15 @@ export class ViewRecords extends Component {
                 }
 
                 else if(x.length!=0) {
+                  let rid = []
+                  for(let j = 0;j<x.length; j++) {
+                    rid[j] = Number(x[j])
+                  }
+                  for(let j = 0;j<x.length; j++) {
+                    x[j] = rid[j]
+                  }
+                  x.sort(function(a, b){return b - a});
+
                   let myarray = []
 
                   for(let i = 0; i<x.length; i++) {
@@ -117,7 +126,13 @@ export class ViewRecords extends Component {
                         obj['ipfsHash'] = y[0]
                         obj['name'] = y[2]
                         obj['type'] = y[1]
-                        obj['date'] = y[3]
+                        // let dd = new Date(Number(y[3])).getDate()
+                        // let mm = new Date(Number(y[3])).getMonth()+1
+                        // let yyyy = new Date(Number(y[3])).getFullYear()
+                        // obj['date'] = dd + '/' + mm + '/' + yyyy
+                        let f = Number(y[3])
+                        obj['date'] = new Date(f*1000).toLocaleDateString()
+                        console.log(y[3])
                         obj['hospital'] = y[4]
                         obj['masterkey'] = y[5]
                         
