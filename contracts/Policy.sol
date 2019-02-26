@@ -15,7 +15,7 @@ contract PolicyTemplate{
     address[] public policyContracts;
     address public lastContractAddress;
     
-    event newP(address policyContractAddress);
+    event newPolicyPurchase(address policyContractAddress);
     
     address owner;
     
@@ -52,7 +52,7 @@ contract PolicyTemplate{
         policyContracts.push(p);
         lastContractAddress = p;
         userdetails.policyMap(_aadhaar,p);
-        emit newP(p);
+        emit newPolicyPurchase(p);
         return p;
     }
 }
@@ -60,19 +60,21 @@ contract PolicyTemplate{
 contract Policy{
     
    
-    uint public value;
+    uint value;
     address public seller;
     address public buyer;
-    uint public premium;
-    uint public coverage;
-    uint public dateApplied;
-    uint public startDate;
-    uint public graceDate;
-    uint public lapseDate;
+    uint premium;
+    uint coverage;
+    uint dateApplied;
+    uint startDate;
+    uint graceDate;
+    uint lapseDate;
+    uint renewAppDate;
     uint penalty;
     
     enum State { Applied, Active, Grace, Lapsed, Renewal, Inactive, Defunct}
     State public state;
+    State public prevState;
     
     modifier onlyBuyer(){
         require(msg.sender == buyer);
@@ -103,16 +105,24 @@ contract Policy{
     }
     
     function confirmPolicy() onlyBuyer inState(State.Applied) public payable{
+        //check if sent value is equal to premium set by insurance company 
         require(msg.value == premium);
+        //policy start date
         startDate = now;
+        //send premium to insurance company 
         seller.transfer(premium);
-        buyer.transfer(this.balance);
+        //send application fee back to user
+        buyer.transfer(value);
+        //change policy state to active
         state = State.Active;
+        //set grace date to 1 year after start date
         graceDate = startDate + 1 years;
+        //set grace date to 4 weeks after grace date
         lapseDate = graceDate + 4 weeks;
     }
     
-    function getDetails() public returns(address, address, uint, State, uint, uint, uint, uint){
+    //test function
+    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint){
         return (seller,buyer,value,state,this.balance,startDate,graceDate,lapseDate);
     }
 
@@ -122,20 +132,64 @@ contract Policy{
         }
     }
     
+    function getPremium() external view returns(uint){
+        return(premium);
+    }
+    
     function policyLapse(uint _timestamp) onlySeller inState(State.Grace) public{
         if(_timestamp > lapseDate){
             state = State.Lapsed;
+            penalty = (5 * premium)/100;
         }
     }
     
-    function policyRenew() onlyBuyer public payable{
-        if(state == State.Grace){
-            require(msg.value == premium);
-        }
-        else if(state == State.Lapsed){
-            require(msg.value == premium + penalty);
-            
+    function policyInactive(uint _timestamp) onlySeller inState(State.Lapsed) public{
+        if(_timestamp > lapseDate){
+            state = State.Inactive;
+            penalty = (10 * premium)/100;
         }
     }
+    
+    function renewPolicy(uint _coverage) onlyBuyer public {
+        renewAppDate = now;
+        coverage = _coverage;
+        state = State.Applied;
+    }
+    
+    function confirmRenewal() onlyBuyer inState(State.Renewal) public payable{
+        if(prevState == State.Grace){
+            require(msg.value == premium);
+            startDate = now;
+            //change policy state to active
+            state = State.Active;
+            //set grace date to 1 year after start date
+            graceDate = startDate + 1 years;
+            //set grace date to 4 weeks after grace date
+            lapseDate = graceDate + 4 weeks;
+            seller.transfer(this.balance);
+        }
+        else if(prevState == State.Lapsed){
+            require(msg.value == premium + penalty);
+            startDate = now;
+            //change policy state to active
+            state = State.Active;
+            //set grace date to 1 year after start date
+            graceDate = startDate + 1 years;
+            //set grace date to 4 weeks after grace date
+            lapseDate = graceDate + 4 weeks;
+            seller.transfer(this.balance);
+        }
+        else if(prevState == State.Inactive)
+            require(msg.value == premium + penalty);
+            startDate = now;
+            //change policy state to active
+            state = State.Active;
+            //set grace date to 1 year after start date
+            graceDate = startDate + 1 years;
+            //set grace date to 4 weeks after grace date
+            lapseDate = graceDate + 4 weeks;
+            seller.transfer(this.balance);
+    }
+    
     
 }
