@@ -97,50 +97,47 @@ class ShareRecords extends Component {
                 })
                 console.log(x)
 
+                //if there are no records for the user
                 if(x === null) {
                   alert("No records found")
                 }
 
+                //if record length is grater than 0
                 else if(x.length!=0) {
                   let rid = []
+
+                  //convert the record string array to number array
                   for(let j = 0;j<x.length; j++) {
                     rid[j] = Number(x[j])
                   }
+
                   for(let j = 0;j<x.length; j++) {
                     x[j] = rid[j]
                   }
+
+                  //sort the number array in descending order
                   x.sort(function(a, b){return b - a});
 
                   let myarray = []
 
+                  //getting data of each record
                   for(let i = 0; i<x.length; i++) {
                     this.RecordUploaderContract.methods.viewRecord(x[i]).call(
                       {from:address}, function(error, y){
-                        // alert('called')
-                        let obj = {
-                          // name: y[2],
-                          // type: y[1],
-                          // hospital: y[3]
-                        }
+
                         obj['recordId'] = x[i]
                         obj['ipfsHash'] = y[0]
                         obj['name'] = y[2]
                         obj['type'] = y[1]
-                        // let dd = new Date(Number(y[3])).getDate()
-                        // let mm = new Date(Number(y[3])).getMonth()+1
-                        // let yyyy = new Date(Number(y[3])).getFullYear()
-                        // obj['date'] = dd + '/' + mm + '/' + yyyy
                         let f = Number(y[3])
                         obj['date'] = new Date(f*1000).toLocaleDateString()
                         console.log(y[3])
                         obj['hospital'] = y[4]
                         obj['masterkey'] = y[5]
                         
-                        
+                        //push the record object into array of objects                        
                         myarray.push(obj)
-                        
-                        // alert("Objec"+myarray[0].name + myarray[0].type)
-                        
+                                                
                         this.setState({
                           arr: myarray
                         })  
@@ -148,10 +145,6 @@ class ShareRecords extends Component {
       
                   }
                 
-                  // console.log(JSON.parse(myarray))
-                  
-                  // alert(myarray[0].name)
-                  // alert(myarray[1].name)
                 }
                 else {
                   alert("No records found")
@@ -162,14 +155,18 @@ class ShareRecords extends Component {
         })              
       }
 
+      //function for modal
       togglePrimary() {
         this.setState({
           primary: !this.state.primary,
         });
       }
 
+
+      //creating table for sharing the records
       TableBody(recordsId) {
         let ids = [];
+
         const rows = recordsId.map((row, index) => {
               return (
                   <tr key={index}>
@@ -202,16 +199,15 @@ class ShareRecords extends Component {
                   );
           
           });
-      
+          
+          //return the table of records
           return rows
       }
   
   
     onSubmit(){
-//        event.preventDefault();
-// this.setState({
-//     value:val
-// })
+        event.preventDefault();
+
         alert("Value:"+this.state.value)
 
         this.RecordUploaderContract.methods.viewRecord(this.state.value).call(
@@ -227,6 +223,7 @@ class ShareRecords extends Component {
 
         
     }
+
     Change(event){
         this.setState({
             value : event.target.value
@@ -236,9 +233,12 @@ class ShareRecords extends Component {
     }
   
    render() {
+     //don't render if there are no records for the user
      if(this.state.arr.length === 0) {
        return <div></div>
      }
+
+     //render if the user has records
      else if(this.state.arr.length > 0){
       console.log("Athis.state.arr", this.state.arr)
       return (
@@ -273,44 +273,22 @@ class ShareRecords extends Component {
                     <th>Date Generated</th>
                     <th>Record Type</th>
                     <th>Hospital Name</th>
-                    <th></th>
+                    <th>Select Records</th>
                   </tr>
                   </thead>
                   <tbody>
-                 
-                  {/* <this.TableBody id="check" recordsId={this.state.recordsId} recordArray={this.state.arr}/> */}
-                  {/* {this.createSelectList()}                   */}
-                  {this.TableBody(this.state.arr)}
+                    {this.TableBody(this.state.arr)}
                   </tbody>
                 </Table>
               </CardBody>
             </Card>
           </Col>
           </Row>
-          <Row id ="itemPreview">
-              <p>Your Record:</p>
-              
-          </Row>
-          </div>
-      //     <main className="container">
-      //       <div className="pure-g">
-      //         <div className="pure-u-1-1">
-
-      //           <h2>View My Health Records</h2>
-      //           {/* <form onSubmit={this.onSubmit}>
-      //               <select id="select" value={this.state.value} onChange={this.Change}>
-      //               <option value=""  disabled selected>Select Record</option>
-      //  {this.createSelectList()}
-      //               </select>
-      //               <br></br>
-      //               <input type='submit' />
-      //           </form>
-      //            */}
-             
-      //          </div>
-      //       </div>
-      //     </main>
-    
+            <Row id ="itemPreview">
+                <p>Your Record:</p>
+                
+            </Row>
+          </div>    
       );
 
      }

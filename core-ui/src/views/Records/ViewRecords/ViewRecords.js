@@ -97,46 +97,45 @@ export class ViewRecords extends Component {
                     recordsId : x
                 })
                 console.log(x)
-
+                
+                //if there are no records for the user
                 if(x === null) {
                   alert("No records found")
                 }
 
+                //if record length is greater than 0
                 else if(x.length!=0) {
                   let rid = []
+                  
+                  //convert the record string array to number array
                   for(let j = 0;j<x.length; j++) {
                     rid[j] = Number(x[j])
                   }
+
                   for(let j = 0;j<x.length; j++) {
                     x[j] = rid[j]
                   }
+
+                  //sort the number array in descending order
                   x.sort(function(a, b){return b - a});
 
                   let myarray = []
 
+                  //getting data of each record
                   for(let i = 0; i<x.length; i++) {
                     this.RecordUploaderContract.methods.viewRecord(x[i]).call(
                       {from:address}, function(error, y){
                         // alert('called')
-                        let obj = {
-                          // name: y[2],
-                          // type: y[1],
-                          // hospital: y[3]
-                        }
                         obj['ipfsHash'] = y[0]
                         obj['name'] = y[2]
                         obj['type'] = y[1]
-                        // let dd = new Date(Number(y[3])).getDate()
-                        // let mm = new Date(Number(y[3])).getMonth()+1
-                        // let yyyy = new Date(Number(y[3])).getFullYear()
-                        // obj['date'] = dd + '/' + mm + '/' + yyyy
                         let f = Number(y[3])
                         obj['date'] = new Date(f*1000).toLocaleDateString()
                         console.log(y[3])
                         obj['hospital'] = y[4]
                         obj['masterkey'] = y[5]
                         
-                        
+                        //push the record object into array of objects                        
                         myarray.push(obj)
                         
                         // alert("Objec"+myarray[0].name + myarray[0].type)
@@ -162,12 +161,15 @@ export class ViewRecords extends Component {
         })              
       }
 
+      //function for modal
       togglePrimary() {
         this.setState({
           primary: !this.state.primary,
         });
       }
 
+
+      //creating table for displaying the records
       TableBody(recordsId) {
 
         const rows = recordsId.map((row, index) => {
@@ -198,7 +200,8 @@ export class ViewRecords extends Component {
                   );
           
           });
-      
+          
+          //return the table of records
           return rows
       }
     
@@ -265,69 +268,8 @@ export class ViewRecords extends Component {
                 alert('ipfs : '+x[0]+ 'masterkey :'+x[4])
                 this.view(this.state.ipfs, this.state.masterkey)
             }.bind(this))
-
-        
+   
     }
-    createSelectList(){
-    
-     //var x = document.getElementById("mySelect");
-    // var length = this.state.recordsId.length;
-    // var option ;
-    // for(let i=0;i < length; i++){
-    //     option = document.createElement("option");
-    //     option.text =  this.state.recordsId[i];
-    //     option.value =  this.state.recordsId[i];
-    //     x.add(option);
-    // }
-    
-    // this.state.web3.eth.getAccounts((error,account) => {
-    //   if(!error) {
-    //     console.log(account[0])
-    //   }
-    // this.RecordUploaderContract.methods.retrieve(myaadhaar).call(
-    //     {from:account[0]}, function(error, x){
-            
-    //         this.setState({
-    //             recordsId : x
-    //         })
-    //         alert('State : '+ this.state.recordsId)
-    //         alert('Length : '+ this.state.recordsId.length)
-    //         alert('Value : '+ this.state.recordsId[0])
-            
-    //         alert("Loo[p")
-    //         for(let i=0;i<this.state.recordsId.length;i++) {
-    //           console.log("contract:",this.RecordUploaderContract)
-    //           this.RecordUploaderContract.methods.viewRecord(this.state.value).call(
-    //             {from:this.state.userAddress}, function(error, x){
-    //               alert('called')
-    //               obj.name = x[2]
-    //               obj.date = "date"
-    //               obj.type = x[1]
-    //               obj.hospital = x[3]
-    //               console.log(obj)
-    //               temp.push(obj)
-    //             }.bind(this))
-    //            this.setState({
-    //              arr: temp
-    //            }) 
-    //         }
-    //     }.bind(this))
-    //  })
-    // alert("Name:"+this.recordArray[0].name)
-    // let items = [];         
-    //  for (let i = 0; i < this.state.recordsId.length; i++) {             
-    //       items.push(
-    //       <option key={this.state.recordsId[i]} value={this.state.recordsId[i]}>{this.state.recordsId[i]}
-          
-    //       </option>);   
-    //       //here I will be creating my options dynamically based on
-    //       //what props are currently passed to the parent component
-    //  }
-    //  return items;
-     
- }  
-  
- 
     
     Change(event){
         this.setState({
@@ -338,9 +280,12 @@ export class ViewRecords extends Component {
     }
   
    render() {
+     //don't render if there are no records for the user
      if(this.state.arr.length === 0) {
        return <div></div>
      }
+
+      //render if the user has records
      else if(this.state.arr.length > 0){
       console.log("Athis.state.arr", this.state.arr)
       return (
@@ -379,10 +324,7 @@ export class ViewRecords extends Component {
                   </tr>
                   </thead>
                   <tbody>
-                 
-                  {/* <this.TableBody id="check" recordsId={this.state.recordsId} recordArray={this.state.arr}/> */}
-                  {/* {this.createSelectList()}                   */}
-                  {this.TableBody(this.state.arr)}
+                    {this.TableBody(this.state.arr)}
                   </tbody>
                 </Table>
               </CardBody>
@@ -394,25 +336,7 @@ export class ViewRecords extends Component {
               
           </Row>
           </div>
-      //     <main className="container">
-      //       <div className="pure-g">
-      //         <div className="pure-u-1-1">
-
-      //           <h2>View My Health Records</h2>
-      //           {/* <form onSubmit={this.onSubmit}>
-      //               <select id="select" value={this.state.value} onChange={this.Change}>
-      //               <option value=""  disabled selected>Select Record</option>
-      //  {this.createSelectList()}
-      //               </select>
-      //               <br></br>
-      //               <input type='submit' />
-      //           </form>
-      //            */}
-             
-      //          </div>
-      //       </div>
-      //     </main>
-    
+     
       );
 
      }
