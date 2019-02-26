@@ -97,7 +97,7 @@ export class ViewRecords extends Component {
                     recordsId : x
                 })
                 console.log(x)
-                
+
                 //if there are no records for the user
                 if(x === null) {
                   alert("No records found")
@@ -290,22 +290,16 @@ export class ViewRecords extends Component {
       console.log("Athis.state.arr", this.state.arr)
       return (
         <div className="animated fadeIn">
-        {/* <Button color="primary" onClick={this.togglePrimary} className="mr-1">Primary modal</Button>
-                <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
+                {/* <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
                        className={'modal-primary '}>
                   <ModalHeader toggle={this.togglePrimary}>Modal title</ModalHeader>
-                  <ModalBody>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                    culpa qui officia deserunt mollit anim id est laborum.
+                  <ModalBody id="itemPreview">
                   </ModalBody>
                   <ModalFooter>
                     <Button color="primary" onClick={this.togglePrimary}>Do Something</Button>{' '}
                     <Button color="secondary" onClick={this.togglePrimary}>Cancel</Button>
                   </ModalFooter>
-                </Modal> */}
+                </Modal>  */}
        <Row>
           <Col xs="12" lg="12">
             <Card>

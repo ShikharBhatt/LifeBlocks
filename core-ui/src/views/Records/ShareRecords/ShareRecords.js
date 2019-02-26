@@ -8,7 +8,6 @@ import {userdetails, storage} from "../../../contract_abi";
 import { Badge, Card, CardBody, CardHeader, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 
-
 class ShareRecords extends Component {
     constructor(props) {
       super(props)
@@ -102,7 +101,7 @@ class ShareRecords extends Component {
                   alert("No records found")
                 }
 
-                //if record length is grater than 0
+                //if record length is greater than 0
                 else if(x.length!=0) {
                   let rid = []
 
