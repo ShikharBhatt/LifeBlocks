@@ -1,303 +1,269 @@
-// import React, { Component } from 'react';
 
-// class Typography extends Component {
-//   render() {
-//     return (
-//       <div className="animated fadeIn">
-//         <div className="card">
-//           <div className="card-header">
-//             Headings
-//           </div>
-//           <div className="card-body">
-//             <p>Documentation and examples for Bootstrap typography, including global settings, headings, body text, lists, and more.</p>
-//             <table className="table">
-//               <thead>
-//               <tr>
-//                 <th>Heading</th>
-//                 <th>Example</th>
-//               </tr>
-//               </thead>
-//               <tbody>
-//               <tr>
-//                 <td>
-//                   <p><code className="highlighter-rouge">&lt;h1&gt;&lt;/h1&gt;</code></p>
-//                 </td>
-//                 <td><span className="h1">h1. Bootstrap heading</span></td>
-//               </tr>
-//               <tr>
-//                 <td>
-//                   <p><code className="highlighter-rouge">&lt;h2&gt;&lt;/h2&gt;</code></p>
-//                 </td>
-//                 <td><span className="h2">h2. Bootstrap heading</span></td>
-//               </tr>
-//               <tr>
-//                 <td>
-//                   <p><code className="highlighter-rouge">&lt;h3&gt;&lt;/h3&gt;</code></p>
-//                 </td>
-//                 <td><span className="h3">h3. Bootstrap heading</span></td>
-//               </tr>
-//               <tr>
-//                 <td>
-//                   <p><code className="highlighter-rouge">&lt;h4&gt;&lt;/h4&gt;</code></p>
-//                 </td>
-//                 <td><span className="h4">h4. Bootstrap heading</span></td>
-//               </tr>
-//               <tr>
-//                 <td>
-//                   <p><code className="highlighter-rouge">&lt;h5&gt;&lt;/h5&gt;</code></p>
-//                 </td>
-//                 <td><span className="h5">h5. Bootstrap heading</span></td>
-//               </tr>
-//               <tr>
-//                 <td>
-//                   <p><code className="highlighter-rouge">&lt;h6&gt;&lt;/h6&gt;</code></p>
-//                 </td>
-//                 <td><span className="h6">h6. Bootstrap heading</span></td>
-//               </tr>
-//               </tbody>
-//             </table>
-//           </div>
-//         </div>
-//         <div className="card">
-//           <div className="card-header">
-//             Headings
-//           </div>
-//           <div className="card-body">
-//             <p><code className="highlighter-rouge">.h1</code> through <code className="highlighter-rouge">.h6</code> classes are also available, for when you
-//               want to match the font styling of a heading but cannot use the associated HTML element.</p>
-//             <div className="bd-example">
-//               <p className="h1">h1. Bootstrap heading</p>
-//               <p className="h2">h2. Bootstrap heading</p>
-//               <p className="h3">h3. Bootstrap heading</p>
-//               <p className="h4">h4. Bootstrap heading</p>
-//               <p className="h5">h5. Bootstrap heading</p>
-//               <p className="h6">h6. Bootstrap heading</p>
-//             </div>
-//           </div>
-//         </div>
-//         <div className="card">
-//           <div className="card-header">
-//             Display headings
-//           </div>
-//           <div className="card-body">
-//             <p>Traditional heading elements are designed to work best in the meat of your page content. When you need a heading to stand out, consider using
-//               a <strong>display heading</strong>—a larger, slightly more opinionated heading style.</p>
-//             <div className="bd-example bd-example-type">
-//               <table className="table">
-//                 <tbody>
-//                 <tr>
-//                   <td><span className="display-1">Display 1</span></td>
-//                 </tr>
-//                 <tr>
-//                   <td><span className="display-2">Display 2</span></td>
-//                 </tr>
-//                 <tr>
-//                   <td><span className="display-3">Display 3</span></td>
-//                 </tr>
-//                 <tr>
-//                   <td><span className="display-4">Display 4</span></td>
-//                 </tr>
-//                 </tbody>
-//               </table>
-//             </div>
-//           </div>
-//         </div>
-//         <div className="card">
-//           <div className="card-header">
-//             Inline text elements
-//           </div>
-//           <div className="card-body">
-//             <p>Traditional heading elements are designed to work best in the meat of your page content. When you need a heading to stand out, consider using
-//               a <strong>display heading</strong>—a larger, slightly more opinionated heading style.</p>
-//             <div className="bd-example">
-//               <p>You can use the mark tag to <mark>highlight</mark> text.</p>
-//               <p>
-//                 <del>This line of text is meant to be treated as deleted text.</del>
-//               </p>
-//               <p><s>This line of text is meant to be treated as no longer accurate.</s></p>
-//               <p>
-//                 <ins>This line of text is meant to be treated as an addition to the document.</ins>
-//               </p>
-//               <p><u>This line of text will render as underlined</u></p>
-//               <p>
-//                 <small>This line of text is meant to be treated as fine print.</small>
-//               </p>
-//               <p><strong>This line rendered as bold text.</strong></p>
-//               <p><em>This line rendered as italicized text.</em></p>
-//             </div>
-//           </div>
-//         </div>
-//         <div className="card">
-//           <div className="card-header">
-//             Description list alignment
-//           </div>
-//           <div className="card-body">
-//             <p>Align terms and descriptions horizontally by using our grid system’s predefined classes (or semantic mixins). For longer terms, you can
-//               optionally add a <code className="highlighter-rouge">.text-truncate</code> class to truncate the text with an ellipsis.</p>
-//             <div className="bd-example">
-//               <dl className="row">
-//                 <dt className="col-sm-3">Description lists</dt>
-//                 <dd className="col-sm-9">A description list is perfect for defining terms.</dd>
-
-//                 <dt className="col-sm-3">Euismod</dt>
-//                 <dd className="col-sm-9">
-//                   <p>Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.</p>
-//                   <p>Donec id elit non mi porta gravida at eget metus.</p>
-//                 </dd>
-
-//                 <dt className="col-sm-3">Malesuada porta</dt>
-//                 <dd className="col-sm-9">Etiam porta sem malesuada magna mollis euismod.</dd>
-
-//                 <dt className="col-sm-3 text-truncate">Truncated term is truncated</dt>
-//                 <dd className="col-sm-9">Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</dd>
-
-//                 <dt className="col-sm-3">Nesting</dt>
-//                 <dd className="col-sm-9">
-//                   <dl className="row">
-//                     <dt className="col-sm-4">Nested definition list</dt>
-//                     <dd className="col-sm-8">Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc.</dd>
-//                   </dl>
-//                 </dd>
-//               </dl>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-// }
-
-// export default Typography;
+import React, { Component } from 'react'
+import ipfs from '../../../Dependencies/ipfs'
+import {decrypt} from '../../../Dependencies/crypto'
+import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
+import getWeb3 from "../../../Dependencies/utils/getWeb3";
+import {userdetails, storage} from "../../../contract_abi";
+import { Badge, Card, CardBody, CardHeader, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 
-import React, { Component } from "react";
-import {
-  Badge,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
-  Row,
-  Table
-} from "reactstrap";
 
 class ShareRecords extends Component {
-  handle = ele => {
-    console.log(ele);
-    console.log("checkbox");
-  };
+    constructor(props) {
+      super(props)
+  
+      this.state = {
+        ipfs : '',
+        buffer: null,
+        userAddress : '',
+        recordsId :[],
+        arr: [],
+        selectValue: '',
+        masterkey: '',
+        newHash:'',
+        value:'',
+        web3:null,
+        primary: false,
+      };
+  
+      
+        this.onSubmit = this.onSubmit.bind(this);
+        this.Change = this.Change.bind(this);
+        this.TableBody = this.TableBody.bind(this);
+        this.togglePrimary = this.togglePrimary.bind(this);
+      }
 
-  createTable = () => {
-    let table = [];
-    let ids = [];
-    // Outer loop to create parent
-    // for (let i = 0; i < 3; i++) {
-    let children = [
-      { id: 0, col1: 0, col2: 0, col3: 0 },
-      { id: 1, col1: 1, col2: 2, col3: 3 },
-      { id: 2, col1: 2, col2: 4, col3: 6 }
-    ];
 
-   
-    table.push(
-      <tr key={children[0].id}>
-        <td>{children[0].col1}</td>
-        <td>{children[0].col2}</td>
-        <td>{children[0].col3}</td>
-        <td></td>
-        <td>
-          <input
-            type="checkbox"
-            // defaultChecked={this.state.chkbox}
-            id="checkbox0"
-            onChange={function() {
-              console.log(children[0].id);
-              if (document.getElementById("checkbox0").checked) {
-                console.log("checked");
-                ids.push(children[0].id);
-              } else {
-                ids = ids.filter(c => {
-                  return c !== children[0].id;
-                });
-              }
-              console.log(ids);
-            }}
-          />
-        </td>
-      </tr>
-    );
-    table.push(
-      <tr key={children[1].id}>
-        <td>{children[1].col1}</td>
-        <td>{children[1].col2}</td>
-        <td>{children[1].col3}</td>
-        <td></td>
-        <td>
-          <input
-            type="checkbox"
-            id="checkbox1"
-            // defaultChecked={this.state.chkbox}
-            onChange={function() {
-              console.log(children[1].id);
-              if (document.getElementById("checkbox1").checked) {
-                console.log("checked");
-                ids.push(children[1].id);
-              } else {
-                ids = ids.filter(c => {
-                  return c !== children[1].id;
-                });
-              }
-              console.log(ids);
-            }}
-          />
-        </td>
-      </tr>
-    );
-    table.push(
-      <tr key={children[2].id}>
-        <td>{children[2].col1}</td>
-        <td>{children[2].col2}</td>
-        <td>{children[2].col3}</td>
-        <td></td>
-        <td>
-          <input
-            type="checkbox"
-            id="checkbox2"
-            // defaultChecked={this.state.chkbox}
-            onChange={function() {
-              console.log(children[2].id);
-              console.log(document.getElementById("checkbox2").checked);
-              if (document.getElementById("checkbox2").checked) {
-                console.log("checked");
-                ids.push(children[2].id);
-              } else {
-                ids = ids.filter(c => {
-                  return c !== children[2].id;
-                });
-              }
-              console.log(ids);
-            }}
-          />
-        </td>
-      </tr>
-    );
+      async componentWillMount() {
+
+       
+        // Get network provider and web3 instance.
+        // See utils/getWeb3 for more info.
+                await getWeb3
+                .then(results => {
+          this.setState({
+            web3: results.web3
+          })
+    
+          // Instantiate contract once web3 provided.
+        })
+        .catch(() => {
+          console.log('Error finding web3.')
+          
+        })
+      
+        await this.instantiateContract()
 
     
-    return table;
-  };
+      }
 
-  render() {
-    return (
-      <div className="animated fadeIn">
-        <Row>
 
+     instantiateContract() {
+  
+
+      //Record Uploader Contract Instantiation
+      const contractAddress = storage.contract_address
+      const ABI = storage.abi    
+      var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)      
+      this.RecordUploaderContract = RecordUploaderContract
+        
+
+      //User Details Contract Instantiation
+      const contractAddress_u = userdetails.contract_address       
+      const ABI_u = userdetails.abi              
+      var UserContract = new this.state.web3.eth.Contract(ABI_u, contractAddress_u)     
+      this.UserContract = UserContract
+
+      console.log("User Contract: "+ this.UserContract)
+
+      //Get account from metamask
+          this.state.web3.eth.getAccounts((error,account) => {
+          if(!error) {
+            console.log(account[0])
+          }
+
+          //get aadhaar value stored in Session
+        let aadhaar = sessionStorage.getItem('aadhaar')
+        let address = account[0]
+        // alert(aadhaar)
+
+        //Retrieve record id's for the user
+        this.RecordUploaderContract.methods.retrieve(aadhaar).call(
+            {from:account[0]}, function(error, x){
+                
+                this.setState({
+                    recordsId : x
+                })
+                console.log(x)
+
+                if(x === null) {
+                  alert("No records found")
+                }
+
+                else if(x.length!=0) {
+                  let rid = []
+                  for(let j = 0;j<x.length; j++) {
+                    rid[j] = Number(x[j])
+                  }
+                  for(let j = 0;j<x.length; j++) {
+                    x[j] = rid[j]
+                  }
+                  x.sort(function(a, b){return b - a});
+
+                  let myarray = []
+
+                  for(let i = 0; i<x.length; i++) {
+                    this.RecordUploaderContract.methods.viewRecord(x[i]).call(
+                      {from:address}, function(error, y){
+                        // alert('called')
+                        let obj = {
+                          // name: y[2],
+                          // type: y[1],
+                          // hospital: y[3]
+                        }
+                        obj['recordId'] = x[i]
+                        obj['ipfsHash'] = y[0]
+                        obj['name'] = y[2]
+                        obj['type'] = y[1]
+                        // let dd = new Date(Number(y[3])).getDate()
+                        // let mm = new Date(Number(y[3])).getMonth()+1
+                        // let yyyy = new Date(Number(y[3])).getFullYear()
+                        // obj['date'] = dd + '/' + mm + '/' + yyyy
+                        let f = Number(y[3])
+                        obj['date'] = new Date(f*1000).toLocaleDateString()
+                        console.log(y[3])
+                        obj['hospital'] = y[4]
+                        obj['masterkey'] = y[5]
+                        
+                        
+                        myarray.push(obj)
+                        
+                        // alert("Objec"+myarray[0].name + myarray[0].type)
+                        
+                        this.setState({
+                          arr: myarray
+                        })  
+                      }.bind(this))
+      
+                  }
+                
+                  // console.log(JSON.parse(myarray))
+                  
+                  // alert(myarray[0].name)
+                  // alert(myarray[1].name)
+                }
+                else {
+                  alert("No records found")
+                }
+
+              
+            }.bind(this))
+        })              
+      }
+
+      togglePrimary() {
+        this.setState({
+          primary: !this.state.primary,
+        });
+      }
+
+      TableBody(recordsId) {
+        let ids = [];
+        const rows = recordsId.map((row, index) => {
+              return (
+                  <tr key={index}>
+                      <td>{this.state.arr[index].name}</td>
+                      {/* <td>{row.job}</td> */}
+                      <td>{this.state.arr[index].date}</td>
+                      <td>{this.state.arr[index].type}</td>
+                      <td>{this.state.arr[index].hospital}</td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          id={this.state.arr[index].recordId}
+                          // defaultChecked={this.state.chkbox}
+                          onChange={function() {
+                            console.log(document.getElementById(`${this.state.arr[index].recordId}`).checked);
+                            if (document.getElementById(`${this.state.arr[index].recordId}`).checked) {
+                              console.log("checked");
+                              ids.push(`${this.state.arr[index].recordId}`);
+                            } else {
+                              ids = ids.filter(c => {
+                                return c !== `${this.state.arr[index].recordId}`;
+                              });
+                            }
+                            console.log(ids);
+                          }.bind(this)}
+                        />
+                      </td>
+                  </tr>
+                  
+                  );
+          
+          });
+      
+          return rows
+      }
+  
+  
+    onSubmit(){
+//        event.preventDefault();
+// this.setState({
+//     value:val
+// })
+        alert("Value:"+this.state.value)
+
+        this.RecordUploaderContract.methods.viewRecord(this.state.value).call(
+            {from:this.state.userAddress}, function(error, x){
+              alert('called')
+                this.setState({
+                    ipfs : x[0],
+                    masterkey : x[4]
+                })
+                alert('ipfs : '+x[0]+ 'masterkey :'+x[4])
+                this.view(this.state.ipfs, this.state.masterkey)
+            }.bind(this))
+
+        
+    }
+    Change(event){
+        this.setState({
+            value : event.target.value
+        })
+
+        alert(event.target.value)
+    }
+  
+   render() {
+     if(this.state.arr.length === 0) {
+       return <div></div>
+     }
+     else if(this.state.arr.length > 0){
+      console.log("Athis.state.arr", this.state.arr)
+      return (
+        <div className="animated fadeIn">
+        {/* <Button color="primary" onClick={this.togglePrimary} className="mr-1">Primary modal</Button>
+                <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
+                       className={'modal-primary '}>
+                  <ModalHeader toggle={this.togglePrimary}>Modal title</ModalHeader>
+                  <ModalBody>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
+                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+                    culpa qui officia deserunt mollit anim id est laborum.
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="primary" onClick={this.togglePrimary}>Do Something</Button>{' '}
+                    <Button color="secondary" onClick={this.togglePrimary}>Cancel</Button>
+                  </ModalFooter>
+                </Modal> */}
+       <Row>
           <Col xs="12" lg="12">
             <Card>
               <CardHeader>
-                <i className="fa fa-align-justify" /> Share Records
+                <h2>My Records</h2>
               </CardHeader>
               <CardBody>
                 <Table responsive striped>
@@ -307,24 +273,49 @@ class ShareRecords extends Component {
                     <th>Date Generated</th>
                     <th>Record Type</th>
                     <th>Hospital Name</th>
-                    <th>Select</th>
+                    <th></th>
                   </tr>
                   </thead>
-                    <tbody>
-                    {this.createTable()}
-         
+                  <tbody>
+                 
+                  {/* <this.TableBody id="check" recordsId={this.state.recordsId} recordArray={this.state.arr}/> */}
+                  {/* {this.createSelectList()}                   */}
+                  {this.TableBody(this.state.arr)}
                   </tbody>
                 </Table>
-                
               </CardBody>
             </Card>
           </Col>
-        </Row>
+          </Row>
+          <Row id ="itemPreview">
+              <p>Your Record:</p>
+              
+          </Row>
+          </div>
+      //     <main className="container">
+      //       <div className="pure-g">
+      //         <div className="pure-u-1-1">
 
-        
-      </div>
-    );
+      //           <h2>View My Health Records</h2>
+      //           {/* <form onSubmit={this.onSubmit}>
+      //               <select id="select" value={this.state.value} onChange={this.Change}>
+      //               <option value=""  disabled selected>Select Record</option>
+      //  {this.createSelectList()}
+      //               </select>
+      //               <br></br>
+      //               <input type='submit' />
+      //           </form>
+      //            */}
+             
+      //          </div>
+      //       </div>
+      //     </main>
+    
+      );
+
+     }
+    }
   }
-}
+  
 
-export default ShareRecords;
+  export default ShareRecords;
