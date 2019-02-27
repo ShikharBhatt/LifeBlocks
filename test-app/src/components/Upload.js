@@ -252,6 +252,7 @@ class Upload extends Component {
         console.log("Deployed Policy:"+ contractAdd)
       })
     })
+    
 }
 
   render() {
