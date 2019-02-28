@@ -12,6 +12,9 @@ contract Organization{
 
     mapping(address => organization) public orgToAddress;
     mapping(address => string) public orgToKey;
+    mapping(address => address[]) public sellerToPolicy;
+    uint hospitalCount;
+    uint insuranceCount;
     
     address[] public orgAddresses;
 
@@ -25,6 +28,13 @@ contract Organization{
         orgToKey[msg.sender] = _ipfsHash;
         
         orgAddresses.push(msg.sender);
+        
+        if(keccak256(_type) == keccak256("Hospital")){
+            hospitalCount++;
+        }
+        else if(keccak256(_type) == keccak256("Insurance")){
+            insuranceCount++;
+        }
     }
     
     function retAddresses() external view returns(address[]){
@@ -46,5 +56,37 @@ contract Organization{
     function getKeyHash(address _address) external view returns(string){
         return(orgToKey[_address]);
     }
+    
+    function retrieveType(string _type) external view returns(address[]){
+        uint counter = 0;
+        uint j=0;
+        uint limit;
+        
+        if(keccak256(_type) == keccak256("Hospital")){
+            limit  = hospitalCount;
+        }
+        else if(keccak256(_type) == keccak256("Insurance")){
+            limit = insuranceCount;    
+        }
+        
+        address[] memory addresses = new address[](limit);
+        for(uint i = 0;i<orgAddresses.length;i++){
+            if(keccak256(orgToAddress[orgAddresses[i]].orgType) == keccak256(_type)){
+                addresses[j] = orgAddresses[i];
+                counter ++;
+                j++;
+            }
+        }
+        return addresses;
+    }
+    
+    function addPolicy(address _contractAddress) public{
+        sellerToPolicy[msg.sender].push(_contractAddress);
+    }
+    
+    function returnAllPolicy(address _orgAddress) external view returns(address[]){
+        return sellerToPolicy[_orgAddress];
+    }
+
     
 }
