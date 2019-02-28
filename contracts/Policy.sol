@@ -13,7 +13,6 @@ contract PolicyTemplate{
     
     // address of all deployed policy contracts
     address[] public policyContracts;
-    address public lastContractAddress;
     
     event newPolicyPurchase(address policyContractAddress);
     
@@ -50,19 +49,17 @@ contract PolicyTemplate{
         
         Policy p = (new Policy).value(msg.value)(msg.sender,owner,_coverage);
         policyContracts.push(p);
-        lastContractAddress = p;
-        userdetails.policyMap(_aadhaar,p);
-        emit newPolicyPurchase(p);
-        return p;
+        userdetails.policyMap(_aadhaar,address(p));
+        emit newPolicyPurchase(address(p));
+        return address(p);
     }
 }
 
 contract Policy{
-    
-   
+    //to hold application fee
     uint value;
-    address public seller;
-    address public buyer;
+    address seller;
+    address buyer;
     uint premium;
     uint coverage;
     uint dateApplied;
@@ -153,7 +150,8 @@ contract Policy{
     function renewPolicy(uint _coverage) onlyBuyer public {
         renewAppDate = now;
         coverage = _coverage;
-        state = State.Applied;
+        prevState = state;
+        state = State.Renewal;
     }
     
     function confirmRenewal() onlyBuyer inState(State.Renewal) public payable{
