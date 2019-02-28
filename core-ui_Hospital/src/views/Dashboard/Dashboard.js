@@ -23,10 +23,8 @@ import { getKeys,keyEncrypt } from "../../Dependencies/pgp";
 
 import getWeb3 from "../../Dependencies/utils/getWeb3";
 
-const Web3 = require("web3");
-const web3 = new Web3("http://localhost:7545");
 
-console.log(web3);
+console.log("Type:",sessionStorage.getItem("orgType"));
 
 class Dashboard extends Component {
   constructor(props) {

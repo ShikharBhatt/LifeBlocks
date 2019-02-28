@@ -123,7 +123,9 @@ class ShareRecords extends Component {
                   for(let i = 0; i<x.length; i++) {
                     this.RecordUploaderContract.methods.viewRecord(x[i]).call(
                       {from:address}, function(error, y){
+                        let obj = {
 
+                        }
                         obj['recordId'] = x[i]
                         obj['ipfsHash'] = y[0]
                         obj['name'] = y[2]
@@ -205,7 +207,7 @@ class ShareRecords extends Component {
   
   
     onSubmit(){
-        event.preventDefault();
+       // event.preventDefault();
 
         alert("Value:"+this.state.value)
 

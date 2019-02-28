@@ -1,181 +1,76 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import classNames from 'classnames';
-import { Row, Col } from 'reactstrap'
-import { rgbToHex } from '@coreui/coreui/dist/js/coreui-utilities'
+import React, { Component } from "react";
+import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
+import getWeb3 from "../../../Dependencies/utils/getWeb3";
 
-class ThemeView extends Component {
+import {
+  Button, Card, CardBody, CardGroup,Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row
+} from "reactstrap";
+
+class Colors extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      bgColor: 'rgb(255, 255, 255)'
-    }
+      //declaring state variables
+      orgId: "",
+      web3: null,
+      currentAddress: null,
+      phone: null,
+      seedphrase: ""
+    };
+    this.signIn = this.signIn.bind(this);
   }
 
-  componentDidMount () {
-    const elem = ReactDOM.findDOMNode(this).parentNode.firstChild
-    const color = window.getComputedStyle(elem).getPropertyValue('background-color')
-    this.setState({
-      bgColor: color || this.state.bgColor
+  componentWillMount() {
+    // Get network provider and web3 instance.
+    // See utils/getWeb3 for more info.
+    getWeb3
+      .then(results => {
+        this.setState({
+          web3: results.web3
+        });
+
+        // Instantiate contract once web3 provided.
+        this.instantiateContract();
+      })
+      .catch(() => {
+        console.log("Error finding web3.");
+      });
+  }
+
+
+  instantiateContract() {
+   //Initialize organization contract
+   const orgContractAddress = "0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20"
+   const orgABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"orgAddresses","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"orgToAddress","outputs":[{"name":"orgName","type":"string"},{"name":"orgType","type":"string"},{"name":"uniqueIdentifier","type":"uint256"},{"name":"keyHash","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getKeyHash","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"string"},{"name":"_type","type":"string"},{"name":"_identifier","type":"uint256"},{"name":"_ipfsHash","type":"string"}],"name":"orgSignUp","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"retAddresses","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgName","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgType","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgDetails","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"orgToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"}]
+   var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress)
+   this.orgContract = orgContract
+   console.log("org contract: "+this.orgContract)
+  }
+
+  signIn(event) {
+    event.preventDefault(); //function handling the signup event
+    this.state.web3.eth.getAccounts((error, accounts) => {
+      this.orgContract.methods.getOrgDetails(accounts[0]).call({from:accounts[0]},function(error,details){
+          let id = details[2]
+          console.log("id returned: "+id)
+          if(this.state.orgId == id){
+            alert("sign in successful")
+            sessionStorage.setItem("orgId", this.state.orgId);
+            sessionStorage.setItem("orgType", details[1]);
+            this.props.history.push("/dashboard");
+          }
+          else{
+            alert("Incorrect details")
+          }
+      }.bind(this))
     })
   }
 
   render() {
-
     return (
-      <table className="w-100">
-        <tbody>
-        <tr>
-          <td className="text-muted">HEX:</td>
-          <td className="font-weight-bold">{ rgbToHex(this.state.bgColor) }</td>
-        </tr>
-        <tr>
-          <td className="text-muted">RGB:</td>
-          <td className="font-weight-bold">{ this.state.bgColor }</td>
-        </tr>
-        </tbody>
-      </table>
-    )
-  }
-}
-
-class ThemeColor extends Component {
-  // constructor(props) {
-  //   super(props);
-  // }
-  render() {
-
-    // const { className, children, ...attributes } = this.props
-    const { className, children } = this.props
-
-    const classes = classNames(className, 'theme-color w-75 rounded mb-3')
-
-    return (
-      <Col xl="2" md="4" sm="6" xs="12" className="mb-4">
-        <div className={classes} style={{paddingTop: '75%'}}></div>
-        {children}
-        <ThemeView/>
-      </Col>
-    )
-  }
-}
-
-class Colors extends Component {
-  render() {
-    return (
-      <div className="animated fadeIn">
-        <div className="card">
-          <div className="card-header">
-            <i className="icon-drop"></i> Theme colors
-          </div>
-          <div className="card-body">
-            <Row>
-              <ThemeColor className="bg-primary">
-                <h6>Brand Primary Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-secondary">
-                <h6>Brand Secondary Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-success">
-                <h6>Brand Success Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-danger">
-                <h6>Brand Danger Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-warning">
-                <h6>Brand Warning Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-info">
-                <h6>Brand Info Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-light">
-                <h6>Brand Light Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-dark">
-                <h6>Brand Dark Color</h6>
-              </ThemeColor>
-            </Row>
-          </div>
-        </div>
-        <div className="card">
-          <div className="card-header">
-            <i className="icon-drop"></i> Grays
-          </div>
-          <div className="card-body">
-            <Row className="mb-3">
-              <ThemeColor className="bg-gray-100">
-                <h6>Gray 100 Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-gray-200">
-                <h6>Gray 200 Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-gray-300">
-                <h6>Gray 300 Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-gray-400">
-                <h6>Gray 400 Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-gray-500">
-                <h6>Gray 500 Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-gray-600">
-                <h6>Gray 600 Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-gray-700">
-                <h6>Gray 700 Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-gray-800">
-                <h6>Gray 800 Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-gray-900">
-                <h6>Gray 900 Color</h6>
-              </ThemeColor>
-            </Row>
-          </div>
-        </div>
-        <div className="card">
-          <div className="card-header">
-            <i className="icon-drop"></i> Additional colors
-          </div>
-          <div className="card-body">
-            <Row>
-              <ThemeColor className="bg-blue">
-                <h6>Blue Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-light-blue">
-                <h6>Light Blue Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-indigo">
-                <h6>Indigo Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-purple">
-                <h6>Purple Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-pink">
-                <h6>Pink Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-red">
-                <h6>Red Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-orange">
-                <h6>Orange Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-yellow">
-                <h6>Yellow Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-green">
-                <h6>Green Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-teal">
-                <h6>Teal Color</h6>
-              </ThemeColor>
-              <ThemeColor className="bg-cyan">
-                <h6>Cyan Color</h6>
-              </ThemeColor>
-            </Row>
-          </div>
-        </div>
+      <div className="app flex-row align-items-center">
+        
       </div>
     );
   }

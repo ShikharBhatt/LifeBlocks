@@ -72,6 +72,7 @@ class Login extends Component {
           if(this.state.orgId == id){
             alert("sign in successful")
             sessionStorage.setItem("orgId", this.state.orgId);
+            sessionStorage.setItem("orgType", details[1]);
             this.props.history.push("/dashboard");
           }
           else{

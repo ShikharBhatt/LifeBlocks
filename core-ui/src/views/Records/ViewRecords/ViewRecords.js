@@ -27,7 +27,7 @@ export class ViewRecords extends Component {
       };
   
       
-        this.createSelectList = this.createSelectList.bind(this);
+     
         this.onSubmit = this.onSubmit.bind(this);
         this.Change = this.Change.bind(this);
         this.view = this.view.bind(this);
@@ -126,6 +126,9 @@ export class ViewRecords extends Component {
                     this.RecordUploaderContract.methods.viewRecord(x[i]).call(
                       {from:address}, function(error, y){
                         // alert('called')
+                        let obj = {
+
+                        }
                         obj['ipfsHash'] = y[0]
                         obj['name'] = y[2]
                         obj['type'] = y[1]
