@@ -1,10 +1,23 @@
 import React, { Component } from "react";
 import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
+import {organization, policyTemplate} from "../../../contract_abi";
 
 import {
-  Button, Card, CardBody, CardGroup,Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Row,
+  Input,
+  FormText,
+  Label,
+  FormGroup,
+  Form,
+  CardFooter,
 } from "reactstrap";
+
 
 class Colors extends Component {
   constructor(props) {
@@ -18,7 +31,8 @@ class Colors extends Component {
       phone: null,
       seedphrase: ""
     };
-    this.signIn = this.signIn.bind(this);
+    this.deployPolicyTemplate = this.deployPolicyTemplate.bind(this)
+
   }
 
   componentWillMount() {
@@ -41,36 +55,134 @@ class Colors extends Component {
 
   instantiateContract() {
    //Initialize organization contract
-   const orgContractAddress = "0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20"
-   const orgABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"orgAddresses","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"orgToAddress","outputs":[{"name":"orgName","type":"string"},{"name":"orgType","type":"string"},{"name":"uniqueIdentifier","type":"uint256"},{"name":"keyHash","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getKeyHash","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"string"},{"name":"_type","type":"string"},{"name":"_identifier","type":"uint256"},{"name":"_ipfsHash","type":"string"}],"name":"orgSignUp","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"retAddresses","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgName","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgType","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getOrgDetails","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"orgToKey","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"}]
+   const orgContractAddress = organization.contract_address
+   const orgABI = organization.abi
    var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress)
    this.orgContract = orgContract
    console.log("org contract: "+this.orgContract)
   }
 
-  signIn(event) {
-    event.preventDefault(); //function handling the signup event
+  //function to deploy policy templates
+  deployPolicyTemplate(event) {
+    event.preventDefault()
+
     this.state.web3.eth.getAccounts((error, accounts) => {
-      this.orgContract.methods.getOrgDetails(accounts[0]).call({from:accounts[0]},function(error,details){
-          let id = details[2]
-          console.log("id returned: "+id)
-          if(this.state.orgId == id){
-            alert("sign in successful")
-            sessionStorage.setItem("orgId", this.state.orgId);
-            sessionStorage.setItem("orgType", details[1]);
-            this.props.history.push("/dashboard");
-          }
-          else{
-            alert("Incorrect details")
-          }
-      }.bind(this))
+      if(error) {
+        console.log(error)
+      }
+      else {
+        alert(accounts[0])
+        this.state.web3.eth.sendTransaction({
+          from:accounts[0],
+          data: policyTemplate.bytecode
+        }).then((receipt) =>{
+          console.log("Receipt:",receipt.contractAddress)
+          this.orgContract.methods.addPolicy(receipt.contractAddress).send(
+            {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then(() => {
+              alert("Mapping in organization.sol made")
+            })  
+        })
+      }
+     
     })
   }
 
   render() {
     return (
-      <div className="app flex-row align-items-center">
-        
+      <div className="App">
+        <div className="animated fadeIn">
+        <Row className="justify-content-center">
+            <Col md="9" lg="7" xl="6">
+          <Card>
+          <Form
+                onSubmit={this.deployPolicyTemplate}
+                method="post"
+                encType="multipart/form-data"
+                className="form-horizontal">
+            
+            <CardHeader>
+              <strong>Deploy Policy Template</strong>
+            </CardHeader>
+            <CardBody>
+              
+{/*                 
+                <FormGroup row>
+                  <Col md="3">
+                    <Label htmlFor="text-input">Enter patient's Aadhaar:</Label>
+                  </Col>
+                  <Col xs="12" md="9">
+                    <Input
+                      type="text"
+                      placeholder="Aadhaar Card No."
+                      onChange={event =>
+                        this.setState({ aadhaar: event.target.value })
+                      }
+                      required={true}
+                    />
+                  </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                  <Col md="3">
+                    <Label htmlFor="input">Record Name:</Label>
+                  </Col>
+                  <Col xs="12" md="9">
+                    <Input
+                      type="text"
+                      placeholder="Record Name"
+                      onChange={event =>
+                        this.setState({ rname: event.target.value })
+                      }
+                      required={true}
+                    />
+                  </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                  <Col md="3">
+                    <Label htmlFor="select">Record Type:</Label>
+                  </Col>
+                  <Col xs="12" md="9">
+                    <Input type="select" onChange={event => this.setState({ rtype:event.target.value })} required={true} defaultValue="no-value">
+                      <option value="no-value" disabled>Select Record Type</option>
+                      <option value="Routine">Routine</option>
+                      <option value="Sensitive">Sensitive</option>
+                      <option value="Emergency">Emergency</option>
+                      <option value="Claim">Claim</option>
+                    </Input>
+                  </Col>
+                </FormGroup>
+                
+                <FormGroup row>
+                  <Col md="3">
+                    <Label htmlFor="file-input">Upload File:</Label>
+                  </Col>
+                  <Col xs="12" md="9">
+                    <Input type="file" onChange={this.captureFile} required={true}/>
+                  </Col>
+                </FormGroup> */}
+                            
+            </CardBody>
+
+            <CardFooter>
+              <Row>
+                <Col md="2" sm="3" xs="6">
+                <Button type="submit" size="md" color="primary">
+                <i className="fa fa-dot-circle-o" /> Submit
+              </Button>
+                </Col> 
+                <Col md="2" sm="3" xs="6">
+                <Button type="reset" size="md" color="danger">
+                <i className="fa fa-ban" /> Reset
+              </Button>
+                </Col>
+              </Row>
+            </CardFooter>
+            </Form>
+          </Card>
+          </Col>
+          </Row>
+      </div>
       </div>
     );
   }
