@@ -7,7 +7,7 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
-alert("in index");
+
 
 
 ReactDOM.render(<App />, document.getElementById("root"));

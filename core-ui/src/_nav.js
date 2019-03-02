@@ -29,6 +29,11 @@ export default {
       icon: 'icon-pencil',
     },
     {
+      name: 'Apply Policy',
+      url: '/records/applypolicy',
+      icon: 'icon-pencil',
+    },
+    {
       title: true,
       name: 'Components',
       wrapper: {

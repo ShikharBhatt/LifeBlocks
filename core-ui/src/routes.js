@@ -33,6 +33,7 @@ const Badges = React.lazy(() => import('./views/Notifications/Badges'));
 const Modals = React.lazy(() => import('./views/Notifications/Modals'));
 const ViewRecords = React.lazy(() => import('./views/Records/ViewRecords'));
 const ShareRecords = React.lazy(() => import('./views/Records/ShareRecords'));
+const ApplyPolicy = React.lazy(() => import('./views/Records/ApplyPolicy'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
@@ -43,6 +44,7 @@ const routes = [
   { path: '/records', exact: true, name: 'Records', component: ViewRecords },
   { path: '/records/ViewRecords', name: 'View Records', component: ViewRecords },
   { path: '/records/ShareRecords', name: 'Share Records', component: ShareRecords },
+  { path: '/records/ApplyPolicy', name: 'Apply Policy', component: ApplyPolicy },
   { path: '/base', exact: true, name: 'Base', component: Cards },
   { path: '/base/cards', name: 'Cards', component: Cards },
   { path: '/base/forms', name: 'Forms', component: Forms },

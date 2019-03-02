@@ -24,13 +24,14 @@ import Dashboard from './Dashboard';
 import { CoreUIIcons, Flags, FontAwesome, SimpleLineIcons } from './Icons';
 import { Alerts, Badges, Modals } from './Notifications';
 import { Login, Page404, Page500, Register } from './Pages';
-import { ShareRecords, ViewRecords } from './Records';
+import { ShareRecords, ViewRecords, ApplyPolicy } from './Records';
 
 
 export {
   Badges,
   ShareRecords,
   ViewRecords,
+  ApplyPolicy,
   CoreUIIcons,
   Page404,
   Page500,
