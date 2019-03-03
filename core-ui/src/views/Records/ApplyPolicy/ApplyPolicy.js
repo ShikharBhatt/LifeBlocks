@@ -3,7 +3,7 @@ import ipfs from '../../../Dependencies/ipfs'
 import {decrypt} from '../../../Dependencies/crypto'
 import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
-import {userdetails, organization} from "../../../contract_abi";
+import {userdetails, organization, policyTemplate} from "../../../contract_abi";
 import {
   Button,
   Card,
@@ -31,11 +31,13 @@ export class ApplyPolicy extends Component {
         account: null,
         value:'',
         web3:null,
+        coverage:null,
         insuranceAdds:[],
         insuranceCompanies: [],
         insurancePolicies: [],
         insuranceAddress:null,
-        insuranceName:null
+        insuranceName:null,
+        appliedAddress: ''
       };
   
       this.insurancePopulate = this.insurancePopulate.bind(this)
@@ -81,7 +83,6 @@ export class ApplyPolicy extends Component {
       const orgABI = organization.abi
       var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress)
       this.orgContract = orgContract
-      
 
       //Get account from metamask
           await this.state.web3.eth.getAccounts((error,accounts) => {
@@ -147,7 +148,7 @@ export class ApplyPolicy extends Component {
           this.orgContract.methods.returnAllPolicy(insAdd).call(
             {from: this.state.account}, (error, policies) => {
               if(!error) {
-                console.log(policies)
+                
                 this.setState({
                   insurancePolicies: policies
                 })
@@ -157,18 +158,37 @@ export class ApplyPolicy extends Component {
             const rows = this.state.insurancePolicies.map((row, index) => {
               return (
                   <tr key={index}>
+                 
                       <td>{row}</td>
                       {/* <td>{row.job}</td> */}
-                      <td></td>
+                      <td>
+                        <Input
+                          type="text"
+                          placeholder="Enter Coverage"
+                          onChange={event =>
+                            this.setState({ coverage: event.target.value })
+                          }
+                          required={true}
+                        />
+                    </td>
                       <td></td>
                       <td></td>
                       <td>
                         <Button
+                        
                         block color="primary" 
                         size="lg"
                         value={row} 
-                       
+                        onClick={
+                                  () => 
+                                      {
+                                        this.setState({appliedAddress:row}, ()=> {
+                                          this.applyPolicy()
+                                        })
+                                      }
+                                }
                           ><b>Apply</b></Button></td>
+                  
                   </tr>
                   
                   );
@@ -180,6 +200,68 @@ export class ApplyPolicy extends Component {
     
     
         }
+     }
+
+
+     applyPolicy() {
+      
+
+      this.state.web3.eth.getAccounts((error, accounts) => {
+        //get the account from metamask
+        this.UserContract.methods.login(sessionStorage.getItem('aadhaar')).call(
+          { from: accounts[0] },
+          (error, x)=> {
+            //check if account exists
+            if (error) {
+              alert("Wrong");
+              return;
+            }
+            if (x === true) {
+              alert("Aadhaar available");
+              //get address from aadhaar number
+              this.UserContract.methods
+                .getAddress(sessionStorage.getItem('aadhaar'))
+                .call(
+                  { from: accounts[0] },
+                  (error, add) => {
+                    //get account address from SC
+                    if (error) {
+                      alert("Wrong Details");
+                      return;
+                    }
+
+                    //if account is valid
+                    if (add === accounts[0]) {
+                      alert("Account address matches aadhaar mapping");
+
+                      var policyTemplateContractAddress = this.state.appliedAddress
+                      var policyTemplateABI = policyTemplate.abi
+                      var policyTemplateContract = new this.state.web3.eth.Contract(policyTemplateABI, policyTemplateContractAddress)
+                      this.policyTemplateContract = policyTemplateContract
+                      console.log(this.policyTemplateContract)
+                      alert(this.state.coverage)
+                      alert(sessionStorage.getItem('aadhaar'))
+                      alert(this.state.appliedAddress)
+                      this.policyTemplateContract.methods.newPolicy(this.state.coverage, sessionStorage.getItem('aadhaar')).send(
+                        {
+                          from: accounts[0],
+                          gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
+                          value:this.state.web3.utils.toHex(this.state.web3.utils.toWei('1','ether'))
+                        }, (error, returnedAddress) =>{
+                          alert(returnedAddress)
+                        })
+                    } else {
+                      alert("Details Incorrect");
+                    }
+                  }
+                );
+            } else {
+              alert("Details Incorrect");
+            }
+          }
+        );
+      });
+  
      }
 
 
@@ -219,7 +301,7 @@ export class ApplyPolicy extends Component {
                   <thead>
                   <tr>
                     <th>Policy Address</th>
-                    <th>Date Generated</th>
+                    <th>Coverage</th>
                     <th>Record Type</th>
                     <th>Hospital Name</th>
                     <th></th>
