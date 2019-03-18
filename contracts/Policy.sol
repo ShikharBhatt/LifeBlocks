@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./UserDetails.sol";
 
 contract userDetailsInterface{
-    function policyMap(uint _aadhaar, address _contract) external view returns(address);
+    function policyMap(uint _aadhaar, address _contract) public;
 } 
 
 contract PolicyTemplate{
@@ -13,10 +13,12 @@ contract PolicyTemplate{
     
     // address of all deployed policy contracts
     address[] public policyContracts;
+    address lastContractAddress;
     
     event newPolicyPurchase(address policyContractAddress);
     
     address owner;
+    uint coverage;
     
     // ensure that caller of function is the owner of the contract
     modifier onlyOwner(){
@@ -25,20 +27,21 @@ contract PolicyTemplate{
     }
     
     // set contract deployer as owner
-    constructor() public{
+    constructor(uint _coverage) public{
         owner = msg.sender;
+        coverage = _coverage;
     }
     
     // get length of policyContracts array
-    function getContractCount() onlyOwner public returns(uint){
+    function getContractCount() onlyOwner external view returns(uint){
         return policyContracts.length;
     }
     
-    function getContract(uint _position) onlyOwner public returns(address){
+    function getContract(uint _position) onlyOwner external view returns(address){
         return policyContracts[_position];
     }
     
-    function getOwner() public returns(address){
+    function getOwner() external view returns(address){
         return owner;
     }
     
@@ -46,11 +49,12 @@ contract PolicyTemplate{
     function newPolicy(uint _coverage, uint _aadhaar) public payable returns(address newPolicyContract){
         // check to ensure 1 ether was sent to the function call
         require(msg.value == 1 ether);
-        
+
         Policy p = (new Policy).value(msg.value)(msg.sender,owner,_coverage);
         policyContracts.push(p);
-        userdetails.policyMap(_aadhaar,address(p));
+        lastContractAddress = address(p);
         emit newPolicyPurchase(address(p));
+        userdetails.policyMap(_aadhaar,lastContractAddress);
         return address(p);
     }
 }

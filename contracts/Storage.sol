@@ -25,16 +25,16 @@ contract Storage{
     Record[] public records;
 
     //mapping patient address to medical record
-    mapping(uint => address) public RecordtoOwner;
+    mapping(address => uint[]) public ownerToRecord;
     
-    mapping(address => uint) public OwnerRecordCount;
+    //mapping(address => uint) public OwnerRecordCount;
   
     //enter deployed userDetails contract Address here
-    address userDetailsInterfaceAddress = 0x5559291517fd70189de6e56c0f0e97917c9c4cb6; 
+    address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
 
     //instantiate organization interface here
-    address organizationInterfaceAddress = 0xe46b2d8b3a5ccf2df628468dee2f3ec1e85e7a28;
+    address organizationInterfaceAddress = 0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20;
     organizationInterface organization = organizationInterface(organizationInterfaceAddress);
     
 
@@ -43,21 +43,13 @@ contract Storage{
        address addr = userdetails.getAddress(_aadhaar);
        string memory hospitalName = organization.getOrgName(msg.sender);
        uint id = records.push(Record(_ipfsHash,_type,_name,now,hospitalName,_masterkey)) - 1;
-       RecordtoOwner[id] = addr;
-       OwnerRecordCount[addr]++;
+       ownerToRecord[addr].push(id);
+    //   OwnerRecordCount[addr]++;
     } 
     
     function retrieve(uint _aadhaar) external view returns(uint[]){
         address addr = userdetails.getAddress(_aadhaar);
-        uint counter = 0;
-        uint[] memory recordId = new uint[](OwnerRecordCount[addr]);
-        for(uint i = 0;i<records.length;i++){
-            if(RecordtoOwner[i] == addr){
-                recordId[counter] = i;
-                counter ++;
-            }
-        }
-        return recordId;
+        return ownerToRecord[addr];
     }
 
     function viewRecord(uint i) external view returns(string, string, string, uint, string, string){
