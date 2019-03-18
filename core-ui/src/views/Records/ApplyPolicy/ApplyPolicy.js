@@ -235,20 +235,20 @@ export class ApplyPolicy extends Component {
                       alert("Account address matches aadhaar mapping");
 
                       var policyTemplateContractAddress = this.state.appliedAddress
-                      var policyTemplateABI = policyTemplate.abi
+                      var policyTemplateABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"policyContracts","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_position","type":"uint256"}],"name":"getContract","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"getOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_coverage","type":"uint256"},{"name":"_aadhaar","type":"uint256"}],"name":"newPolicy","outputs":[{"name":"newPolicyContract","type":"address"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"getContractCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"policyContractAddress","type":"address"}],"name":"newPolicyPurchase","type":"event"}]
                       var policyTemplateContract = new this.state.web3.eth.Contract(policyTemplateABI, policyTemplateContractAddress)
                       this.policyTemplateContract = policyTemplateContract
                       console.log(this.policyTemplateContract)
                       alert(this.state.coverage)
                       alert(sessionStorage.getItem('aadhaar'))
                       alert(this.state.appliedAddress)
+
+                      //Creating the policy contract
                       this.policyTemplateContract.methods.newPolicy(this.state.coverage, sessionStorage.getItem('aadhaar')).send(
                         {
                           from: accounts[0],
                           gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
                           value:this.state.web3.utils.toHex(this.state.web3.utils.toWei('1','ether'))
-                        }, (error, returnedAddress) =>{
-                          alert(returnedAddress)
                         })
                     } else {
                       alert("Details Incorrect");
@@ -267,7 +267,7 @@ export class ApplyPolicy extends Component {
 
    render() {
      //don't render if not loaded
-     if(this.state.insuranceCompanies.length === 0) {
+     if(this.state.insuranceCompanies.length != this.state.insuranceAdds.length) {
       return <div></div>
     }
 

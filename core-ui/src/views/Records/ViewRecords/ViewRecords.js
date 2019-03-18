@@ -4,7 +4,7 @@ import {decrypt} from '../../../Dependencies/crypto'
 import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {userdetails, storage} from "../../../contract_abi";
-import { Badge, Card, CardBody, CardHeader, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Badge, Input, Card, CardBody, CardHeader, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 
 
@@ -16,14 +16,15 @@ export class ViewRecords extends Component {
         ipfs : '',
         buffer: null,
         userAddress : '',
-        recordsId :[],
+        recordsId : [],
         arr: [],
         selectValue: '',
         masterkey: '',
-        newHash:'',
-        value:'',
-        web3:null,
+        newHash: '',
+        value: '',
+        web3: null,
         primary: false,
+        seedphrase: null
       };
   
       
@@ -209,10 +210,17 @@ export class ViewRecords extends Component {
       }
     
     view(ipfs_hash,masterkey) {
-      let un_mkey,keyObj,decrypted
+      let un_mkey,keyObj,decrypted,seedphrase
       let myaadhaar = sessionStorage.getItem('aadhaar')
       // call to ipfs api to retrieve file
-      ipfs.cat(ipfs_hash,(err,file) => {
+      seedphrase = this.state.seedphrase
+
+      if(!seedphrase) {
+        alert("Please enter your seedphrase in the available text box")
+      }
+
+      else {
+        ipfs.cat(ipfs_hash,(err,file) => {
           if(err){
               throw err;
           }
@@ -232,7 +240,7 @@ export class ViewRecords extends Component {
                         console.log("key object: " +keyObj)
                         console.log("key obj properties: "+Object.getOwnPropertyNames(keyObj))
                         //call to function to decrypt masterkey using pgp private key
-                        keyDecrypt(keyObj,masterkey,"sumit",function(plain){
+                        keyDecrypt(keyObj,masterkey,seedphrase,function(plain){
                             un_mkey = plain
                             console.log("unencrypted masterkey : "+un_mkey)
                             let file_string = Buffer.from(file,'hex')
@@ -249,6 +257,8 @@ export class ViewRecords extends Component {
                 })
           })
       })
+
+      }
 
     }
 
@@ -290,7 +300,7 @@ export class ViewRecords extends Component {
 
       //render if the user has records
      else if(this.state.arr.length > 0){
-      console.log("Athis.state.arr", this.state.arr)
+      
       return (
         <div className="animated fadeIn">
                 {/* <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
@@ -307,7 +317,16 @@ export class ViewRecords extends Component {
           <Col xs="12" lg="12">
             <Card>
               <CardHeader>
-                <h2>My Records: {this.state.recordsId.length}</h2>
+                <h2>My Records: {this.state.recordsId.length}
+                </h2>
+                <Input
+                          type="password"
+                          placeholder="Enter seedphrase"
+                          onChange={event =>
+                            this.setState({ seedphrase: event.target.value })
+                          }
+                          
+                />
               </CardHeader>
               <CardBody>
                 <Table responsive striped>
