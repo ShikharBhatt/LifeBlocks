@@ -137,6 +137,7 @@ class Dashboard extends Component {
               }
               else{
                 alert(result[0].hash + this.state.aadhaar+this.state.rtype+this.state.rname)
+                alert(m_key)
                 this.storageContract.methods.upload(this.state.aadhaar, result[0].hash,this.state.rtype,this.state.rname,m_key).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
               if(!error)  {
                 console.log("tx: "+txHash)                   
