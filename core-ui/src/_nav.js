@@ -33,6 +33,11 @@ export default {
       url: '/records/applypolicy',
       icon: 'icon-pencil',
     },
+    {
+      name: 'View Policy',
+      url: '/records/viewpolicy',
+      icon: 'icon-pencil',
+    },
     // {
     //   title: true,
     //   name: 'Components',

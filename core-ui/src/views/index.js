@@ -24,7 +24,7 @@ import Dashboard from './Dashboard';
 import { CoreUIIcons, Flags, FontAwesome, SimpleLineIcons } from './Icons';
 import { Alerts, Badges, Modals } from './Notifications';
 import { Login, Page404, Page500, Register } from './Pages';
-import { ShareRecords, ViewRecords, ApplyPolicy } from './Records';
+import { ShareRecords, ViewRecords, ApplyPolicy, ViewPolicy } from './Records';
 
 
 export {
@@ -32,6 +32,7 @@ export {
   ShareRecords,
   ViewRecords,
   ApplyPolicy,
+  ViewPolicy,
   CoreUIIcons,
   Page404,
   Page500,

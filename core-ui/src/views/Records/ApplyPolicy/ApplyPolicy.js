@@ -31,7 +31,7 @@ export class ApplyPolicy extends Component {
         account: null,
         value:'',
         web3:null,
-        coverage:null,
+        coverage:4000,
         insuranceAdds:[],
         insuranceCompanies: [],
         insurancePolicies: [],
@@ -162,14 +162,7 @@ export class ApplyPolicy extends Component {
                       <td>{row}</td>
                       {/* <td>{row.job}</td> */}
                       <td>
-                        <Input
-                          type="text"
-                          placeholder="Enter Coverage"
-                          onChange={event =>
-                            this.setState({ coverage: event.target.value })
-                          }
-                          required={true}
-                        />
+                       {this.state.coverage}
                     </td>
                       <td></td>
                       <td></td>
@@ -235,7 +228,7 @@ export class ApplyPolicy extends Component {
                       alert("Account address matches aadhaar mapping");
 
                       var policyTemplateContractAddress = this.state.appliedAddress
-                      var policyTemplateABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"policyContracts","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_position","type":"uint256"}],"name":"getContract","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"getOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_coverage","type":"uint256"},{"name":"_aadhaar","type":"uint256"}],"name":"newPolicy","outputs":[{"name":"newPolicyContract","type":"address"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"getContractCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"policyContractAddress","type":"address"}],"name":"newPolicyPurchase","type":"event"}]
+                      var policyTemplateABI = policyTemplate.abi
                       var policyTemplateContract = new this.state.web3.eth.Contract(policyTemplateABI, policyTemplateContractAddress)
                       this.policyTemplateContract = policyTemplateContract
                       console.log(this.policyTemplateContract)

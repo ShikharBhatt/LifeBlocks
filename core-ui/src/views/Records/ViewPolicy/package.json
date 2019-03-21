@@ -1,0 +1,6 @@
+{
+  "name": "ViewPolicy",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ViewPolicy.js"
+}
