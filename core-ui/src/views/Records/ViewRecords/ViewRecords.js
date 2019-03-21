@@ -165,7 +165,7 @@ export class ViewRecords extends Component {
         })              
       }
 
-      //function for modal
+      //function for toggling the modal
       togglePrimary() {
         this.setState({
           primary: !this.state.primary,
@@ -209,6 +209,7 @@ export class ViewRecords extends Component {
           return rows
       }
     
+    //function to view record - includes decryption after fetching file from IPFS
     view(ipfs_hash,masterkey) {
       let un_mkey,keyObj,decrypted,seedphrase
       let myaadhaar = sessionStorage.getItem('aadhaar')
@@ -227,7 +228,7 @@ export class ViewRecords extends Component {
           //print retrieved file
           console.log("file retrieved: " + file)
           console.log("file retrieved type: " + typeof file)
-
+          this.setState({primary:true})// open the modal
           //get metamask account address 
           this.state.web3.eth.getAccounts((error,account) => {
               console.log(account[0])
@@ -248,8 +249,8 @@ export class ViewRecords extends Component {
                             console.log("file_string type: "+ typeof file_string)
                             decrypt(file_string,un_mkey,function(decrypted){
                                 console.log("decrypted file: "+decrypted)
-
-                            document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>'
+                              
+                            document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>' // show data in modal
                             })
                             
                         })
@@ -303,16 +304,12 @@ export class ViewRecords extends Component {
       
       return (
         <div className="animated fadeIn">
-                {/* <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
-                       className={'modal-primary '}>
-                  <ModalHeader toggle={this.togglePrimary}>Modal title</ModalHeader>
+                <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
+                       className={'modal-primary '} size="xl">
+                  <ModalHeader toggle={this.togglePrimary}>Record</ModalHeader>
                   <ModalBody id="itemPreview">
                   </ModalBody>
-                  <ModalFooter>
-                    <Button color="primary" onClick={this.togglePrimary}>Do Something</Button>{' '}
-                    <Button color="secondary" onClick={this.togglePrimary}>Cancel</Button>
-                  </ModalFooter>
-                </Modal>  */}
+                </Modal> 
        <Row>
           <Col xs="12" lg="12">
             <Card>
@@ -347,10 +344,10 @@ export class ViewRecords extends Component {
             </Card>
           </Col>
           </Row>
-          <Row id ="itemPreview">
+          {/* <Row id ="itemPreview">
               <p>Your Record:</p>
               
-          </Row>
+          </Row> */}
           </div>
      
       );
