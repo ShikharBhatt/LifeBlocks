@@ -31,7 +31,7 @@ export class ApplyPolicy extends Component {
         account: null,
         value:'',
         web3:null,
-        coverage:4000,
+        coverage:6000,
         insuranceAdds:[],
         insuranceCompanies: [],
         insurancePolicies: [],
@@ -164,8 +164,7 @@ export class ApplyPolicy extends Component {
                       <td>
                        {this.state.coverage}
                     </td>
-                      <td></td>
-                      <td></td>
+                     
                       <td>
                         <Button
                         
@@ -295,8 +294,7 @@ export class ApplyPolicy extends Component {
                   <tr>
                     <th>Policy Address</th>
                     <th>Coverage</th>
-                    <th>Record Type</th>
-                    <th>Hospital Name</th>
+                   
                     <th></th>
                   </tr>
                   </thead>

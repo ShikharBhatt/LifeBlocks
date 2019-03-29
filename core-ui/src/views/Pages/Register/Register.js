@@ -82,12 +82,12 @@ class Register extends Component {
     console.log("contract:" + this.UserDetailsContract);
     
     //getting active account from metamask
-    this.state.web3.eth.getAccounts((error, accounts) => {
-      console.log(accounts[0]);
-      this.acc = accounts[0];
-      console.log(this.acc);
-      this.setState({ currentAddress: this.acc });
-    });
+    // this.state.web3.eth.getAccounts((error, accounts) => {
+    //   console.log(accounts[0]);
+    //   this.acc = accounts[0];
+    //   console.log(this.acc);
+    //   this.setState({ currentAddress: this.acc });
+    // });
 
     //set metamask address in state
     this.setState({ currentAddress: this.acc });
@@ -138,7 +138,7 @@ class Register extends Component {
     this.state.web3.eth.getAccounts((error, accounts) => {
       alert("aadhaar:", this.state.aadhaar);
       alert("seedphrase:", this.state.seedphrase);
-
+      alert(accounts[0])
       //call registerKey function from pgp.js
       registerkey(
         accounts[0],
@@ -177,20 +177,20 @@ class Register extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let callLinkAadhaar = this.linkAadhaar;
-    callLinkAadhaar();
-    // window.confirmationResult
-    //   .confirm(document.getElementById("verificationcode").value)
-    //   .then(
-    //     function(result) {
-    //       callLinkAadhaar();
-    //       //window.location.href = '/signin'
-    //       alert("success");
-    //     },
+    //callLinkAadhaar();
+    window.confirmationResult
+      .confirm(document.getElementById("verificationcode").value)
+      .then(
+        function(result) {
+          callLinkAadhaar();
+          //window.location.href = '/signin'
+          alert("success");
+        },
 
-    //     function(error) {
-    //       alert(error);
-    //     }
-    //   );
+        function(error) {
+          alert(error);
+        }
+      );
   };
 
   render() {

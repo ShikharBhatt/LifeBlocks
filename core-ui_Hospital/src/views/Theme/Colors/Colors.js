@@ -29,7 +29,8 @@ class Colors extends Component {
       web3: null,
       currentAddress: null,
       phone: null,
-      seedphrase: ""
+      seedphrase: "",
+      coverage:null
     };
     this.deployPolicyTemplate = this.deployPolicyTemplate.bind(this)
 
@@ -74,7 +75,8 @@ class Colors extends Component {
         alert(accounts[0])
         this.state.web3.eth.sendTransaction({
           from:accounts[0],
-          data: policyTemplate.bytecode
+          data: policyTemplate.bytecode,
+          arguments: [this.state.coverage]
         }).then((receipt) =>{
           console.log("Receipt:",receipt.contractAddress)
           this.orgContract.methods.addPolicy(receipt.contractAddress).send(
@@ -105,24 +107,24 @@ class Colors extends Component {
             </CardHeader>
             <CardBody>
               
-{/*                 
+                 
                 <FormGroup row>
                   <Col md="3">
-                    <Label htmlFor="text-input">Enter patient's Aadhaar:</Label>
+                    <Label htmlFor="text-input">Enter Policy Coverage:</Label>
                   </Col>
                   <Col xs="12" md="9">
                     <Input
                       type="text"
-                      placeholder="Aadhaar Card No."
+                      placeholder="Coverage"
                       onChange={event =>
-                        this.setState({ aadhaar: event.target.value })
+                        this.setState({ coverage: event.target.value })
                       }
                       required={true}
                     />
                   </Col>
                 </FormGroup>
 
-                <FormGroup row>
+              {/*  <FormGroup row>
                   <Col md="3">
                     <Label htmlFor="input">Record Name:</Label>
                   </Col>

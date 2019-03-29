@@ -223,6 +223,7 @@ export class ViewRecords extends Component {
       else {
         ipfs.cat(ipfs_hash,(err,file) => {
           if(err){
+            alert("In-Correct Seedphrase")
               throw err;
           }
           //print retrieved file
