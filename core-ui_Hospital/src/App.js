@@ -45,7 +45,7 @@ class App extends Component {
           <Route exact path="/login" name="Login Page" component={Login} />
           <Route
             exact
-            path="/register"
+            path="/"
             name="Register Page"
             component={Register}
           />
