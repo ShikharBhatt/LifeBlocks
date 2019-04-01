@@ -19,7 +19,7 @@ import {
 } from "reactstrap";
 
 
-class Colors extends Component {
+class DeployPolicy extends Component {
   constructor(props) {
     super(props);
 
@@ -190,4 +190,4 @@ class Colors extends Component {
   }
 }
 
-export default Colors;
+export default DeployPolicy;

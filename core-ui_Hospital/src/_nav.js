@@ -587,7 +587,7 @@ if(sessionStorage.getItem("orgType") === "Hospital")
         // },
         {
           name: 'Deploy Policy',
-          url: '/theme/colors',
+          url: '/Policy/DeployPolicy',
           icon: 'icon-drop',
         },
         // {
