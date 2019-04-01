@@ -84,6 +84,9 @@ class Login extends Component {
   }
 
   render() {
+    if (sessionStorage.getItem("orgId") !== null)
+      //return (window.location.href = "/dashboard");
+      this.props.history.push("/dashboard");
     return (
       <div className="app flex-row align-items-center">
         <Container>

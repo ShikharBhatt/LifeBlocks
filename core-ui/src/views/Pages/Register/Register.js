@@ -270,15 +270,18 @@ class Register extends Component {
                     </Button>
                   </Form>
                 </CardBody>
-                {/* <CardFooter className="p-4">
+                <CardFooter className="p-4">
                   <Row>
-                    <Col xs="12" sm="12">
+                    <Col xs="9" sm="9" style={{marginTop:'2%',textAlign:'right'}}>
+                        Already Registered?
+                        </Col>
+                        <Col xs="3" sm="3">
                       <Link to="/login">
                       <Button className="btn-facebook mb-1" block><span>Login</span></Button>
                       </Link>
                     </Col>
                   </Row>
-                </CardFooter> */}
+                </CardFooter>
               </Card>
             </Col>
           </Row>

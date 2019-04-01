@@ -1,9 +1,6 @@
 import React, { Component } from "react";
-import { Link, browserHistory } from "react-router-dom";
-import { firebaseApp } from "../../../Dependencies/firebase";
-import * as firebase from "firebase";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
-//import '../App.css'
+import { Link} from "react-router-dom";
 import { registerkey } from "../../../Dependencies/pgp";
 import { organization } from "../../../contract_abi";
 
@@ -195,6 +192,18 @@ class Register extends Component {
 
                   </Form>
                 </CardBody>
+                <CardFooter className="p-4">
+                  <Row>
+                    <Col xs="9" sm="9" style={{marginTop:'2%',textAlign:'right'}}>
+                        Already Registered?
+                        </Col>
+                        <Col xs="3" sm="3">
+                      <Link to="/login">
+                      <Button className="btn-facebook mb-1" block><span>Login</span></Button>
+                      </Link>
+                    </Col>
+                  </Row>
+                </CardFooter>
               </Card>
             </Col>
           </Row>
