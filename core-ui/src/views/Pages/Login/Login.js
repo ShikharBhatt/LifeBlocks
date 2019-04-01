@@ -111,6 +111,7 @@ class Login extends Component {
   verifyLogin() {
     this.state.web3.eth.getAccounts((error, accounts) => {
       //get the account from metamask
+      console.log("Account:",accounts[0])
       this.UserDetailsContract.methods.login(this.state.aadhaar).call(
         { from: accounts[0] },
         function(error, x) {
@@ -157,20 +158,20 @@ class Login extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
-    //verifyLogin()
-    window.confirmationResult
-      .confirm(document.getElementById("verificationcode").value)
-      .then(
-        function(result) {
-          verifyLogin();
-          //window.location.href = '/signin'
-          alert("success");
-        },
+    verifyLogin()
+    // window.confirmationResult
+    //   .confirm(document.getElementById("verificationcode").value)
+    //   .then(
+    //     function(result) {
+    //       verifyLogin();
+    //       //window.location.href = '/signin'
+    //       alert("success");
+    //     },
 
-        function(error) {
-          alert(error);
-        }
-      );
+    //     function(error) {
+    //       alert(error);
+    //     }
+    //   );
   };
 
   render() {
