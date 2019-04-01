@@ -1,6 +1,11 @@
 pragma solidity ^0.4.24;
 
 contract Permissions{
+    
+    // modifier hasAccess(){
+    //     require();
+    //     _;
+    // }
 
     struct permission{
         address to;
@@ -10,22 +15,26 @@ contract Permissions{
         bool status;
     } 
 
-    permission[] public permission_list;
+    permission[] permission_list;
 
-    mapping(uint => address) public permissionFrom;
+    mapping(address => uint[]) permissionFrom;
 
-    mapping(address => uint) public permissionCount;
-
-
-    function grant(address _from, string _ipfsHash, string _masterkey) public{
-        uint id = permission_list.push(permission(msg.sender,_from,_ipfsHash,_masterkey,true));
-        permissionFrom[id] = msg.sender;
-        permissionCount[msg.sender]++;
-        //emit event
+    function grant(address _to, string _ipfsHash, string _masterkey) public{
+        uint id = permission_list.push(permission(_to,msg.sender,_ipfsHash,_masterkey,true)) -1;
+        permissionFrom[msg.sender].push(id);
     }
-
+    
     function revoke(uint _id) public {
-        permission[_id].status = false;
+        require(permission_list[_id].from == msg.sender, "You are not authorized");
+        permission_list[_id].status = false;
+    }
+    
+    function getPermissionList(address _from) external view returns(uint[]){
+        return(permissionFrom[_from]);
+    }
+    
+    function permissionList(uint _id) external view returns(address, address, string, string, bool){
+        return(permission_list[_id].to, permission_list[_id].from, permission_list[_id].ipfsHash, permission_list[_id].masterkey, permission_list[_id].status);
     }
 
 }
