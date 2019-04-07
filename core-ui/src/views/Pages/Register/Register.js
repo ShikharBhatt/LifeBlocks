@@ -3,6 +3,7 @@ import { Link, browserHistory } from "react-router-dom";
 import { firebaseApp } from "../../../Dependencies/firebase";
 import * as firebase from "firebase";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
+import {userdetails} from "../../../contract_abi";
 //import '../App.css'
 import { registerkey } from "../../../Dependencies/pgp";
 
@@ -25,6 +26,8 @@ class Register extends Component {
   constructor(props) {
     super(props);
 
+
+    //initializing state of the component
     this.state = {
       //declaring state variables
       aadhaar: "",
@@ -33,20 +36,24 @@ class Register extends Component {
       phone: null,
       seedphrase: ""
     };
+
+    //binding functions
     this.SignUp = this.SignUp.bind(this);
     this.linkAadhaar = this.linkAadhaar.bind(this);
     this.myFunction = this.myFunction.bind(this);
   }
 
-  componentWillMount() {
+  async componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
 
-    getWeb3
+    await getWeb3
       .then(results => {
         this.setState({
           web3: results.web3
         });
+        console.log(results.web3)
+        console.log("Procider:",results.web3.currentProvider)
 
         // Instantiate contract once web3 provided.
         this.instantiateContract();
@@ -55,115 +62,36 @@ class Register extends Component {
         console.log("Error finding web3.");
       });
   }
-
+  
   componentDidMount() {
-    document.getElementById("OTP").style.display="none"
+    //document.getElementById("OTP").style.display="none"
   }
 
   instantiateContract() {
-    const contractAddress = "0x78478e7666bcb38b2ddeddfe7cb0ba152301df07";
+    //contract address for user details contract
+    const contractAddress = userdetails.contract_address;
 
-    const ABI = [
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "login",
-        outputs: [{ name: "", type: "bool" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "uint256" }],
-        name: "aadhaarToAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [{ name: "_ipfskey", type: "string" }],
-        name: "keymap",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [
-          { name: "_aadhaar", type: "uint256" },
-          { name: "_ipfskey", type: "string" }
-        ],
-        name: "link",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "addressToAadhaar",
-        outputs: [{ name: "", type: "uint256" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "getAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "ownerToKey",
-        outputs: [{ name: "", type: "string" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_aadhaar", type: "uint256" }
-        ],
-        name: "addressLinked",
-        type: "event"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_ipfshash", type: "string" }
-        ],
-        name: "keyLinked",
-        type: "event"
-      }
-    ];
-
+    //ABI for UserDetails contract
+    const ABI = userdetails.abi
+    
+    //instatiate UserDetails Contract
     var UserDetailsContract = new this.state.web3.eth.Contract(
       ABI,
       contractAddress
     );
-
+    
     this.UserDetailsContract = UserDetailsContract;
     console.log("contract:" + this.UserDetailsContract);
-
+    
+    //getting active account from metamask
     this.state.web3.eth.getAccounts((error, accounts) => {
       console.log(accounts[0]);
       this.acc = accounts[0];
       console.log(this.acc);
       this.setState({ currentAddress: this.acc });
     });
+
+    //set metamask address in state
     this.setState({ currentAddress: this.acc });
     console.log(this.state.web3);
     //console.log(this.UserDetailsContract)
@@ -190,7 +118,7 @@ class Register extends Component {
             "recaptcha-container"
           );
 
-          //     //send OTP to the phone number
+          //send OTP to the phone number
           firebaseApp
             .auth()
             .signInWithPhoneNumber(
@@ -207,9 +135,11 @@ class Register extends Component {
 
   //link aadhaar to account address using Smart Contract
   linkAadhaar() {
+
+    //getting active account from metamask
     this.state.web3.eth.getAccounts((error, accounts) => {
-      alert("aadhaar:", this.state.aadhaar);
-      alert("seedphrase:", this.state.seedphrase);
+      alert(accounts[0])
+      //call registerKey function from pgp.js
       registerkey(
         accounts[0],
         this.state.seedphrase,
@@ -218,6 +148,7 @@ class Register extends Component {
           alert("callback ipfs: " + ipfsHash);
           alert(accounts[0]);
           console.log(this.UserDetailsContract);
+
           //transaction to link aadhaar card to address
           this.UserDetailsContract.methods
             .link(this.state.aadhaar, ipfsHash)
@@ -233,7 +164,7 @@ class Register extends Component {
                   console.log("tx: " + txHash);
                   alert("Transaction Hash:" + txHash);
                   alert("Registered Successfully");
-                  window.location.reload(true);
+                  window.location.reload(true);   //if transaction successful then refresh the page
                 } else console.log(error);
               }
             );
@@ -246,23 +177,25 @@ class Register extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let callLinkAadhaar = this.linkAadhaar;
-    
-    window.confirmationResult
-      .confirm(document.getElementById("verificationcode").value)
-      .then(
-        function(result) {
-          callLinkAadhaar();
-          //window.location.href = '/signin'
-          alert("success");
-        },
+    callLinkAadhaar();
+    // window.confirmationResult
+    //   .confirm(document.getElementById("verificationcode").value)
+    //   .then(
+    //     function(result) {
+    //       callLinkAadhaar();
+    //       //window.location.href = '/signin'
+    //       alert("success");
+    //     },
 
-        function(error) {
-          alert(error);
-        }
-      );
+    //     function(error) {
+    //       alert(error);
+    //     }
+    //   );
   };
 
   render() {
+
+    //if already login then redirect to dashboard page
     if (sessionStorage.getItem("aadhaar") !== null)
       //  return (window.location.href = "/dashboard");
       this.props.history.push("/dashboard");
@@ -337,15 +270,18 @@ class Register extends Component {
                     </Button>
                   </Form>
                 </CardBody>
-                {/* <CardFooter className="p-4">
+                <CardFooter className="p-4">
                   <Row>
-                    <Col xs="12" sm="12">
+                    <Col xs="9" sm="9" style={{marginTop:'2%',textAlign:'right'}}>
+                        Already Registered?
+                        </Col>
+                        <Col xs="3" sm="3">
                       <Link to="/login">
                       <Button className="btn-facebook mb-1" block><span>Login</span></Button>
                       </Link>
                     </Col>
                   </Row>
-                </CardFooter> */}
+                </CardFooter>
               </Card>
             </Col>
           </Row>

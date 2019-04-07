@@ -7,7 +7,7 @@ contract userDetailsInterface{
     function getAddress(uint _aadhaar) external view returns(address);
 } 
 
-contract organizationDetails{
+contract organizationInterface{
     function getOrgName(address _address) external view returns(string);
 }
 
@@ -25,9 +25,9 @@ contract Storage{
     Record[] public records;
 
     //mapping patient address to medical record
-    mapping(uint => address) public RecordtoOwner;
+    mapping(address => uint[]) public ownerToRecord;
     
-    mapping(address => uint) public OwnerRecordCount;
+    //mapping(address => uint) public OwnerRecordCount;
   
     //enter deployed userDetails contract Address here
     address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
@@ -41,31 +41,18 @@ contract Storage{
     function upload(uint _aadhaar, string _ipfsHash, string _type, string _name, string _masterkey) public{
         //add require condition to check if address is of type hospital
        address addr = userdetails.getAddress(_aadhaar);
-       string hospitalName = organization.getOrgName(msg.sender);
-       uint id = records.push(Record(_ipfsHash,_type,_name,now,hospitalName,_masterkey));
-       RecordtoOwner[id] = addr;
-       OwnerRecordCount[addr]++;
+       string memory hospitalName = organization.getOrgName(msg.sender);
+       uint id = records.push(Record(_ipfsHash,_type,_name,now,hospitalName,_masterkey)) - 1;
+       ownerToRecord[addr].push(id);
+    //   OwnerRecordCount[addr]++;
     } 
     
     function retrieve(uint _aadhaar) external view returns(uint[]){
         address addr = userdetails.getAddress(_aadhaar);
-        uint counter = 0;
-        uint[] memory recordId = new uint[](OwnerRecordCount[addr]);
-        for(uint i = 0;i<records.length;i++){
-            if(RecordtoOwner[i] == addr){
-                recordId[counter] = i;
-                counter ++;
-            }
-        }
-        return recordId;
+        return ownerToRecord[addr];
     }
-
-
 
     function viewRecord(uint i) external view returns(string, string, string, uint, string, string){
         return (records[i].ipfsHash,records[i].rtype,records[i].rname,records[i].date,records[i].Hospital,records[i].masterkey);
-
-    //event
-
     }
 }

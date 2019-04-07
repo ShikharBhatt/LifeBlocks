@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
-//import { Redirect} from 'react-router';
 import { firebaseApp } from "../../../Dependencies/firebase";
 import * as firebase from "firebase";
+import {userdetails} from "../../../contract_abi";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
-//import '../App.css'
-import { registerkey } from "../../../Dependencies/pgp";
 import {
   Button,
   Card,
@@ -29,7 +27,6 @@ class Login extends Component {
       //declaring state variables
       aadhaar: "",
       web3: null,
-      currentAddress: null,
       phone: null,
       seedphrase: ""
     };
@@ -60,95 +57,13 @@ class Login extends Component {
   }
 
   instantiateContract() {
-    const contractAddress = "0x78478e7666bcb38b2ddeddfe7cb0ba152301df07";
+    //User Details contract instantiation
+    const contractAddress = userdetails.contract_address;
 
-    const ABI = [
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "login",
-        outputs: [{ name: "", type: "bool" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "uint256" }],
-        name: "aadhaarToAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [{ name: "_ipfskey", type: "string" }],
-        name: "keymap",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [
-          { name: "_aadhaar", type: "uint256" },
-          { name: "_ipfskey", type: "string" }
-        ],
-        name: "link",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "addressToAadhaar",
-        outputs: [{ name: "", type: "uint256" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "getAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "ownerToKey",
-        outputs: [{ name: "", type: "string" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_aadhaar", type: "uint256" }
-        ],
-        name: "addressLinked",
-        type: "event"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_ipfshash", type: "string" }
-        ],
-        name: "keyLinked",
-        type: "event"
-      }
-    ];
+    //ABI for User Details contract
+    const ABI = userdetails.abi
 
+    //initializing the contract 
     var UserDetailsContract = new this.state.web3.eth.Contract(
       ABI,
       contractAddress
@@ -156,16 +71,6 @@ class Login extends Component {
 
     this.UserDetailsContract = UserDetailsContract;
     console.log("contract:" + this.UserDetailsContract);
-
-    this.state.web3.eth.getAccounts((error, accounts) => {
-      console.log(accounts[0]);
-      this.acc = accounts[0];
-      console.log(this.acc);
-      this.setState({ currentAddress: this.acc });
-    });
-    this.setState({ currentAddress: this.acc });
-    console.log(this.state.web3);
-    //console.log(this.UserDetailsContract)
   }
 
   SignIn(event) {
@@ -187,7 +92,7 @@ class Login extends Component {
             "recaptcha-container"
           );
 
-    //       //     //send OTP to the phone number
+        //send OTP to the phone number
           firebaseApp
             .auth()
             .signInWithPhoneNumber(
@@ -206,6 +111,7 @@ class Login extends Component {
   verifyLogin() {
     this.state.web3.eth.getAccounts((error, accounts) => {
       //get the account from metamask
+      console.log("Account:",accounts[0])
       this.UserDetailsContract.methods.login(this.state.aadhaar).call(
         { from: accounts[0] },
         function(error, x) {
@@ -216,6 +122,7 @@ class Login extends Component {
           }
           if (x === true) {
             alert("Login Successfull");
+            //get address from aadhaar number
             this.UserDetailsContract.methods
               .getAddress(this.state.aadhaar)
               .call(
@@ -251,20 +158,20 @@ class Login extends Component {
   myFunction = function(event) {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
-    
-    window.confirmationResult
-      .confirm(document.getElementById("verificationcode").value)
-      .then(
-        function(result) {
-          verifyLogin();
-          //window.location.href = '/signin'
-          alert("success");
-        },
+    verifyLogin()
+    // window.confirmationResult
+    //   .confirm(document.getElementById("verificationcode").value)
+    //   .then(
+    //     function(result) {
+    //       verifyLogin();
+    //       //window.location.href = '/signin'
+    //       alert("success");
+    //     },
 
-        function(error) {
-          alert(error);
-        }
-      );
+    //     function(error) {
+    //       alert(error);
+    //     }
+    //   );
   };
 
   render() {

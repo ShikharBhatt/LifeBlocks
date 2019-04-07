@@ -37,8 +37,10 @@ const Page500 = Loadable({
 
 class App extends Component {
   //not  null redirect to dashboard
+  
 
   render() {
+    
     return (
       <BrowserRouter>
         <Switch>

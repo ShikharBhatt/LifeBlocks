@@ -33,7 +33,8 @@ const Badges = React.lazy(() => import('./views/Notifications/Badges'));
 const Modals = React.lazy(() => import('./views/Notifications/Modals'));
 const ViewRecords = React.lazy(() => import('./views/Records/ViewRecords'));
 const ShareRecords = React.lazy(() => import('./views/Records/ShareRecords'));
-const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
+const ApplyPolicy = React.lazy(() => import('./views/Records/ApplyPolicy'));
+const ViewPolicy = React.lazy(() => import('./views/Records/ViewPolicy'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
@@ -44,6 +45,8 @@ const routes = [
   { path: '/records', exact: true, name: 'Records', component: ViewRecords },
   { path: '/records/ViewRecords', name: 'View Records', component: ViewRecords },
   { path: '/records/ShareRecords', name: 'Share Records', component: ShareRecords },
+  { path: '/records/ApplyPolicy', name: 'Apply Policy', component: ApplyPolicy },
+  { path: '/records/ViewPolicy', name: 'View Policy', component: ViewPolicy },
   { path: '/base', exact: true, name: 'Base', component: Cards },
   { path: '/base/cards', name: 'Cards', component: Cards },
   { path: '/base/forms', name: 'Forms', component: Forms },
@@ -76,7 +79,6 @@ const routes = [
   { path: '/notifications/alerts', name: 'Alerts', component: Alerts },
   { path: '/notifications/badges', name: 'Badges', component: Badges },
   { path: '/notifications/modals', name: 'Modals', component: Modals },
-  { path: '/widgets', name: 'Widgets', component: Widgets },
   { path: '/charts', name: 'Charts', component: Charts },
   { path: '/users', exact: true,  name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },

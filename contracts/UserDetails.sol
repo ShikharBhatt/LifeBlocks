@@ -11,13 +11,16 @@ contract userDetails{
     //create mapping(key => value) : (adress => aadhaar)
     mapping(address => uint) public addressToAadhaar;
 
-    // create mapping between user address and pgp key file stored on ipfs
+    // create mappoing between user address and pgp key file stored on ipfs
     mapping(address => string) public ownerToKey;
+    
+    //create mapping between user aadhaar and policy contract
+    mapping(uint => address) public ownerToPolicy;
      
     // function to link aadhaar card to user's ethereum address  
     function link(uint _aadhaar, string _ipfskey) public{
         //ensure user can call this function only once
-        //ensures one to one mapping between user's address and aadhaar card
+        //enusres one to one mapping between user's address and aadhaar card
         require(aadhaarToAddress[_aadhaar] == 0x0000000000000000000000000000000000000000,"Aadhar Card already exists");
         require(addressToAadhaar[msg.sender] == 0,"Address already used");
         //ensure key pair has not been generated for user
@@ -53,5 +56,9 @@ contract userDetails{
 
     function getKeyHash(uint _aadhaar) external view returns(string){
         return(ownerToKey[aadhaarToAddress[_aadhaar]]);
+    }
+    
+    function policyMap(uint _aadhaar, address _contract) public {
+        ownerToPolicy[_aadhaar] = _contract;
     }
 }

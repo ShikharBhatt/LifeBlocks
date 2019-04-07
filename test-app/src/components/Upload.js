@@ -30,7 +30,7 @@ class Upload extends Component {
       rname:''
     };
     
-    this.captureFile = this.captureFile.bind(this);
+    //this.captureFile = this.captureFile.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
@@ -60,8 +60,130 @@ class Upload extends Component {
      * Normally these functions would be called in the context of a
      * state management library, but for convenience I've placed them here.
      */                    //0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20
-    const contractAddress = '0xf5e9037A2412db50c74d5A1642D6d3B99Dd90f20'
-    const ABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"records","outputs":[{"name":"ipfsHash","type":"string"},{"name":"rtype","type":"string"},{"name":"rname","type":"string"},{"name":"Hospital","type":"address"},{"name":"masterkey","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"RecordtoOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"OwnerRecordCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"viewRecord","outputs":[{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"string"},{"name":"","type":"address"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_aadhaar","type":"uint256"}],"name":"retrieve","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_aadhaar","type":"uint256"},{"name":"_ipfsHash","type":"string"},{"name":"_type","type":"string"},{"name":"_name","type":"string"},{"name":"_masterkey","type":"string"}],"name":"upload","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]    
+    const contractAddress = '0xafb27a2deb77ca90ed435326904ca257635cbf2f'
+    const ABI = [
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "lastContractAddress",
+        "outputs": [
+          {
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [
+          {
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "policyContracts",
+        "outputs": [
+          {
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "_position",
+            "type": "uint256"
+          }
+        ],
+        "name": "getContract",
+        "outputs": [
+          {
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [],
+        "name": "getOwner",
+        "outputs": [
+          {
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "_coverage",
+            "type": "uint256"
+          },
+          {
+            "name": "_aadhaar",
+            "type": "uint256"
+          }
+        ],
+        "name": "newPolicy",
+        "outputs": [
+          {
+            "name": "newPolicyContract",
+            "type": "address"
+          }
+        ],
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [],
+        "name": "getContractCount",
+        "outputs": [
+          {
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "name": "policyContractAddress",
+            "type": "address"
+          }
+        ],
+        "name": "newPolicyPurchase",
+        "type": "event"
+      }
+    ]
     //console.log('constract Address : ',contractAddress)
     var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)
     //console.log(RecordUploaderContract)
@@ -95,17 +217,17 @@ class Upload extends Component {
     // })
   }
 
-  captureFile(event) {
-    event.preventDefault()
-    const file = event.target.files[0]
-    const reader = new window.FileReader()
-    reader.readAsArrayBuffer(file)
-    reader.onloadend = () => {
-      this.buffer = Buffer(reader.result)
-      this.setState({ buffer: Buffer(reader.result) })
-      console.log('buffer', this.state.buffer)
-    }
-  }
+  // captureFile(event) {
+  //   event.preventDefault()
+  //   const file = event.target.files[0]
+  //   const reader = new window.FileReader()
+  //   reader.readAsArrayBuffer(file)
+  //   reader.onloadend = () => {
+  //     this.buffer = Buffer(reader.result)
+  //     this.setState({ buffer: Buffer(reader.result) })
+  //     console.log('buffer', this.state.buffer)
+  //   }
+  // }
 
   handleInputChange(event){ 
     this.setState({
@@ -116,53 +238,21 @@ class Upload extends Component {
   onSubmit(event) {
 
     event.preventDefault()
-    console.log(this.buffer);
-    var encrypted = encrypt(this.buffer);
-    const masterkey = encrypted[0];
-    this.buffer = Buffer(encrypted[1]);
-    console.log(masterkey)
-    console.log(encrypted);
-    let keyObj,m_key,record
+    // console.log(this.buffer);
+    // var encrypted = encrypt(this.buffer);
+    // const masterkey = encrypted[0];
+    // this.buffer = Buffer(encrypted[1]);
+    // console.log(masterkey)
+    // console.log(encrypted);
+    // let keyObj,m_key,record
 
-    record = this.buffer
-    this.state.web3.eth.getAccounts((error, accounts) => {          
-          //transaction to link aadhaar card to address
-         this.UserContract.methods.getKeyHash(this.state.aadhaar).call(
-           {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((ipfsHash) =>{
-          
-            getKeys(ipfsHash,function(key){
-              //in callback function of getKeys 
-                keyObj = JSON.parse(key)
-                //console.log(this.state.aadhaar)
-                  console.log("key object: "+keyObj)
-                  console.log("key object type: "+ typeof keyObj)
-                  console.log("public key : "+keyObj.publicKeyArmored)
-                  console.log(Object.getOwnPropertyNames(keyObj))
-                  keyEncrypt(masterkey,keyObj,function(cipher){
-                    //in callback function of keyEncrypt
-                    m_key = cipher
-                    console.log("encrypted masterkey: "+m_key)        
-                  })
-              })                
-           })
-            ipfs.files.add(record, (error, result) => {
-              if(error) {
-                console.error(error)
-                return
-              }
-              else{
-                alert(result[0].hash + this.state.aadhaar+this.state.type+this.state.rname)
-                this.RecordUploaderContract.methods.upload(this.state.aadhaar, result[0].hash,this.state.type,this.state.rname,m_key).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
-              if(!error)  {
-                console.log("tx: "+txHash)                   
-                alert('Transaction Hash:'+txHash)
-              }
-              else
-                console.log(error)
-              })
-            }
-          })     
-  })
+    //record = this.buffer
+    this.state.web3.eth.getAccounts((error, accounts) => {
+      this.RecordUploaderContract.methods.newPolicy(4000,7911755205).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),value:this.state.web3.utils.toHex(this.state.web3.utils.toWei('1','ether'))}).then((contractAdd) => {
+        console.log("Deployed Policy:"+ contractAdd)
+      })
+    })
+    
 }
 
   render() {
@@ -177,32 +267,11 @@ class Upload extends Component {
             <div className="pure-u-1-1">
               <h2>My Hospital</h2>
               <form onSubmit={this.onSubmit} >
-                <label>Enter User Aadhaar :</label><br/> 
+                <label>Enter Coverage :</label><br/> 
                   <input 
                     type='text' 
                     name="aadhaar"
-                    value={this.state.aadhaar}
-                    onChange={this.handleInputChange}
-                    autoComplete="false" 
-                  required/>
-                  <br /><br/> 
-                  <label>Upload Record:</label><br/>
-                <input type='file' onChange={this.captureFile} />
-                <br /><br/>
-                <label>Enter Name of Record :</label><br/> 
-                  <input 
-                    type='text' 
-                    name="rname"
-                    value={this.state.rname}
-                    onChange={this.handleInputChange}
-                    autoComplete="false" 
-                  required/>
-                  <br/><br/> 
-                <label>Enter Type of Record :</label><br/> 
-                  <input 
-                    type='text' 
-                    name="type"
-                    value={this.state.type}
+                    value={this.state.coverage}
                     onChange={this.handleInputChange}
                     autoComplete="false" 
                   required/>

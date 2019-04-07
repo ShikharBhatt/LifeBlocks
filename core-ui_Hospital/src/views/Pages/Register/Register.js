@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import { Link, browserHistory } from "react-router-dom";
-import { firebaseApp } from "../../../Dependencies/firebase";
-import * as firebase from "firebase";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
-//import '../App.css'
+import { Link} from "react-router-dom";
 import { registerkey } from "../../../Dependencies/pgp";
+import { organization } from "../../../contract_abi";
+
 
 import {
   Button,
@@ -18,25 +17,25 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
+  Row,
 } from "reactstrap";
 
 class Register extends Component {
   constructor(props) {
     super(props);
 
+    //declaring state variables
     this.state = {
-      //declaring state variables
-      aadhaar: "",
+      orgName: "",
+      orgType: "",
+      orgId: "",
       web3: null,
       currentAddress: null,
       phone: null,
       seedphrase: ""
     };
-    this.SignUp = this.SignUp.bind(this);
-    this.linkAadhaar = this.linkAadhaar.bind(this);
-    this.myFunction = this.myFunction.bind(this);
-  }
+    this.signUp = this.signUp.bind(this);  
+}
 
   componentWillMount() {
     // Get network provider and web3 instance.
@@ -47,7 +46,6 @@ class Register extends Component {
         this.setState({
           web3: results.web3
         });
-
         // Instantiate contract once web3 provided.
         this.instantiateContract();
       })
@@ -56,225 +54,44 @@ class Register extends Component {
       });
   }
 
-  componentDidMount() {
-    document.getElementById("OTP").style.display = "none";
-  }
-
   instantiateContract() {
-    const contractAddress = "0x78478e7666bcb38b2ddeddfe7cb0ba152301df07";
 
-    const ABI = [
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "login",
-        outputs: [{ name: "", type: "bool" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "uint256" }],
-        name: "aadhaarToAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [{ name: "_ipfskey", type: "string" }],
-        name: "keymap",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [
-          { name: "_aadhaar", type: "uint256" },
-          { name: "_ipfskey", type: "string" }
-        ],
-        name: "link",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "addressToAadhaar",
-        outputs: [{ name: "", type: "uint256" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "_aadhaar", type: "uint256" }],
-        name: "getAddress",
-        outputs: [{ name: "", type: "address" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        constant: true,
-        inputs: [{ name: "", type: "address" }],
-        name: "ownerToKey",
-        outputs: [{ name: "", type: "string" }],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_aadhaar", type: "uint256" }
-        ],
-        name: "addressLinked",
-        type: "event"
-      },
-      {
-        anonymous: false,
-        inputs: [
-          { indexed: false, name: "_address", type: "address" },
-          { indexed: false, name: "_ipfshash", type: "string" }
-        ],
-        name: "keyLinked",
-        type: "event"
-      }
-    ];
-
-    var UserDetailsContract = new this.state.web3.eth.Contract(
-      ABI,
-      contractAddress
-    );
-
-    this.UserDetailsContract = UserDetailsContract;
-    console.log("contract:" + this.UserDetailsContract);
-
-    this.UserDetailsContract.getPastEvents(
-      "AllEvents",
-      { formBlock: 0, toBlock: "latest" },
-      (err, events) => {
-        console.log(events.length);
-      }
-    );
-
-    this.state.web3.eth.getAccounts((error, accounts) => {
-      console.log(accounts[0]);
-      this.acc = accounts[0];
-      console.log(this.acc);
-      this.setState({ currentAddress: this.acc });
-    });
-    this.setState({ currentAddress: this.acc });
-    console.log(this.state.web3);
-    //console.log(this.UserDetailsContract)
+    //Initialize organization contract
+    const orgContractAddress = organization.contract_address
+    const orgABI = organization.abi
+    var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress)
+    this.orgContract = orgContract
+    console.log("org contract: "+this.orgContract)
   }
 
-  SignUp(event) {
+  signUp(event) {
     //function handling the signup event
     event.preventDefault();
-    document.getElementById("OTP").style.display = "block";
-
-    alert("In Signup");
-    //getting phone number for the entered aadhaar number
-
-    // firebaseApp
-    //   .database()
-    //   .ref("/uidai/")
-    //   .orderByChild("aadhaar_no")
-    //   .equalTo(this.state.aadhaar)
-    //   .once("value")
-    //   .then(function(snapshot) {
-    //     snapshot.forEach(function(child) {
-    //       var value = child.val();
-
-    //       window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-    //         "recaptcha-container"
-    //       );
-
-    //       //     //send OTP to the phone number
-    //       firebaseApp
-    //         .auth()
-    //         .signInWithPhoneNumber(
-    //           "+91" + value.phone,
-    //           window.recaptchaVerifier
-    //         )
-    //         .then(function(confirmationResult) {
-    //           //wait for OTP verification
-    //           window.confirmationResult = confirmationResult;
-    //         });
-    //     });
-    //   });
-  }
-
-  //link aadhaar to account address using Smart Contract
-  linkAadhaar() {
     this.state.web3.eth.getAccounts((error, accounts) => {
-      alert("aadhaar:", this.state.aadhaar);
-      alert("seedphrase:", this.state.seedphrase);
-      registerkey(
-        accounts[0],
-        this.state.seedphrase,
-        function(ipfsHash) {
-          console.log("callback ipfs: " + ipfsHash);
-          alert("callback ipfs: " + ipfsHash);
-          alert(accounts[0]);
-          console.log(this.UserDetailsContract);
-          //transaction to link aadhaar card to address
-          this.UserDetailsContract.methods
-            .link(this.state.aadhaar, ipfsHash)
-            .send(
-              {
-                from: accounts[0],
-                gasPrice: this.state.web3.utils.toHex(
-                  this.state.web3.utils.toWei("0", "gwei")
-                )
-              },
-              function(error, txHash) {
-                if (!error) {
-                  console.log("tx: " + txHash);
-                  alert("Transaction Hash:" + txHash);
-                  alert("Registered Successfully");
-                  window.location.reload(true);
-                } else console.log(error);
-              }
-            );
-        }.bind(this)
-      );
-    });
+      console.log("orgName: "+this.state.orgName)
+      console.log("orgType: "+this.state.orgType)
+      console.log("orgId: "+this.state.orgId)
+      console.log("seedphrase: "+this.state.seedphrase)
+      console.log("account address: "+accounts[0])
+
+      //create pgp key from seedphrase and get its ipfshash
+      registerkey(accounts[0],this.state.seedphrase,function(ipfsHash){
+        console.log("callback ipfs: " + ipfsHash)
+        alert("callback ipfs: " + ipfsHash)
+        //create structure with organization information in smart contract
+        this.orgContract.methods.orgSignUp(this.state.orgName,this.state.orgType,this.state.orgId,ipfsHash).send({from: accounts[0],gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei("0", "gwei"))},function(error, txHash) {
+          if (!error) {
+            console.log("tx: " + txHash);
+            alert("Transaction Hash:" + txHash);
+            alert("Registered Successfully");
+            window.location.reload(true);
+          } else console.log(error);
+        })
+      }.bind(this))
+    })
   }
-
-  //confirm OTP function and call to linkAadhaar function
-  myFunction = function(event) {
-    event.preventDefault();
-    let callLinkAadhaar = this.linkAadhaar;
-    callLinkAadhaar();
-    // window.confirmationResult
-    //   .confirm(document.getElementById("verificationcode").value)
-    //   .then(
-    //     function(result) {
-    //       callLinkAadhaar();
-    //       //window.location.href = '/signin'
-    //       alert("success");
-    //     },
-
-    //     function(error) {
-    //       alert(error);
-    //     }
-    //   );
-  };
-
+  
   render() {
-    if (sessionStorage.getItem("aadhaar") !== null)
-      //  return (window.location.href = "/dashboard");
-      this.props.history.push("/dashboard");
     return (
       <div className="app flex-row align-items-center">
         <Container>
@@ -282,30 +99,65 @@ class Register extends Component {
             <Col md="9" lg="7" xl="6">
               <Card className="mx-4">
                 <CardBody className="p-4">
-                  <Form onSubmit={this.SignUp}>
+                  <Form id="orgRegister" onSubmit={this.signUp}>
                     <h1>Register</h1>
-                    <p className="text-muted">Create your account</p>
+                    <p className="text-muted">Create an account for your organization</p>
+                    
+                    {/* select organization type */}
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-user" />
+                          <i className="fa fa-building " />
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input type="select" onChange={event => this.setState({ orgType:event.target.value })} required={true} defaultValue="no-value">
+                        <option value="no-value" disabled>Select Organization Type</option>
+                        <option value="Hospital">Hospital</option>
+                        <option value="Insurance">Insurance Company</option>
+                      </Input>
+                    </InputGroup>
+
+                    {/* input organization name */}
+                    <InputGroup className="mb-3">
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          <i className="icon-user" /> 
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
                         type="text"
-                        placeholder="Aadhaar Number"
+                        placeholder="Organization Name"
                         autoComplete="username"
                         onChange={event =>
-                          this.setState({ aadhaar: event.target.value })
+                          this.setState({ orgName: event.target.value })
+                        }
+                        required={true}
+                      />
+                    </InputGroup>
+                    
+                    {/* input organization identifier */}
+                    <InputGroup className="mb-3">
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          <i className="fa fa-clipboard" />
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input
+                        type="text"
+                        placeholder="Organization Identifier"
+                        autoComplete="username"
+                        onChange={event =>
+                          this.setState({ orgId: event.target.value })
                         }
                         required={true}
                       />
                     </InputGroup>
 
+                    {/* enter seedphrase */}
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-lock" />
+                          <i className="fa fa-asterisk" />
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
@@ -318,25 +170,18 @@ class Register extends Component {
                         required={true}
                       />
                     </InputGroup>
-
-                    <Button color="success" type="submit" block>
-                      Get OTP
-                    </Button>
-                  </Form>
-                  <br />
-                  <div id="recaptcha-container" />
-                  <br />
-                  <Form id="OTP" onSubmit={this.myFunction}>
+                    
+                    {/* enter secret key */}
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-user" />
+                          <i className="icon-key" />
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
-                        type="text"
-                        id="verificationcode"
-                        placeholder="Enter OTP"
+                        type="password"
+                        id="secret"
+                        placeholder="Enter shared secret"
                         required={true}
                       />
                     </InputGroup>
@@ -344,17 +189,21 @@ class Register extends Component {
                     <Button color="success" type="submit" block>
                       Submit
                     </Button>
+
                   </Form>
                 </CardBody>
-                {/* <CardFooter className="p-4">
+                <CardFooter className="p-4">
                   <Row>
-                    <Col xs="12" sm="12">
+                    <Col xs="9" sm="9" style={{marginTop:'2%',textAlign:'right'}}>
+                        Already Registered?
+                        </Col>
+                        <Col xs="3" sm="3">
                       <Link to="/login">
                       <Button className="btn-facebook mb-1" block><span>Login</span></Button>
                       </Link>
                     </Col>
                   </Row>
-                </CardFooter> */}
+                </CardFooter>
               </Card>
             </Col>
           </Row>
