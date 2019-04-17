@@ -14,6 +14,7 @@ contract PolicyTemplate{
     // address of all deployed policy contracts
     address[] public policyContracts;
     address lastContractAddress;
+    string policyName;
     
     event newPolicyPurchase(address policyContractAddress);
     
@@ -27,12 +28,17 @@ contract PolicyTemplate{
     }
     
     // set contract deployer as owner
-    constructor(uint _coverage) public{
+    constructor(uint _coverage, string _name) public{
         owner = msg.sender;
         coverage = _coverage;
+        policyName = _name;
     }
     
-    // get length of policyContracts array
+    function getPolicyDetails() external view returns(uint, string){
+        return(coverage,policyName);
+    }
+    
+    // get length of policyContracts array 
     function getContractCount() onlyOwner external view returns(uint){
         return policyContracts.length;
     }

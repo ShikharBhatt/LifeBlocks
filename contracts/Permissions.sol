@@ -4,6 +4,7 @@ import "./Storage.sol";
 
 contract storageInterface{
     function getRecordOwner(uint _id) external view returns(address);
+    function getDetails(uint _id) external view returns(string, string, string, uint, string);
 }
 
 contract Permissions{
@@ -24,7 +25,7 @@ contract Permissions{
     struct permission{
         address to;
         address from;
-        string ipfsHash;
+        uint recordID;
         string masterkey;
         bool status;
     } 
@@ -33,8 +34,11 @@ contract Permissions{
 
     mapping(address => uint[]) permissionFrom;
 
-    function grant(uint recordID, address _to, string _ipfsHash, string _masterkey) recordOwner(recordID) public{
-        uint id = permission_list.push(permission(_to,msg.sender,_ipfsHash,_masterkey,true)) -1;
+    address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
+    userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
+
+    function grant(uint recordID, address _to, string _masterkey) recordOwner(recordID) public{
+        uint id = permission_list.push(permission(_to, msg.sender, recordID, _masterkey, true)) -1;
         permissionFrom[msg.sender].push(id);
     }
     
@@ -47,8 +51,24 @@ contract Permissions{
         return(permissionFrom[_from]);
     }
     
-    function permissionList(uint _id) permission_participants(_id) external view returns(address, address, string, string, bool){
-        return(permission_list[_id].to, permission_list[_id].from, permission_list[_id].ipfsHash, permission_list[_id].masterkey, permission_list[_id].status);
+    function filterList(uint _aadhaar) external view returns(uint[]){
+        uint[] memory filtered;
+        address _from = userdetails.getAddress(_aadhaar);
+        uint count = 0;
+        uint[] memory tofilter = permissionFrom[_from];
+        for(uint i=0; i<tofilter.length; i++)
+        {
+            if(permission_list[tofilter[i]].to == msg.sender)
+            {
+                filtered[count] = tofilter[i];
+                count++;
+            }
+        }
+        return(filtered);
+    }
+    
+    function permissionList(uint _id) permission_participants(_id) external view returns(address, address, uint, string, bool){
+        return(permission_list[_id].to, permission_list[_id].from, permission_list[_id].recordID, permission_list[_id].masterkey, permission_list[_id].status);
     }
 
 }
