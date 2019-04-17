@@ -1,0 +1,6 @@
+{
+  "name": "AcceptPolicy",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AcceptPolicy.js"
+}
