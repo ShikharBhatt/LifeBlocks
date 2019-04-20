@@ -6,7 +6,7 @@ import * as firebase from "firebase";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 //import '../App.css'
 import { registerkey } from "../../../Dependencies/pgp";
-import {organization} from "../../../contract_abi";
+import { organization } from "../../../contract_abi";
 import {
   Button,
   Card,
@@ -54,33 +54,37 @@ class Login extends Component {
       });
   }
 
-
   instantiateContract() {
-   //Initialize organization contract
-   const orgContractAddress = organization.contract_address
-   const orgABI = organization.abi
-   var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress)
-   this.orgContract = orgContract
-   console.log("org contract: "+this.orgContract)
+    //Initialize organization contract
+    const orgContractAddress = organization.contract_address;
+    const orgABI = organization.abi;
+    var orgContract = new this.state.web3.eth.Contract(
+      orgABI,
+      orgContractAddress
+    );
+    this.orgContract = orgContract;
+    console.log("org contract: " + this.orgContract);
   }
 
   signIn(event) {
     event.preventDefault(); //function handling the signup event
     this.state.web3.eth.getAccounts((error, accounts) => {
-      this.orgContract.methods.getOrgDetails(accounts[0]).call({from:accounts[0]},function(error,details){
-          let id = details[2]
-          console.log("id returned: "+id)
-          if(this.state.orgId == id){
-            alert("sign in successful")
+      this.orgContract.methods.getOrgDetails(accounts[0]).call(
+        { from: accounts[0] },
+        function(error, details) {
+          let id = details[2];
+          console.log("id returned: " + id);
+          if (this.state.orgId == id) {
+            alert("sign in successful");
             sessionStorage.setItem("orgId", this.state.orgId);
             sessionStorage.setItem("orgType", details[1]);
             this.props.history.push("/dashboard");
+          } else {
+            alert("Incorrect details");
           }
-          else{
-            alert("Incorrect details")
-          }
-      }.bind(this))
-    })
+        }.bind(this)
+      );
+    });
   }
 
   render() {
@@ -97,7 +101,8 @@ class Login extends Component {
                   <CardBody>
                     <Form id="signIn" onSubmit={this.signIn}>
                       <h1>Login</h1>
-                      <p className="text-muted">Sign In to your account</p><br/>
+                      <p className="text-muted">Sign In to your account</p>
+                      <br />
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
