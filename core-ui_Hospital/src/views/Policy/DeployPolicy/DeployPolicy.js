@@ -30,7 +30,8 @@ class DeployPolicy extends Component {
       currentAddress: null,
       phone: null,
       seedphrase: "",
-      coverage:null
+      coverage:null,
+      policyName:"",
     };
     this.deployPolicyTemplate = this.deployPolicyTemplate.bind(this)
 
@@ -76,7 +77,7 @@ class DeployPolicy extends Component {
         this.state.web3.eth.sendTransaction({
           from:accounts[0],
           data: policyTemplate.bytecode,
-          arguments: [this.state.coverage]
+          arguments: [this.state.coverage, this.state.policyName]
         }).then((receipt) =>{
           console.log("Receipt:",receipt.contractAddress)
           this.orgContract.methods.addPolicy(receipt.contractAddress).send(
@@ -118,6 +119,22 @@ class DeployPolicy extends Component {
                       placeholder="Coverage"
                       onChange={event =>
                         this.setState({ coverage: event.target.value })
+                      }
+                      required={true}
+                    />
+                  </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                  <Col md="3">
+                    <Label htmlFor="text-input">Enter Policy Name:</Label>
+                  </Col>
+                  <Col xs="12" md="9">
+                    <Input
+                      type="text"
+                      placeholder="Policy Name"
+                      onChange={event =>
+                        this.setState({ policyName: event.target.value })
                       }
                       required={true}
                     />
