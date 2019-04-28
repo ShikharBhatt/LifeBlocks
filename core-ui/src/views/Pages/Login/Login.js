@@ -32,7 +32,7 @@ class Login extends Component {
     };
     this.SignIn = this.SignIn.bind(this);
     this.verifyLogin = this.verifyLogin.bind(this);
-    this.myFunction = this.myFunction.bind(this);
+    this.validateOTP = this.validateOTP.bind(this);
   }
 
   componentWillMount() {
@@ -64,13 +64,10 @@ class Login extends Component {
     const ABI = userdetails.abi
 
     //initializing the contract 
-    var UserDetailsContract = new this.state.web3.eth.Contract(
-      ABI,
-      contractAddress
-    );
+    var UserDetailsContract = new this.state.web3.eth.Contract(ABI, contractAddress);
 
     this.UserDetailsContract = UserDetailsContract;
-    console.log("contract:" + this.UserDetailsContract);
+    console.log("userdetails contract:" + this.UserDetailsContract);
   }
 
   SignIn(event) {
@@ -155,23 +152,23 @@ class Login extends Component {
   }
 
   //confirm OTP function and call to linkAadhaar function
-  myFunction = function(event) {
+  validateOTP = function(event) {
     event.preventDefault();
     let verifyLogin = this.verifyLogin;
-    verifyLogin()
-    // window.confirmationResult
-    //   .confirm(document.getElementById("verificationcode").value)
-    //   .then(
-    //     function(result) {
-    //       verifyLogin();
-    //       //window.location.href = '/signin'
-    //       alert("success");
-    //     },
+    //verifyLogin()
+    window.confirmationResult
+      .confirm(document.getElementById("verificationcode").value)
+      .then(
+        function(result) {
+          verifyLogin();
+          //window.location.href = '/signin'
+          alert("success");
+        },
 
-    //     function(error) {
-    //       alert(error);
-    //     }
-    //   );
+        function(error) {
+          alert(error);
+        }
+      );
   };
 
   render() {
@@ -228,7 +225,7 @@ class Login extends Component {
                     <div id="recaptcha-container" />
                     <br />
 
-                    <Form id="OTP" onSubmit={this.myFunction}>
+                    <Form id="OTP" onSubmit={this.validateOTP}>
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>

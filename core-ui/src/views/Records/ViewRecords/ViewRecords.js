@@ -67,8 +67,8 @@ export class ViewRecords extends Component {
       //Record Uploader Contract Instantiation
       const contractAddress = storage.contract_address
       const ABI = storage.abi    
-      var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)      
-      this.RecordUploaderContract = RecordUploaderContract
+      var storageContract = new this.state.web3.eth.Contract(ABI, contractAddress)      
+      this.storageContract = storageContract
         
 
       //User Details Contract Instantiation
@@ -91,7 +91,7 @@ export class ViewRecords extends Component {
         // alert(aadhaar)
 
         //Retrieve record id's for the user
-        this.RecordUploaderContract.methods.retrieve(aadhaar).call(
+        this.storageContract.methods.retrieve(aadhaar).call(
             {from:account[0]}, function(error, x){
                 
                 this.setState({
@@ -124,7 +124,7 @@ export class ViewRecords extends Component {
 
                   //getting data of each record
                   for(let i = 0; i<x.length; i++) {
-                    this.RecordUploaderContract.methods.viewRecord(x[i]).call(
+                    this.storageContract.methods.viewRecord(x[i]).call(
                       {from:address}, function(error, y){
                         // alert('called')
                         let obj = {
@@ -213,7 +213,6 @@ export class ViewRecords extends Component {
     view(ipfs_hash,masterkey) {
       let un_mkey,keyObj,decrypted,seedphrase
       let myaadhaar = sessionStorage.getItem('aadhaar')
-      // call to ipfs api to retrieve file
       seedphrase = this.state.seedphrase
 
       if(!seedphrase) {
@@ -221,6 +220,7 @@ export class ViewRecords extends Component {
       }
 
       else {
+        // call to ipfs api to retrieve file
         ipfs.cat(ipfs_hash,(err,file) => {
           if(err){
             alert("In-Correct Seedphrase")
@@ -259,21 +259,13 @@ export class ViewRecords extends Component {
                 })
           })
       })
-
-      }
-
     }
+  }
 
-  
-  
     onSubmit(){
-//        event.preventDefault();
-// this.setState({
-//     value:val
-// })
         alert("Value:"+this.state.value)
 
-        this.RecordUploaderContract.methods.viewRecord(this.state.value).call(
+        this.storageContract.methods.viewRecord(this.state.value).call(
             {from:this.state.userAddress}, function(error, x){
               alert('called')
                 this.setState({
@@ -305,12 +297,12 @@ export class ViewRecords extends Component {
       
       return (
         <div className="animated fadeIn">
-                <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
-                       className={'modal-primary '} size="xl">
-                  <ModalHeader toggle={this.togglePrimary}>Record</ModalHeader>
+              <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
+                  className={'modal-primary '} size="xl">
+                <ModalHeader toggle={this.togglePrimary}>Record</ModalHeader>
                   <ModalBody id="itemPreview">
                   </ModalBody>
-                </Modal> 
+              </Modal> 
        <Row>
           <Col xs="12" lg="12">
             <Card>
@@ -318,12 +310,9 @@ export class ViewRecords extends Component {
                 <h2>My Records: {this.state.recordsId.length}
                 </h2>
                 <Input
-                          type="password"
-                          placeholder="Enter seedphrase"
-                          onChange={event =>
-                            this.setState({ seedphrase: event.target.value })
-                          }
-                          
+                  type="password"
+                  placeholder="Enter seedphrase"
+                  onChange={event => this.setState({ seedphrase: event.target.value })}          
                 />
               </CardHeader>
               <CardBody>
