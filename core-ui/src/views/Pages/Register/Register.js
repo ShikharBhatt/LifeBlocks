@@ -4,7 +4,6 @@ import { firebaseApp } from "../../../Dependencies/firebase";
 import * as firebase from "firebase";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {userdetails} from "../../../contract_abi";
-//import '../App.css'
 import { registerkey } from "../../../Dependencies/pgp";
 
 import {
@@ -40,12 +39,12 @@ class Register extends Component {
     //binding functions
     this.SignUp = this.SignUp.bind(this);
     this.linkAadhaar = this.linkAadhaar.bind(this);
-    this.myFunction = this.myFunction.bind(this);
+    this.validateOTP = this.validateOTP.bind(this);
   }
 
   async componentWillMount() {
     // Get network provider and web3 instance.
-    // See utils/getWeb3 for more info.
+    // See Dependencies/utils/getWeb3 for more info.
 
     await getWeb3
       .then(results => {
@@ -53,7 +52,7 @@ class Register extends Component {
           web3: results.web3
         });
         console.log(results.web3)
-        console.log("Procider:",results.web3.currentProvider)
+        console.log("Provider:",results.web3.currentProvider)
 
         // Instantiate contract once web3 provided.
         this.instantiateContract();
@@ -103,7 +102,7 @@ class Register extends Component {
     document.getElementById("OTP").style.display = "block";
 
     alert("In Signup");
-    //getting phone number for the entered aadhaar number
+    //getting phone number for the entered aadhaar number from firebase
     firebaseApp
       .database()
       .ref("/uidai/")
@@ -174,23 +173,23 @@ class Register extends Component {
   }
 
   //confirm OTP function and call to linkAadhaar function
-  myFunction = function(event) {
+  validateOTP = function(event) {
     event.preventDefault();
     let callLinkAadhaar = this.linkAadhaar;
-    callLinkAadhaar();
-    // window.confirmationResult
-    //   .confirm(document.getElementById("verificationcode").value)
-    //   .then(
-    //     function(result) {
-    //       callLinkAadhaar();
-    //       //window.location.href = '/signin'
-    //       alert("success");
-    //     },
+    //callLinkAadhaar();
+    window.confirmationResult
+      .confirm(document.getElementById("verificationcode").value)
+      .then(
+        function(result) {
+          callLinkAadhaar();
+          //window.location.href = '/signin'
+          alert("success");
+        },
 
-    //     function(error) {
-    //       alert(error);
-    //     }
-    //   );
+        function(error) {
+          alert(error);
+        }
+      );
   };
 
   render() {
@@ -250,7 +249,7 @@ class Register extends Component {
                   <br />
                   <div id="recaptcha-container" />
                   <br />
-                  <Form id="OTP" onSubmit={this.myFunction}>
+                  <Form id="OTP" onSubmit={this.validateOTP}>
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
