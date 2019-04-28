@@ -1,23 +1,7 @@
 import React, { Component } from "react";
-import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {organization, policyTemplate, userdetails} from "../../../contract_abi";
-
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Row,
-  Input,
-  FormText,
-  Label,
-  FormGroup,
-  Form,
-  CardFooter,
-  Table
-} from "reactstrap";
+import { Button, Card, CardBody, CardHeader, Col, Row, Input, FormText, Label, FormGroup, Form, CardFooter, Table } from "reactstrap";
 
 
 class AcceptPolicy extends Component {
@@ -50,7 +34,6 @@ class AcceptPolicy extends Component {
 
     async componentWillMount() {
 
-     
       // Get network provider and web3 instance.
       // See utils/getWeb3 for more info.
               await getWeb3
@@ -105,32 +88,6 @@ class AcceptPolicy extends Component {
                 })
               }
             })
-          // this.orgContract.methods.retrieveType("Insurance").call({
-          //   from: accounts[0]}, (error, x) => {
-          //     console.log(x)
-          //     this.setState({
-          //       insuranceAdds: x
-          //     })
-
-          //     let insurance = []
-              
-          //     for(let i=0; i<x.length; i++) {
-          //       this.orgContract.methods.getOrgName(x[i]).call(
-          //         {from: accounts[0]}, (error, y) => {
-          //           let obj = {}
-          //           obj['address'] = x[i]
-          //           obj['name'] = y
-
-          //           insurance.push(obj)
-
-          //           this.setState({
-          //             insuranceCompanies: insurance
-          //           })
-          //         }
-          //       )
-          //     }
-          //   }
-          // )
         }
         else {
           console.log(error)
@@ -158,7 +115,7 @@ class AcceptPolicy extends Component {
 
    //show policies based on the insurance company selected 
     showPolicies(tempAdd) {
-      // alert("Show")
+  
       if(tempAdd) {
         const templateContractAddress = tempAdd
         const templateABI = policyTemplate.abi
@@ -169,13 +126,9 @@ class AcceptPolicy extends Component {
           {from: this.state.account}, (error, count) => {
             if(!error) {
               
-              // this.setState({
-              //   contractCount: count
-              // })
             if( count != 0) {
                 let policiesGenerated = []
-                // alert("Loop")
-                
+               
                 for(let i=count-1; i>=0; i--) {
                   
                   this.templateContract.methods.getContract(i).call(
@@ -188,12 +141,11 @@ class AcceptPolicy extends Component {
                       }
                     })
               }
-              // alert("Done")
       
           }
             }
           })
-          // alert("Change")
+          
           const rows = this.state.policiesGenerated.map((row, index) => {
             return (
                 <tr key={index}>
@@ -228,8 +180,7 @@ class AcceptPolicy extends Component {
 
 
    applyPolicy() {
-    
-
+  
     this.state.web3.eth.getAccounts((error, accounts) => {
       //get the account from metamask
       this.UserContract.methods.login(sessionStorage.getItem('aadhaar')).call(

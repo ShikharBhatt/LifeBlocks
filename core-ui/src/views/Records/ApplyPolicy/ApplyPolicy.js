@@ -37,7 +37,8 @@ export class ApplyPolicy extends Component {
         insurancePolicies: [],
         insuranceAddress:null,
         insuranceName:null,
-        appliedAddress: ''
+        appliedAddress: '',
+        policyDetails:[],
       };
   
       this.insurancePopulate = this.insurancePopulate.bind(this)
@@ -143,8 +144,9 @@ export class ApplyPolicy extends Component {
 
 
      //show policies based on the insurance company selected 
-      showPolicies(insAdd) {
-        if(insAdd) {
+      showPolicies() {
+        const insAdd = this.state.insuranceAddress
+        if(insAdd != null) {
           this.orgContract.methods.returnAllPolicy(insAdd).call(
             {from: this.state.account}, (error, policies) => {
               if(!error) {
@@ -152,48 +154,94 @@ export class ApplyPolicy extends Component {
                 this.setState({
                   insurancePolicies: policies
                 })
+                console.log(policies)
               }
             })
-    
-            const rows = this.state.insurancePolicies.map((row, index) => {
-              return (
-                  <tr key={index}>
-                 
-                      <td>{row}</td>
-                      {/* <td>{row.job}</td> */}
-                      <td>
-                       {this.state.coverage}
-                    </td>
-                     
-                      <td>
-                        <Button
-                        
-                        block color="primary" 
-                        size="lg"
-                        value={row} 
-                        onClick={
-                                  () => 
-                                      {
-                                        this.setState({appliedAddress:row}, ()=> {
-                                          this.applyPolicy()
-                                        })
-                                      }
-                                }
-                          ><b>Apply</b></Button></td>
+            console.log("State:", this.state.insurancePolicies)
+          // const lengthp = this.state.insurancePolicies.length
+          // if(lengthp > 0) {
+
+          //   var policyTemplateABI = policyTemplate.abi
+
+          //   let myarray = []
+          //   console.log(this.state.insurancePolicies.length)
+          //   for(let i=0; i<this.state.insurancePolicies.length; i++) {
+          //     console.log("in ", this.state.insurancePolicies[i], " length:", lengthp )
+          //     var policyTemplateContractAddress = this.state.insurancePolicies[i]
+          //     var policyTemplateContract = new this.state.web3.eth.Contract(policyTemplateABI, policyTemplateContractAddress)
+              
+              
+          //     policyTemplateContract.methods.getPolicyDetails().call(
+          //       {from:this.state.account}, function(error, y){
+          //         alert(y[0],y[1])
+          //         let obj = {
+
+          //         }
+          //         obj['coverage'] = y[0]
+          //         obj['policyName'] = y[1]
                   
-                  </tr>
+          //         //push the record object into array of objects                        
+          //         myarray.push(obj)
                   
-                  );
-          
-          });
-          
-          //return the table of records
-          return rows
+          //         // alert("Objec"+myarray[0].name + myarray[0].type)
+                  
+          //         this.setState({
+          //           policyDetails: myarray
+          //         })  
+          //       }.bind(this))
+          //   }
+
+          // }  
+
+          //   if(this.state.policyDetails.length === lengthp) {
+          //     const rows = this.createTable()
+          //     return rows
+          //   }
+
     
     
         }
      }
 
+     createTable() {
+      const rows = this.state.insurancePolicies.map((row, index) => {
+        return (
+            <tr key={index}>
+           
+                <td>{row}</td>
+                <td>
+                  {this.state.policyDetails[index].policyName}
+                </td>
+                <td>
+                 {this.state.policyDetails[index].coverage}
+                </td>
+               
+                <td>
+                  <Button
+                  
+                  block color="primary" 
+                  size="lg"
+                  value={row} 
+                  onClick={
+                            () => 
+                                {
+                                  this.setState({appliedAddress:row}, ()=> {
+                                    this.applyPolicy()
+                                  })
+                                }
+                          }
+                    ><b>Apply</b></Button></td>
+            
+            </tr>
+            
+            );
+    
+    });
+    
+    //return the table of records
+    return rows
+
+     }
 
      applyPolicy() {
       
@@ -293,13 +341,14 @@ export class ApplyPolicy extends Component {
                   <thead>
                   <tr>
                     <th>Policy Address</th>
+                    <th>Policy Name</th>
                     <th>Coverage</th>
                    
                     <th></th>
                   </tr>
                   </thead>
                   <tbody>
-                    {this.showPolicies(this.state.insuranceAddress)}
+                    {this.showPolicies()}
                   </tbody>
                 </Table>                           
           </CardBody>

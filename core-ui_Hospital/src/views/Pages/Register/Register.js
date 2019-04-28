@@ -3,21 +3,8 @@ import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import { Link } from "react-router-dom";
 import { registerkey } from "../../../Dependencies/pgp";
 import { organization } from "../../../contract_abi";
+import { Button, Card, CardBody, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from "reactstrap";
 
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  Col,
-  Container,
-  Form,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Row
-} from "reactstrap";
 
 class Register extends Component {
   constructor(props) {
@@ -57,16 +44,13 @@ class Register extends Component {
     //Initialize organization contract
     const orgContractAddress = organization.contract_address;
     const orgABI = organization.abi;
-    var orgContract = new this.state.web3.eth.Contract(
-      orgABI,
-      orgContractAddress
-    );
+    var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress);
     this.orgContract = orgContract;
     console.log("org contract: " + this.orgContract);
   }
 
+  //function handling the signup event
   signUp(event) {
-    //function handling the signup event
     event.preventDefault();
     this.state.web3.eth.getAccounts((error, accounts) => {
       console.log("orgName: " + this.state.orgName);
@@ -113,7 +97,6 @@ class Register extends Component {
 
   render() {
     if (sessionStorage.getItem("orgId") !== null)
-      //return (window.location.href = "/dashboard");
       this.props.history.push("/dashboard");
     return (
       <div className="app flex-row align-items-center">

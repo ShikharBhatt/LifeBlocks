@@ -1,33 +1,14 @@
 import React, { Component } from "react";
-import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
-//import { Redirect} from 'react-router';
-import { firebaseApp } from "../../../Dependencies/firebase";
-import * as firebase from "firebase";
+import { Link } from "react-router-dom";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
-//import '../App.css'
-import { registerkey } from "../../../Dependencies/pgp";
 import { organization } from "../../../contract_abi";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardGroup,
-  Col,
-  Container,
-  Form,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Row
-} from "reactstrap";
+import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from "reactstrap";
 
 class Login extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      //declaring state variables
       orgId: "",
       web3: null,
       currentAddress: null,
@@ -67,19 +48,26 @@ class Login extends Component {
   }
 
   signIn(event) {
+
     event.preventDefault(); //function handling the signup event
+    
+    //get the account from metamask
     this.state.web3.eth.getAccounts((error, accounts) => {
+
+      //get the details of the organization trying to login
       this.orgContract.methods.getOrgDetails(accounts[0]).call(
         { from: accounts[0] },
         function(error, details) {
           let id = details[2];
           console.log("id returned: " + id);
+
           if (this.state.orgId == id) {
             alert("sign in successful");
             sessionStorage.setItem("orgId", this.state.orgId);
             sessionStorage.setItem("orgType", details[1]);
             this.props.history.push("/dashboard");
-          } else {
+          } 
+          else {
             alert("Incorrect details");
           }
         }.bind(this)
@@ -88,8 +76,7 @@ class Login extends Component {
   }
 
   render() {
-    if (sessionStorage.getItem("orgId") !== null)
-      //return (window.location.href = "/dashboard");
+    if (sessionStorage.getItem("orgId") != null)
       this.props.history.push("/dashboard");
     return (
       <div className="app flex-row align-items-center">

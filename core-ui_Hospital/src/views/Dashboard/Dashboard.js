@@ -1,26 +1,12 @@
 import React, { Component } from "react";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Row,
-  Input,
-  FormText,
-  Label,
-  FormGroup,
-  Form,
-  CardFooter
-} from "reactstrap";
-
+import { Button, Card, CardBody, CardHeader, Col, Row, Input, FormText, Label, FormGroup, Form, CardFooter } from "reactstrap";
 import ipfs from "../../Dependencies/ipfs";
 import { encrypt } from "../../Dependencies/crypto";
 import { getKeys, keyEncrypt } from "../../Dependencies/pgp";
 import { userdetails, storage } from "../../contract_abi";
-
 import getWeb3 from "../../Dependencies/utils/getWeb3";
 
+//prints on console what type of organization is logged in - hospital or insurance company
 console.log("Type:", sessionStorage.getItem("orgType"));
 
 class Dashboard extends Component {
@@ -42,10 +28,7 @@ class Dashboard extends Component {
     this.captureFile = this.captureFile.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
-    //this.toggle = this.toggle.bind(this);
-    // this.state = {
-    //   dropdownOpen: new Array(19).fill(false)
-    // };
+    
   }
 
   componentWillMount() {
@@ -69,26 +52,21 @@ class Dashboard extends Component {
     //Initialize user details contract
     const userContractAddress = userdetails.contract_address;
     const userABI = userdetails.abi;
-    var userContract = new this.state.web3.eth.Contract(
-      userABI,
-      userContractAddress
-    );
+    var userContract = new this.state.web3.eth.Contract( userABI, userContractAddress);
     this.userContract = userContract;
     //Initialize storage contract
     const storageContractAddress = storage.contract_address;
     const storageABI = storage.abi;
-    var storageContract = new this.state.web3.eth.Contract(
-      storageABI,
-      storageContractAddress
-    );
+    var storageContract = new this.state.web3.eth.Contract( storageABI, storageContractAddress);
     this.storageContract = storageContract;
-    console.log("storage contract: " + this.storageContract);
   }
 
   captureFile(event) {
     event.preventDefault();
+
     const file = event.target.files[0];
     const reader = new window.FileReader();
+    
     reader.readAsArrayBuffer(file);
     reader.onloadend = () => {
       this.buffer = Buffer(reader.result);
@@ -140,13 +118,17 @@ class Dashboard extends Component {
             });
           });
         });
+
+      //add the record to ipfs  
       ipfs.files.add(record, (error, result) => {
         if (error) {
           console.error(error);
           return;
         } else {
+
           alert(result[0].hash + this.state.aadhaar + this.state.rtype + this.state.rname);
           alert(m_key);
+          
           this.storageContract.methods.upload(this.state.aadhaar, result[0].hash, this.state.rtype, this.state.rname, m_key)
             .send(
               {
@@ -168,9 +150,13 @@ class Dashboard extends Component {
   }
 
   render() {
+    //if insurance company logged in then render this
     if (sessionStorage.getItem("orgType") == "Insurance") {
       return <div className="App"> This is Insurance Page</div>;
-    } else
+    } 
+    
+    //if hospital logged in then render this
+    else
       return (
         <div className="App">
           <div className="animated fadeIn">
