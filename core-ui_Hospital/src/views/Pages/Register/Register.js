@@ -3,7 +3,7 @@ import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import { Link } from "react-router-dom";
 import { registerkey } from "../../../Dependencies/pgp";
 import { organization } from "../../../contract_abi";
-import { Button, Card, CardBody, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from "reactstrap";
+import { Button, Card, CardBody, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, CardFooter } from "reactstrap";
 
 
 class Register extends Component {
