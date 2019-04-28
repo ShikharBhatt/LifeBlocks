@@ -1,22 +1,7 @@
 import React, { Component } from "react";
-import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {organization, policyTemplate} from "../../../contract_abi";
-
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Row,
-  Input,
-  FormText,
-  Label,
-  FormGroup,
-  Form,
-  CardFooter,
-} from "reactstrap";
+import { Button, Card, CardBody, CardHeader, Col, Row, Input, FormText, Label, FormGroup, Form, CardFooter, Table } from "reactstrap";
 
 
 class DeployPolicy extends Component {
@@ -30,9 +15,10 @@ class DeployPolicy extends Component {
       currentAddress: null,
       phone: null,
       seedphrase: "",
-      coverage:null
+      coverage:null,
+      policyName:null,
     };
-    this.deployPolicyTemplate = this.deployPolicyTemplate.bind(this)
+    this.deployPolicyTemplate = this.deployPolicyTemplate.bind(this);
 
   }
 
@@ -72,13 +58,19 @@ class DeployPolicy extends Component {
         console.log(error)
       }
       else {
-        alert(accounts[0])
+        alert(this.state.coverage)
+        alert("Name:" + this.state.policyName)
+        alert(accounts[0], this.state.coverage, this.state.policyName)
+
+        //create a policyTemplate contract
         this.state.web3.eth.sendTransaction({
           from:accounts[0],
           data: policyTemplate.bytecode,
-          arguments: [this.state.coverage]
+          arguments: [this.state.coverage, this.state.policyName]
         }).then((receipt) =>{
           console.log("Receipt:",receipt.contractAddress)
+
+          //create mapping in the organization contract - (template => organization)
           this.orgContract.methods.addPolicy(receipt.contractAddress).send(
             {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then(() => {
               alert("Mapping in organization.sol made")
@@ -124,46 +116,22 @@ class DeployPolicy extends Component {
                   </Col>
                 </FormGroup>
 
-              {/*  <FormGroup row>
+                <FormGroup row>
                   <Col md="3">
-                    <Label htmlFor="input">Record Name:</Label>
+                    <Label htmlFor="text-input">Enter Policy Name:</Label>
                   </Col>
                   <Col xs="12" md="9">
                     <Input
                       type="text"
-                      placeholder="Record Name"
+                      placeholder="Policy Name"
                       onChange={event =>
-                        this.setState({ rname: event.target.value })
+                        this.setState({ policyName: event.target.value })
                       }
                       required={true}
                     />
                   </Col>
                 </FormGroup>
 
-                <FormGroup row>
-                  <Col md="3">
-                    <Label htmlFor="select">Record Type:</Label>
-                  </Col>
-                  <Col xs="12" md="9">
-                    <Input type="select" onChange={event => this.setState({ rtype:event.target.value })} required={true} defaultValue="no-value">
-                      <option value="no-value" disabled>Select Record Type</option>
-                      <option value="Routine">Routine</option>
-                      <option value="Sensitive">Sensitive</option>
-                      <option value="Emergency">Emergency</option>
-                      <option value="Claim">Claim</option>
-                    </Input>
-                  </Col>
-                </FormGroup>
-                
-                <FormGroup row>
-                  <Col md="3">
-                    <Label htmlFor="file-input">Upload File:</Label>
-                  </Col>
-                  <Col xs="12" md="9">
-                    <Input type="file" onChange={this.captureFile} required={true}/>
-                  </Col>
-                </FormGroup> */}
-                            
             </CardBody>
 
             <CardFooter>

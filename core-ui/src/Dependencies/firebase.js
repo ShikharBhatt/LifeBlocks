@@ -1,5 +1,6 @@
 import * as firebase from 'firebase';
 
+//define config for firebase instance
 const config = {
     apiKey: "AIzaSyAKFfHgewDLrGJ7lNxow7Bv8EsQYlvppYY",
     authDomain: "lifeblocks-426b3.firebaseapp.com" ,
