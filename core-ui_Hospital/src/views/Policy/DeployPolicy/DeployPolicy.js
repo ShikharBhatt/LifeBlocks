@@ -61,21 +61,22 @@ class DeployPolicy extends Component {
         alert(this.state.coverage)
         alert("Name:" + this.state.policyName)
         alert(accounts[0], this.state.coverage, this.state.policyName)
-
-        //create a policyTemplate contract
-        this.state.web3.eth.sendTransaction({
-          from:accounts[0],
-          data: policyTemplate.bytecode,
-          arguments: [this.state.coverage, this.state.policyName]
-        }).then((receipt) =>{
-          console.log("Receipt:",receipt.contractAddress)
-
+        
+        const policyScheme = new this.state.web3.eth.Contract(policyTemplate.abi);
+        console.log(policyScheme);
+        policyScheme.deploy({
+          data:policyTemplate.bytecode,
+          arguments:[this.state.coverage, this.state.policyName]
+        }).send({
+          from:accounts[0]  
+        }).then((newContractInstance) => {
+          console.log(newContractInstance.options.address) // instance with the new contract address
           //create mapping in the organization contract - (template => organization)
-          this.orgContract.methods.addPolicy(receipt.contractAddress).send(
+          this.orgContract.methods.addPolicy(newContractInstance.options.address).send(
             {from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then(() => {
               alert("Mapping in organization.sol made")
-            })  
-        })
+            })
+      });
       }
      
     })
