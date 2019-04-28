@@ -37,12 +37,13 @@ export class ApplyPolicy extends Component {
         insurancePolicies: [],
         insuranceAddress:null,
         insuranceName:null,
-        appliedAddress: ''
+        appliedAddress: '',
+        policyDetails: [],
       };
   
-      this.insurancePopulate = this.insurancePopulate.bind(this)
+      this.insurancePopulate = this.insurancePopulate.bind(this);
       this.showPolicies = this.showPolicies.bind(this);
- 
+      this.getPolicyTemplates = this.getPolicyTemplates.bind(this);
       }
 
 
@@ -142,45 +143,92 @@ export class ApplyPolicy extends Component {
       }
 
 
-     //show policies based on the insurance company selected 
-      showPolicies(insAdd) {
-        if(insAdd) {
-          this.orgContract.methods.returnAllPolicy(insAdd).call(
-            {from: this.state.account}, (error, policies) => {
-              if(!error) {
-                
-                this.setState({
-                  insurancePolicies: policies
-                })
-              }
-            })
+     //fetch the policy templates based on the insurance company selected by the user
+     async getPolicyTemplates(insAdd) {
+      console.log("in in in in")
+      if(insAdd) {
+        this.orgContract.methods.returnAllPolicy(insAdd).call(
+          {from: this.state.account}, (error, policies) => {
+            if(!error) {
+              
+              this.setState({
+                insurancePolicies: policies
+              })
+
+            }
+          }).then(policies => {
+            
+            const lengthp = policies.length
+            
+            if(lengthp > 0) {
+              
+              var policyTemplateABI = policyTemplate.abi
     
-            const rows = this.state.insurancePolicies.map((row, index) => {
-              return (
-                  <tr key={index}>
-                 
-                      <td>{row}</td>
-                      {/* <td>{row.job}</td> */}
-                      <td>
-                       {this.state.coverage}
-                    </td>
-                     
-                      <td>
-                        <Button
-                        
-                        block color="primary" 
-                        size="lg"
-                        value={row} 
-                        onClick={
-                                  () => 
-                                      {
-                                        this.setState({appliedAddress:row}, ()=> {
-                                          this.applyPolicy()
-                                        })
-                                      }
-                                }
-                          ><b>Apply</b></Button></td>
-                        <td>
+              let myarray = []
+              for(let i=0; i<policies.length; i++) {
+                console.log("in ", policies[i], " length:", lengthp )
+                var policyTemplateContractAddress = policies[i]
+                var policyTemplateContract = new this.state.web3.eth.Contract(policyTemplateABI, policyTemplateContractAddress)
+    
+    
+                policyTemplateContract.methods.getPolicyDetails().call(
+                  {from:this.state.account}, function(error, y){
+                    
+                    let obj = {
+    
+                    }
+                    obj['coverage'] = y[0]
+                    obj['policyName'] = y[1]
+    
+           
+                    //push the record object into array of objects                        
+                    myarray.push(obj)
+                   // console.log(myarray)
+                    this.setState({
+                      policyDetails: myarray
+                    }, ()=>{
+                      console.log(this.state.policyDetails)
+                    })  
+                  }.bind(this))
+              }       
+            }
+    
+          })
+        }
+
+    }
+
+   //display policies based on the insurance company selected 
+    showPolicies(policies, details) {
+          if(policies.length!=details.length)
+            return;
+          console.log("inside")
+          const rows = policies.map((row, index) => {
+            return (
+                <tr key={index}>
+               
+                    <td>{row}</td>
+                    <td>{details[index].coverage}</td>
+                    <td>
+                     {details[index].policyName}
+                  </td>
+                   
+                    <td>
+                      <Button
+                      
+                      block color="primary" 
+                      size="lg"
+                      value={row} 
+                      onClick={
+                                () => 
+                                    {
+                                      this.setState({appliedAddress:row}, ()=> {
+                                        this.applyPolicy()
+                                      })
+                                    }
+                              }
+                        ><b>Apply</b></Button></td>
+                {/* <td>
                         <Button
                         
                         block color="primary" 
@@ -194,20 +242,20 @@ export class ApplyPolicy extends Component {
                                         })
                                       }
                                 }
-                          ><b>Apply</b></Button></td>
-                  
-                  </tr>
-                  
-                  );
-          
-          });
-          
-          //return the table of records
-          return rows
-    
-    
-        }
-     }
+                          ><b>Apply</b></Button></td> */}
+                </tr>
+                
+                );
+        
+        });
+        
+        //return the table of records
+        return rows
+  
+  
+      
+   }
+
 
      viewCoverage() {
       this.state.web3.eth.getAccounts((error, accounts) => {
@@ -360,6 +408,7 @@ export class ApplyPolicy extends Component {
                 <Col xs="12" md="6">
                   <Input type="select" required={true} defaultValue="no-value" onChange={event => {
                     this.setState({ insuranceAddress:event.target.value })
+                    this.getPolicyTemplates(event.target.value)
                     }}>
                     <option value="no-value" disabled>Select Insurance Company</option>
                     {this.insurancePopulate(this.state.insuranceAdds)}
@@ -373,31 +422,15 @@ export class ApplyPolicy extends Component {
                   <tr>
                     <th>Policy Address</th>
                     <th>Coverage</th>
-                   
+                    <th>PolicyName</th>
                     <th></th>
                   </tr>
                   </thead>
                   <tbody>
-                    {this.showPolicies(this.state.insuranceAddress)}
+                    {this.showPolicies(this.state.insurancePolicies, this.state.policyDetails)}
                   </tbody>
                 </Table>                           
-          </CardBody>
-
-          <CardFooter>
-            {/* <Row>
-              <Col md="2" sm="3" xs="6">
-              <Button type="submit" size="md" color="primary">
-              <i className="fa fa-dot-circle-o" /> Submit
-            </Button>
-              </Col> 
-              <Col md="2" sm="3" xs="6">
-              <Button type="reset" size="md" color="danger">
-              <i className="fa fa-ban" /> Reset
-            </Button>
-              </Col>
-            </Row> */}
-          </CardFooter>
-         
+          </CardBody>        
         </Card>
         </Col>
         </Row>
