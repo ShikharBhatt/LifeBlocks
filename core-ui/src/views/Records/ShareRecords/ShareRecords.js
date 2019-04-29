@@ -1,11 +1,10 @@
 
 import React, { Component } from 'react'
 import ipfs from '../../../Dependencies/ipfs'
-import {decrypt} from '../../../Dependencies/crypto'
-import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
+import { getKeys,keyDecrypt, keyEncrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
-import {userdetails, storage} from "../../../contract_abi";
-import { Badge, Card, CardBody, CardHeader, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import {userdetails, storage, organization, permissions} from "../../../contract_abi";
+import { FormGroup, Input, Form, Card, CardBody, CardHeader, CardFooter, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 
 class ShareRecords extends Component {
@@ -24,13 +23,20 @@ class ShareRecords extends Component {
         value:'',
         web3:null,
         primary: false,
+        insuranceAdds:[],
+        insuranceCompanies: [],
+        insuranceAddress: null,
+        seedphrase:null,
+        selectedRecords: [],
       };
   
       
         this.onSubmit = this.onSubmit.bind(this);
         this.Change = this.Change.bind(this);
-        this.TableBody = this.TableBody.bind(this);
+        this.displayRecords = this.displayRecords.bind(this);
         this.togglePrimary = this.togglePrimary.bind(this);
+        this.insurancePopulate = this.insurancePopulate.bind(this);
+        this.shareRecords = this.shareRecords.bind(this);
       }
 
 
@@ -48,8 +54,7 @@ class ShareRecords extends Component {
           // Instantiate contract once web3 provided.
         })
         .catch(() => {
-          console.log('Error finding web3.')
-          
+          console.log('Error finding web3.')          
         })
       
         await this.instantiateContract()
@@ -58,14 +63,14 @@ class ShareRecords extends Component {
       }
 
 
-     instantiateContract() {
+     async instantiateContract() {
   
 
       //Record Uploader Contract Instantiation
       const contractAddress = storage.contract_address
       const ABI = storage.abi    
-      var RecordUploaderContract = new this.state.web3.eth.Contract(ABI, contractAddress)      
-      this.RecordUploaderContract = RecordUploaderContract
+      var storageContract = new this.state.web3.eth.Contract(ABI, contractAddress)      
+      this.storageContract = storageContract
         
 
       //User Details Contract Instantiation
@@ -74,10 +79,19 @@ class ShareRecords extends Component {
       var UserContract = new this.state.web3.eth.Contract(ABI_u, contractAddress_u)     
       this.UserContract = UserContract
 
-      console.log("User Contract: "+ this.UserContract)
+      const orgContractAddress = organization.contract_address
+      const orgABI = organization.abi
+      var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress)
+      this.orgContract = orgContract
+
+      const permissionsContractAddress = permissions.contract_address
+      const permissionsABI = permissions.abi
+      var permissionsContract = new this.state.web3.eth.Contract(permissionsABI, permissionsContractAddress)
+      this.permissionsContract = permissionsContract
+
 
       //Get account from metamask
-          this.state.web3.eth.getAccounts((error,account) => {
+          await this.state.web3.eth.getAccounts((error,account) => {
           if(!error) {
             console.log(account[0])
           }
@@ -88,7 +102,7 @@ class ShareRecords extends Component {
         // alert(aadhaar)
 
         //Retrieve record id's for the user
-        this.RecordUploaderContract.methods.retrieve(aadhaar).call(
+        this.storageContract.methods.retrieve(aadhaar).call(
             {from:account[0]}, function(error, x){
                 
                 this.setState({
@@ -121,7 +135,7 @@ class ShareRecords extends Component {
 
                   //getting data of each record
                   for(let i = 0; i<x.length; i++) {
-                    this.RecordUploaderContract.methods.viewRecord(x[i]).call(
+                    this.storageContract.methods.viewRecord(x[i]).call(
                       {from:address}, function(error, y){
                         let obj = {
 
@@ -153,7 +167,69 @@ class ShareRecords extends Component {
 
               
             }.bind(this))
+
+        })  
+
+        await this.state.web3.eth.getAccounts((error,accounts) => {
+          if(!error) {
+            console.log(accounts[0])
+            this.setState({
+              account: accounts[0]
+            })
+            this.orgContract.methods.retAddresses().call({
+              from: accounts[0]}, (error, x) => {
+                console.log(x)
+                this.setState({
+                  insuranceAdds: x
+                })
+
+                let insurance = []
+                
+                for(let i=0; i<x.length; i++) {
+                  this.orgContract.methods.getOrgName(x[i]).call(
+                    {from: accounts[0]}, (error, y) => {
+                      let obj = {}
+                      obj['address'] = x[i]
+                      obj['name'] = y
+
+                      insurance.push(obj)
+
+                      this.setState({
+                        insuranceCompanies: insurance
+                      })
+
+                      console.log(this.state.insuranceCompanies)
+                    }
+                  )
+                }
+              }
+            )
+          }
+          else {
+            console.log(error)
+          }
+   
         })              
+
+                    
+      }
+
+
+      insurancePopulate(insuranceAdds) {
+        if(insuranceAdds.length===this.state.insuranceCompanies.length) {
+          const rows =  insuranceAdds.map((row, index) => {
+            return (
+                <option key={index} value={row}>
+                  {this.state.insuranceCompanies[index].name}
+                </option>
+                );
+        
+        });
+        
+        //return the table of records
+        return rows
+
+        }
       }
 
       //function for modal
@@ -165,12 +241,12 @@ class ShareRecords extends Component {
 
 
       //creating table for sharing the records
-      TableBody(recordsId) {
+      displayRecords(recordsId) {
         let ids = [];
-
         const rows = recordsId.map((row, index) => {
               return (
                   <tr key={index}>
+
                       <td>{this.state.arr[index].name}</td>
                       {/* <td>{row.job}</td> */}
                       <td>{this.state.arr[index].date}</td>
@@ -180,19 +256,8 @@ class ShareRecords extends Component {
                         <input
                           type="checkbox"
                           id={this.state.arr[index].recordId}
-                          // defaultChecked={this.state.chkbox}
-                          onChange={function() {
-                            console.log(document.getElementById(`${this.state.arr[index].recordId}`).checked);
-                            if (document.getElementById(`${this.state.arr[index].recordId}`).checked) {
-                              console.log("checked");
-                              ids.push(`${this.state.arr[index].recordId}`);
-                            } else {
-                              ids = ids.filter(c => {
-                                return c !== `${this.state.arr[index].recordId}`;
-                              });
-                            }
-                            console.log(ids);
-                          }.bind(this)}
+                          value={index}
+                          onChange={this.onChange.bind(this)}
                         />
                       </td>
                   </tr>
@@ -204,14 +269,130 @@ class ShareRecords extends Component {
           //return the table of records
           return rows
       }
-  
+
+      //create list of checked records
+      onChange(e) {
+        // current array of options
+        const options = this.state.selectedRecords
+        let index
+    
+        // check if the check box is checked or unchecked
+        if (e.target.checked) {
+          // add the numerical value of the checkbox to options array
+          options.push(+e.target.value)
+        } else {
+          // or remove the value from the unchecked checkbox from the array
+          index = options.indexOf(+e.target.value)
+          options.splice(index, 1)
+        }
+    
+        // update the state with the new array of options
+        this.setState({ selectedRecords: options }, ()=>{
+          console.log("Records: ",this.state.selectedRecords)
+        })
+      }
+
+      async shareRecords(event) {
+        event.preventDefault()
+        if(this.state.selectedRecords.length>0) {
+          let keyObj, un_mkey, keyObjOrg,seedphrase, selectedRecords
+          let recordData = []
+          let data
+          let  m_key = []
+          let myaadhaar = sessionStorage.getItem('aadhaar')
+          let permissionsContract = this.permissionsContract
+          let organizationAddress = this.state.insuranceAddress
+          let account 
+          let gp = this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
+          recordData = this.state.arr
+          seedphrase = this.state.seedphrase
+          selectedRecords = this.state.selectedRecords
+
+          await this.state.web3.eth.getAccounts((error, accounts) => {
+            //transaction to link aadhaar card to address
+            account = accounts[0]
+            this.orgContract.methods
+              .getKeyHash(this.state.insuranceAddress)
+              .call({
+                from: accounts[0],
+                gasPrice: this.state.web3.utils.toHex(
+                  this.state.web3.utils.toWei("0", "gwei")
+                )
+              })
+              .then(pgpIpfsHashOrg => {
+                getKeys(pgpIpfsHashOrg, function (key) {
+                  //in callback function of getKeys
+                  keyObjOrg = JSON.parse(key);
+                  //console.log(this.state.aadhaar)
+                  console.log("key object Organization: " + keyObjOrg);
+                  console.log("key object type: " + typeof keyObjOrg);
+                  console.log("public key : " + keyObjOrg.publicKeyArmored);
+                  console.log(Object.getOwnPropertyNames(keyObjOrg));
+                  
+                });
+              });
+      
+            //add the record to ipfs  
+          });
+
+          await this.state.web3.eth.getAccounts((error,account) => {
+            console.log(account[0])
+            //call to contract to get ipfs hash of pgp key of the user
+            this.UserContract.methods.getKeyHash(myaadhaar).call(
+              {from:account[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((pgpIpfsHash) => {
+                  //get pgp key from ipfs
+                   
+                    getKeys(pgpIpfsHash, function(key){
+                      keyObj = JSON.parse(key)
+                      console.log("key object: " +keyObj)
+                      console.log("key obj properties: "+Object.getOwnPropertyNames(keyObj))
+                      //call to function to decrypt masterkey using pgp private key
+                      for(let i=0;i<selectedRecords.length;i++) {
+                        data = recordData[selectedRecords[i]].recordId
+                        keyDecrypt(keyObj,recordData[selectedRecords[i]].masterkey,seedphrase,function(plain){
+                          un_mkey = (plain)
+                          console.log("unencrypted masterkey : "+un_mkey)
+                          keyEncrypt(un_mkey, keyObjOrg, function (cipher) {
+                            //in callback function of keyEncrypt
+                            m_key.push(cipher);
+                            console.log("encrypted masterkey: " + m_key);
+                        
+                          }).then((cipher)=>{
+                            permissionsContract.methods
+                            .grant(data, organizationAddress,cipher )
+                            .send(
+                              {
+                                from: account,
+                                gasPrice: gp
+                              },
+                              function(error, txHash) {
+                                if (!error) {
+                                  console.log("tx: " + txHash);
+                                  alert("Transaction Hash:" + txHash);
+                                } else console.log(error);
+                              }
+                            );
+                          })                   
+                      })
+
+                      }
+                      console.log("UmKey:",un_mkey)
+                  })//end get keys
+                  
+                  
+              })
+        })
+
+        }
+
+      }
   
     onSubmit(){
        // event.preventDefault();
 
         alert("Value:"+this.state.value)
 
-        this.RecordUploaderContract.methods.viewRecord(this.state.value).call(
+        this.storageContract.methods.viewRecord(this.state.value).call(
             {from:this.state.userAddress}, function(error, x){
               alert('called')
                 this.setState({
@@ -244,22 +425,12 @@ class ShareRecords extends Component {
       console.log("Athis.state.arr", this.state.arr)
       return (
         <div className="animated fadeIn">
-        {/* <Button color="primary" onClick={this.togglePrimary} className="mr-1">Primary modal</Button>
-                <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
-                       className={'modal-primary '}>
-                  <ModalHeader toggle={this.togglePrimary}>Modal title</ModalHeader>
-                  <ModalBody>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                    culpa qui officia deserunt mollit anim id est laborum.
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="primary" onClick={this.togglePrimary}>Do Something</Button>{' '}
-                    <Button color="secondary" onClick={this.togglePrimary}>Cancel</Button>
-                  </ModalFooter>
-                </Modal> */}
+        <Form
+                    onSubmit={this.shareRecords}
+                    method="post"
+                    encType="multipart/form-data"
+                    className="form-horizontal"
+                  >
        <Row>
           <Col xs="12" lg="12">
             <Card>
@@ -278,18 +449,63 @@ class ShareRecords extends Component {
                   </tr>
                   </thead>
                   <tbody>
-                    {this.TableBody(this.state.arr)}
+                    {this.displayRecords(this.state.arr)}
                   </tbody>
                 </Table>
-              </CardBody>
+              
+                  
+                    <FormGroup row>
+                
+                      <Col xs="12" md="6">
+                        <Input 
+                          style={{border:'1px solid black'}}
+                          type="select" required={true} defaultValue="no-value" onChange={event => {
+                          this.setState({ insuranceAddress:event.target.value })
+                          }}
+                          defaultValue=""
+                          required={true}
+                          >
+                          <option value="" disabled>Select Organization</option>
+                          {this.insurancePopulate(this.state.insuranceAdds)}
+                        </Input>
+                        
+                      </Col>
+              </FormGroup>
+
+              <FormGroup row>
+                <Col xs="12" md="6">
+                <Input
+                    style={{border:'1px solid red'}}
+                    type="password"
+                    placeholder="Enter seedphrase"
+                    onChange={event => this.setState({ seedphrase: event.target.value })}          
+                    required={true}      
+                  />
+                  </Col>
+                </FormGroup>
+
+                  </CardBody>
+                  <CardFooter className="p-4">
+                  <Row>
+                    
+                        <Col xs="3" sm="3" md="2">
+                      
+                      
+                      <Button id="shareButton"
+                      className="btn-facebook mb-1" block
+                      block color="primary" 
+                      size="sm"
+                      
+                      type="submit"
+                        ><b><span>Share</span></b></Button>
+                    </Col>
+                  </Row>
+                </CardFooter>
             </Card>
           </Col>
           </Row>
-            <Row id ="itemPreview">
-                <p>Your Record:</p>
-                
-            </Row>
-          </div>    
+          </Form>
+        </div>    
       );
 
      }

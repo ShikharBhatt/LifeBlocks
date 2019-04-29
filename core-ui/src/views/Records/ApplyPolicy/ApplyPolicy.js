@@ -228,21 +228,6 @@ export class ApplyPolicy extends Component {
                                     }
                               }
                         ><b>Apply</b></Button></td>
-                {/* <td>
-                        <Button
-                        
-                        block color="primary" 
-                        size="lg"
-                        value={row} 
-                        onClick={
-                                  () => 
-                                      {
-                                        this.setState({appliedAddress:row}, ()=> {
-                                          this.viewCoverage()
-                                        })
-                                      }
-                                }
-                          ><b>Apply</b></Button></td> */}
                 </tr>
                 
                 );
@@ -250,76 +235,9 @@ export class ApplyPolicy extends Component {
         });
         
         //return the table of records
-        return rows
-  
-  
-      
+        return rows      
    }
 
-
-     viewCoverage() {
-      this.state.web3.eth.getAccounts((error, accounts) => {
-        //get the account from metamask
-        this.UserContract.methods.login(sessionStorage.getItem('aadhaar')).call(
-          { from: accounts[0] },
-          (error, x)=> {
-            //check if account exists
-            if (error) {
-              alert("Wrong");
-              return;
-            }
-            if (x === true) {
-              alert("Aadhaar available");
-              //get address from aadhaar number
-              this.UserContract.methods
-                .getAddress(sessionStorage.getItem('aadhaar'))
-                .call(
-                  { from: accounts[0] },
-                  (error, add) => {
-                    //get account address from SC
-                    if (error) {
-                      alert("Wrong Details");
-                      return;
-                    }
-
-                    //if account is valid
-                    if (add === accounts[0]) {
-                      alert("Account address matches aadhaar mapping");
-
-                      var policyTemplateContractAddress = this.state.appliedAddress
-                      var policyTemplateABI = policyTemplate.abi
-                      var policyTemplateContract = new this.state.web3.eth.Contract(policyTemplateABI, policyTemplateContractAddress)
-                      this.policyTemplateContract = policyTemplateContract
-                      console.log(this.policyTemplateContract)
-                      alert(this.state.coverage)
-                      alert(sessionStorage.getItem('aadhaar'))
-                      alert(this.state.appliedAddress)
-
-                      //Creating the policy contract
-                      this.policyTemplateContract.methods.getPolicyDetails().call(
-                        {
-                          from: accounts[0],
-                        },(error,x) => {
-                          if(error){
-                            alert('wrong')
-                            return
-                          }
-                          else{
-                            console.log(x);
-                          }
-                        })
-                    } else {
-                      alert("Details Incorrect");
-                    }
-                  }
-                );
-            } else {
-              alert("Details Incorrect");
-            }
-          }
-        );
-      });
-     }
 
 
      applyPolicy() {
