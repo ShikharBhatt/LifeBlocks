@@ -301,6 +301,7 @@ class ShareRecords extends Component {
           let  m_key = []
           let myaadhaar = sessionStorage.getItem('aadhaar')
           let permissionsContract = this.permissionsContract
+          let UserContract = this.UserContract
           let organizationAddress = this.state.insuranceAddress
           let account 
           let gp = this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
@@ -328,60 +329,55 @@ class ShareRecords extends Component {
                   console.log("key object type: " + typeof keyObjOrg);
                   console.log("public key : " + keyObjOrg.publicKeyArmored);
                   console.log(Object.getOwnPropertyNames(keyObjOrg));
-                  
+                  UserContract.methods.getKeyHash(myaadhaar).call(
+                    {from:account,gasPrice:gp}).then((pgpIpfsHash) => {
+                        //get pgp key from ipfs
+                         
+                          getKeys(pgpIpfsHash, function(key){
+                            keyObj = JSON.parse(key)
+                            console.log("key object: " +keyObj)
+                            console.log("key obj properties: "+Object.getOwnPropertyNames(keyObj))
+                            //call to function to decrypt masterkey using pgp private key
+                            for(let i=0;i<selectedRecords.length;i++) {
+                              data = recordData[selectedRecords[i]].recordId
+                              console.log(data)
+                              keyDecrypt(keyObj,recordData[selectedRecords[i]].masterkey,seedphrase,function(plain){
+                                un_mkey = (plain)
+                                console.log("unencrypted masterkey : "+un_mkey)
+                                keyEncrypt(un_mkey, keyObjOrg, function (cipher) {
+                                  //in callback function of keyEncrypt
+                                  m_key.push(cipher);
+                                  console.log("encrypted masterkey: " + cipher);
+                                  console.log(account)
+                                  permissionsContract.methods
+                                  .grant(data, organizationAddress,cipher )
+                                  .send(
+                                    {
+                                      from: account,
+                                      gasPrice: gp
+                                    },
+                                    function(error, txHash) {
+                                      if (!error) {
+                                        console.log("tx: " + txHash);
+                                        alert("Transaction Hash:" + txHash);
+                                      } else console.log(error);
+                                    }
+                                  );
+                                })                
+                            })
+      
+                            }
+                        })//end get keys
+                        
+                        
+                    })
                 });
               });
       
-            //add the record to ipfs  
+        
           });
 
-          await this.state.web3.eth.getAccounts((error,account) => {
-            console.log(account[0])
-            //call to contract to get ipfs hash of pgp key of the user
-            this.UserContract.methods.getKeyHash(myaadhaar).call(
-              {from:account[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}).then((pgpIpfsHash) => {
-                  //get pgp key from ipfs
-                   
-                    getKeys(pgpIpfsHash, function(key){
-                      keyObj = JSON.parse(key)
-                      console.log("key object: " +keyObj)
-                      console.log("key obj properties: "+Object.getOwnPropertyNames(keyObj))
-                      //call to function to decrypt masterkey using pgp private key
-                      for(let i=0;i<selectedRecords.length;i++) {
-                        data = recordData[selectedRecords[i]].recordId
-                        keyDecrypt(keyObj,recordData[selectedRecords[i]].masterkey,seedphrase,function(plain){
-                          un_mkey = (plain)
-                          console.log("unencrypted masterkey : "+un_mkey)
-                          keyEncrypt(un_mkey, keyObjOrg, function (cipher) {
-                            //in callback function of keyEncrypt
-                            m_key.push(cipher);
-                            console.log("encrypted masterkey: " + m_key);
-                        
-                          }).then((cipher)=>{
-                            permissionsContract.methods
-                            .grant(data, organizationAddress,cipher )
-                            .send(
-                              {
-                                from: account,
-                                gasPrice: gp
-                              },
-                              function(error, txHash) {
-                                if (!error) {
-                                  console.log("tx: " + txHash);
-                                  alert("Transaction Hash:" + txHash);
-                                } else console.log(error);
-                              }
-                            );
-                          })                   
-                      })
-
-                      }
-                      console.log("UmKey:",un_mkey)
-                  })//end get keys
-                  
-                  
-              })
-        })
+          
 
         }
 
