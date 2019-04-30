@@ -33,6 +33,7 @@ const Badges = React.lazy(() => import('./views/Notifications/Badges'));
 const Modals = React.lazy(() => import('./views/Notifications/Modals'));
 const DeployPolicy = React.lazy(() => import('./views/Policy/DeployPolicy'));
 const AcceptPolicy = React.lazy(() => import('./views/Policy/AcceptPolicy'));
+const ViewPolicy = React.lazy(() => import('./views/Policy/ViewPolicy'));
 const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
@@ -44,6 +45,7 @@ const routes = [
   { path: '/Policy', exact: true, name: 'Policy', component: DeployPolicy },
   { path: '/Policy/DeployPolicy', name: 'Deploy Policy', component: DeployPolicy },
   { path: '/Policy/AcceptPolicy', name: 'Accept Policy', component: AcceptPolicy },
+  { path: '/Policy/ViewPolicy', name: 'View Policy', component: ViewPolicy },
   { path: '/base', exact: true, name: 'Base', component: Cards },
   { path: '/base/cards', name: 'Cards', component: Cards },
   { path: '/base/forms', name: 'Forms', component: Forms },

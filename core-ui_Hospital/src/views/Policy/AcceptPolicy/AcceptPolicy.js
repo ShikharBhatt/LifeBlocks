@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
+import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
 import {organization, policyTemplate, userdetails} from "../../../contract_abi";
 import { Button, Card, CardBody, CardHeader, Col, Row, Input, FormText, Label, FormGroup, Form, CardFooter, Table } from "reactstrap";
 
@@ -28,7 +29,7 @@ class AcceptPolicy extends Component {
 
     this.policyTemplatePopulate = this.policyTemplatePopulate.bind(this)
     this.showPolicies = this.showPolicies.bind(this);
-
+    this.getPolicies = this.getPolicies.bind(this);
     }
 
 
@@ -112,10 +113,9 @@ class AcceptPolicy extends Component {
         return rows
     }
 
-
-   //show policies based on the insurance company selected 
-    showPolicies(tempAdd) {
-  
+    //get the policies corresponding to the policy template selected
+    async getPolicies(tempAdd)
+    {
       if(tempAdd) {
         const templateContractAddress = tempAdd
         const templateABI = policyTemplate.abi
@@ -145,8 +145,17 @@ class AcceptPolicy extends Component {
           }
             }
           })
+      }
+    }
+   //show policies based on the insurance company selected 
+    showPolicies(policiesGenerated) {
+      
+      if(policiesGenerated.length===0)
+        return;
+      else {
+        
           
-          const rows = this.state.policiesGenerated.map((row, index) => {
+          const rows = policiesGenerated.map((row, index) => {
             return (
                 <tr key={index}>
                
@@ -157,13 +166,19 @@ class AcceptPolicy extends Component {
                   </td>
                    
                     <td>
+                      <Link 
+                        to={{
+                          pathname: "/Policy/ViewPolicy",
+                          data:row  // your data array of objects
+                        }}
+                      >
                       <Button
                       
                       block color="primary" 
                       size="lg"
                       value={row} 
                       
-                        ><b>Apply</b></Button></td>
+                        ><b>View Application</b></Button></Link></td>
                 
                 </tr>
                 
@@ -179,65 +194,6 @@ class AcceptPolicy extends Component {
    }
 
 
-   applyPolicy() {
-  
-    this.state.web3.eth.getAccounts((error, accounts) => {
-      //get the account from metamask
-      this.UserContract.methods.login(sessionStorage.getItem('aadhaar')).call(
-        { from: accounts[0] },
-        (error, x)=> {
-          //check if account exists
-          if (error) {
-            alert("Wrong");
-            return;
-          }
-          if (x === true) {
-            alert("Aadhaar available");
-            //get address from aadhaar number
-            this.UserContract.methods
-              .getAddress(sessionStorage.getItem('aadhaar'))
-              .call(
-                { from: accounts[0] },
-                (error, add) => {
-                  //get account address from SC
-                  if (error) {
-                    alert("Wrong Details");
-                    return;
-                  }
-
-                  //if account is valid
-                  if (add === accounts[0]) {
-                    alert("Account address matches aadhaar mapping");
-
-                    var policyTemplateContractAddress = this.state.appliedAddress
-                    var policyTemplateABI = policyTemplate.abi
-                    var policyTemplateContract = new this.state.web3.eth.Contract(policyTemplateABI, policyTemplateContractAddress)
-                    this.policyTemplateContract = policyTemplateContract
-                    console.log(this.policyTemplateContract)
-                    alert(this.state.coverage)
-                    alert(sessionStorage.getItem('aadhaar'))
-                    alert(this.state.appliedAddress)
-
-                    //Creating the policy contract
-                    this.policyTemplateContract.methods.newPolicy(this.state.coverage, sessionStorage.getItem('aadhaar')).send(
-                      {
-                        from: accounts[0],
-                        gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
-                        value:this.state.web3.utils.toHex(this.state.web3.utils.toWei('1','ether'))
-                      })
-                  } else {
-                    alert("Details Incorrect");
-                  }
-                }
-              );
-          } else {
-            alert("Details Incorrect");
-          }
-        }
-      );
-    });
-
-   }
 
 
  render() {
@@ -264,6 +220,7 @@ class AcceptPolicy extends Component {
               <Col xs="12" md="6">
                 <Input type="select" required={true} defaultValue="no-value" onChange={event => {
                   this.setState({ templateAddress:event.target.value })
+                  this.getPolicies(event.target.value)
                   }}>
                   <option value="no-value" disabled>Select Policy</option>
                   {this.policyTemplatePopulate(this.state.insurancePolicies)}
@@ -282,7 +239,7 @@ class AcceptPolicy extends Component {
                 </tr>
                 </thead>
                 <tbody>
-                  {this.showPolicies(this.state.templateAddress)}
+                  {this.showPolicies(this.state.policiesGenerated)}
                 </tbody>
               </Table>                           
         </CardBody>

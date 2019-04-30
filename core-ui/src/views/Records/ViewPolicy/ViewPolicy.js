@@ -34,7 +34,7 @@ export class ViewPolicy extends Component {
         policyAddress: 'NA',
         premium: 'NA',
         stateMap:{0:'Applied', 1:'Active', 2:'Grace', 3:'Lapsed', 4:'Renewal', 5:'Inactive', 6:'Defunct'},
-        policyDetails:[]
+        policyDetails:['NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA']
       };
   
  
@@ -96,7 +96,7 @@ export class ViewPolicy extends Component {
       }
   
      viewPolicy() {
-      
+      document.getElementById("policy").style.display = "none"
       this.state.web3.eth.getAccounts((error, accounts) => {
         //get the account from metamask
         this.UserContract.methods.login(sessionStorage.getItem('aadhaar')).call(
@@ -128,7 +128,13 @@ export class ViewPolicy extends Component {
                       .call(
                         {from : accounts[0]},
                         (error, policyAdd) => {
-                          if(policyAdd) {
+                          if(policyAdd!="0x0000000000000000000000000000000000000000") {
+
+                            document.getElementById("policy").style.display = "inline-block"
+                            document.getElementById("policy").innerText = "Policy Found"
+                            document.getElementById("policy").style.color = "green"
+
+
                             this.setState({
                               policyAddress: policyAdd
                             })
@@ -164,6 +170,11 @@ export class ViewPolicy extends Component {
                         }
 
                           }
+                          else {
+                            document.getElementById("policy").style.display = "inline-block"
+                            document.getElementById("policy").innerText = "No Policy Found"
+                            document.getElementById("policy").style.color = "red"
+                          }
                         }
                       )
                     } else {
@@ -182,7 +193,7 @@ export class ViewPolicy extends Component {
 
 
    render() {
-
+    
     return (
       <div className="animated fadeIn">
            
@@ -191,7 +202,7 @@ export class ViewPolicy extends Component {
         <Card>
        
           <CardHeader>
-            <strong>My Policy Details</strong>
+            <strong>My Policy Details: <b id="policy" > </b></strong>
           </CardHeader>
           <CardBody>
           <Table responsive striped>
