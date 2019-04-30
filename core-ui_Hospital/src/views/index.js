@@ -24,13 +24,14 @@ import Dashboard from './Dashboard';
 import { CoreUIIcons, Flags, FontAwesome, SimpleLineIcons } from './Icons';
 import { Alerts, Badges, Modals } from './Notifications';
 import { Login, Page404, Page500, Register } from './Pages';
-import { DeployPolicy, AcceptPolicy } from './Policy';
+import { DeployPolicy, AcceptPolicy, ViewPolicy } from './Policy';
 import Widgets from './Widgets';
 
 export {
   Badges,
   DeployPolicy,
   AcceptPolicy,
+  ViewPolicy,
   CoreUIIcons,
   Page404,
   Page500,

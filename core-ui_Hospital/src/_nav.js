@@ -51,6 +51,11 @@ if(sessionStorage.getItem("orgType") === "Hospital")
           url: '/Policy/AcceptPolicy',
           icon: 'icon-drop',
         },
+        {
+          name: 'View Policy',
+          url: '/Policy/ViewPolicy',
+          icon: 'icon-drop',
+        },
       ],
     };
   }
