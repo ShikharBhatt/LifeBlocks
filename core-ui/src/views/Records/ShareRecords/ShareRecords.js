@@ -305,6 +305,7 @@ class ShareRecords extends Component {
           let organizationAddress = this.state.insuranceAddress
           let account 
           let gp = this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
+          let gasL = this.state.web3.utils.toHex(4700000)
           recordData = this.state.arr
           seedphrase = this.state.seedphrase
           selectedRecords = this.state.selectedRecords
@@ -354,7 +355,8 @@ class ShareRecords extends Component {
                                   .send(
                                     {
                                       from: account,
-                                      gasPrice: gp
+                                      gasPrice: gp,
+                                      gas:gasL
                                     },
                                     function(error, txHash) {
                                       if (!error) {
