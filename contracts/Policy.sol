@@ -78,8 +78,11 @@ contract Policy{
     uint lapseDate;
     uint renewAppDate;
     uint penalty;
+    uint[] plist;
+    string reason = "Records not submitted";
     
-    enum State { Applied, Active, Grace, Lapsed, Renewal, Inactive, Defunct}
+    
+    enum State { AppliedWOR, Applied, AppliedSP, Active, Grace, Lapsed, RenewalWOR, Renewal, Inactive, Defunct}
     State public state;
     State public prevState;
     
@@ -104,14 +107,42 @@ contract Policy{
         seller = contractSeller;
         dateApplied = now;
         coverage = _coverage;
-        state = State.Applied;
+        state = State.AppliedWOR;
+    }
+    
+    function getRecordsApplied(uint[] _plist) onlyBuyer inState(State.AppliedWOR) public{
+        for(uint i = 0; i < _plist.length; i++)
+            plist.push(_plist[i]);
+        state=State.Applied;
+    }
+    
+    
+    function getRecordsRenewal(uint[] _plist) onlyBuyer inState(State.RenewalWOR) public{
+        for(uint i = 0; i < _plist.length; i++)
+            plist.push(_plist[i]);
+        state=State.Renewal;
+    }
+    
+    function requestRecords(string _reason) onlySeller public{
+        require(state == State.Applied || state == State.Renewal, "Invalid State");
+        
+        if(state == State.Applied){
+            reason = _reason;
+            state = State.AppliedWOR;
+        }
+        
+        else if(state == State.Renewal){
+            reason = _reason;
+            state = State.RenewalWOR;
+        }
     }
     
     function setPremium(uint _premium) onlySeller inState(State.Applied) public{
         premium = _premium;
+        state = State.AppliedSP;
     }
     
-    function confirmPolicy() onlyBuyer inState(State.Applied) public payable{
+    function confirmPolicy() onlyBuyer inState(State.AppliedSP) public payable{
         //check if sent value is equal to premium set by insurance company 
         require(msg.value == premium);
         //policy start date
@@ -129,32 +160,26 @@ contract Policy{
     }
     
     //test function
-    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint){
-        return (seller,buyer,value,state,this.balance,startDate,graceDate,lapseDate);
+    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string){
+        return (seller, buyer, value, state, this.balance, dateApplied, startDate, graceDate, lapseDate, reason);
     }
 
-    function policyGrace(uint _timestamp) onlySeller inState(State.Active) public{
-        if(_timestamp > graceDate){
+    function policyGrace() onlySeller inState(State.Active) public{
             state = State.Grace;
-        }
     }
     
     function getPremium() external view returns(uint){
         return(premium);
     }
     
-    function policyLapse(uint _timestamp) onlySeller inState(State.Grace) public{
-        if(_timestamp > lapseDate){
+    function policyLapse() onlySeller inState(State.Grace) public{
             state = State.Lapsed;
             penalty = (5 * premium)/100;
-        }
     }
     
-    function policyInactive(uint _timestamp) onlySeller inState(State.Lapsed) public{
-        if(_timestamp > lapseDate){
+    function policyInactive() onlySeller inState(State.Lapsed) public{
             state = State.Inactive;
             penalty = (10 * premium)/100;
-        }
     }
     
     function renewPolicy(uint _coverage) onlyBuyer public {
