@@ -148,7 +148,7 @@ class ShareRecords extends Component {
                         obj['date'] = new Date(f*1000).toLocaleDateString()
                         console.log(y[3])
                         obj['hospital'] = y[4]
-                        obj['masterkey'] = y[5]
+                        //obj['masterkey'] = y[5]
                         
                         //push the record object into array of objects                        
                         myarray.push(obj)
@@ -309,6 +309,8 @@ class ShareRecords extends Component {
           recordData = this.state.arr
           seedphrase = this.state.seedphrase
           selectedRecords = this.state.selectedRecords
+          let record
+          let storageCon = this.storageContract
 
           await this.state.web3.eth.getAccounts((error, accounts) => {
             //transaction to link aadhaar card to address
@@ -329,7 +331,7 @@ class ShareRecords extends Component {
                   console.log("key object Organization: " + keyObjOrg);
                   console.log("key object type: " + typeof keyObjOrg);
                   console.log("public key : " + keyObjOrg.publicKeyArmored);
-                  console.log(Object.getOwnPropertyNames(keyObjOrg));
+                  //console.log(Object.getOwnPropertyNames(keyObjOrg));
                   UserContract.methods.getKeyHash(myaadhaar).call(
                     {from:account,gasPrice:gp}).then((pgpIpfsHash) => {
                         //get pgp key from ipfs
@@ -341,32 +343,61 @@ class ShareRecords extends Component {
                             //call to function to decrypt masterkey using pgp private key
                             for(let i=0;i<selectedRecords.length;i++) {
                               data = recordData[selectedRecords[i]].recordId
-                              console.log(data)
-                              keyDecrypt(keyObj,recordData[selectedRecords[i]].masterkey,seedphrase,function(plain){
-                                un_mkey = (plain)
-                                console.log("unencrypted masterkey : "+un_mkey)
-                                keyEncrypt(un_mkey, keyObjOrg, function (cipher) {
-                                  //in callback function of keyEncrypt
-                                  m_key.push(cipher);
-                                  console.log("encrypted masterkey: " + cipher);
-                                  console.log(account)
-                                  permissionsContract.methods
-                                  .grant(data, organizationAddress,cipher )
-                                  .send(
-                                    {
-                                      from: account,
-                                      gasPrice: gp,
-                                      gas:gasL
-                                    },
-                                    function(error, txHash) {
-                                      if (!error) {
-                                        console.log("tx: " + txHash);
-                                        alert("Transaction Hash:" + txHash);
-                                      } else console.log(error);
+                              let rHash = recordData[selectedRecords[i]].ipfsHash
+                              let rtype = recordData[selectedRecords[i]].type
+                              let rname = recordData[selectedRecords[i]].name
+                              console.log(rHash+rtype+rname)
+                              ipfs.cat(rHash,(err,file) => {
+                                if(err){
+                                  alert("In-Correct Seedphrase")
+                                    throw err;
+                                }
+                                keyDecrypt(keyObj,file,seedphrase,function(plain){
+                                  record = (plain)
+                                  console.log("decrypted record : "+record)
+                                  keyEncrypt(record, keyObjOrg, function (cipher) {
+                                    //in callback function of keyEncrypt
+                                   // m_key.push(cipher);
+                                    let cipherText = Buffer(cipher)
+                                    console.log("encrypted record: " + cipher);
+                                    console.log(account)
+                                    ipfs.files.add(cipherText, (error, result) => {
+                                      if(error) {
+                                        console.error(error)
+                                        return
+                                      }
+                                      else{
+                                        alert(result[0].hash + myaadhaar+rtype+rname)
+                                        //alert(m_key)
+                                        storageCon.methods.upload(myaadhaar, result[0].hash,rtype,rname).send({from:accounts[0],gasPrice:gp}, function(error, id){ 
+                                      if(!error)  {
+                                        console.log("id: "+id)                   
+                                        alert('Transaction Hash:'+id)
+                                      }
+                                      else
+                                        console.log(error)
+                                      })
                                     }
-                                  );
-                                })                
-                            })
+                                  }) 
+                                    // permissionsContract.methods
+                                    // .grant(data, organizationAddress,cipher )
+                                    // .send(
+                                    //   {
+                                    //     from: account,
+                                    //     gasPrice: gp,
+                                    //     gas:gasL
+                                    //   },
+                                    //   function(error, txHash) {
+                                    //     if (!error) {
+                                    //       console.log("tx: " + txHash);
+                                    //       alert("Transaction Hash:" + txHash);
+                                    //     } else console.log(error);
+                                    //   }
+                                    // );
+                                  })                
+                              })
+                              })
+                              
       
                             }
                         })//end get keys
@@ -395,10 +426,10 @@ class ShareRecords extends Component {
               alert('called')
                 this.setState({
                     ipfs : x[0],
-                    masterkey : x[4]
+                    //masterkey : x[4]
                 })
-                alert('ipfs : '+x[0]+ 'masterkey :'+x[4])
-                this.view(this.state.ipfs, this.state.masterkey)
+                alert('ipfs : '+x[0])
+                this.view(this.state.ipfs)
             }.bind(this))
 
         
