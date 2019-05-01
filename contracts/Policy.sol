@@ -52,11 +52,11 @@ contract PolicyTemplate{
     }
     
     // function to deploy new policy contract
-    function newPolicy(uint _coverage, uint _aadhaar) public payable returns(address newPolicyContract){
+    function newPolicy(uint _aadhaar) public payable returns(address newPolicyContract){
         // check to ensure 1 ether was sent to the function call
         require(msg.value == 1 ether);
 
-        Policy p = (new Policy).value(msg.value)(msg.sender,owner,_coverage);
+        Policy p = (new Policy).value(msg.value)(msg.sender,owner,coverage);
         policyContracts.push(p);
         lastContractAddress = address(p);
         emit newPolicyPurchase(address(p));
@@ -186,7 +186,8 @@ contract Policy{
         renewAppDate = now;
         coverage = _coverage;
         prevState = state;
-        state = State.Renewal;
+        state = State.RenewalWOR;
+        reason = "Records not submitted";
     }
     
     function confirmRenewal() onlyBuyer inState(State.Renewal) public payable{

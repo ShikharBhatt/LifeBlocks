@@ -27,6 +27,7 @@ contract Storage{
     //mapping patient address to medical record
     mapping(address => uint[]) public ownerToRecord;
     
+    mapping(uint => address) public recordToOwner;
     //mapping(address => uint) public OwnerRecordCount;
   
     //enter deployed userDetails contract Address here
@@ -44,6 +45,7 @@ contract Storage{
        string memory hospitalName = organization.getOrgName(msg.sender);
        uint id = records.push(Record(_ipfsHash,_type,_name,now,hospitalName,_masterkey)) - 1;
        ownerToRecord[addr].push(id);
+       recordToOwner[id] = addr;
     //   OwnerRecordCount[addr]++;
     } 
     
@@ -54,5 +56,13 @@ contract Storage{
 
     function viewRecord(uint i) external view returns(string, string, string, uint, string, string){
         return (records[i].ipfsHash,records[i].rtype,records[i].rname,records[i].date,records[i].Hospital,records[i].masterkey);
+    }
+    
+    function getRecordOwner(uint _id) external view returns(address){
+        return recordToOwner[_id];
+    }
+    
+    function getDetails(uint _id) external view returns(string, string, string, uint, string){
+        return (records[_id].ipfsHash, records[_id].rname, records[_id].rtype, records[_id].date, records[_id].Hospital);
     }
 }

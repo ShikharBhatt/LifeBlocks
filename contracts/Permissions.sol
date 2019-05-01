@@ -9,7 +9,7 @@ contract storageInterface{
 
 contract Permissions{
     
-    address storageInterfaceAddress = 0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20;
+    address storageInterfaceAddress = 0xf3f0fac080e7babdc06dc5a2e2f68f36116a31c0;
     storageInterface storage_contract = storageInterface(storageInterfaceAddress);
     
     modifier recordOwner(uint _rid){
@@ -37,9 +37,10 @@ contract Permissions{
     address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
 
-    function grant(uint recordID, address _to, string _masterkey) recordOwner(recordID) public{
+    function grant(uint recordID, address _to, string _masterkey) recordOwner(recordID) public returns(uint){
         uint id = permission_list.push(permission(_to, msg.sender, recordID, _masterkey, true)) -1;
         permissionFrom[msg.sender].push(id);
+        return id;
     }
     
     function revoke(uint _id) public {
