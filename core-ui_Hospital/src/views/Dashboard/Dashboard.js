@@ -15,7 +15,7 @@ import {
 } from "reactstrap";
 
 import ipfs from "../../Dependencies/ipfs";
-import { encrypt } from "../../Dependencies/crypto";
+//import { encrypt } from "../../Dependencies/crypto";
 import { getKeys,keyEncrypt } from "../../Dependencies/pgp";
 import {userdetails, storage} from "../../contract_abi";
 
@@ -75,6 +75,7 @@ class Dashboard extends Component {
     //Initialize storage contract
     const storageContractAddress = storage.contract_address
     const storageABI = storage.abi
+    console.log("storage contract address :"+storageContractAddress); 
     var storageContract = new this.state.web3.eth.Contract(storageABI, storageContractAddress);
     this.storageContract = storageContract;
     console.log("storage contract: " + this.storageContract);
@@ -102,14 +103,17 @@ class Dashboard extends Component {
 
     event.preventDefault()
     console.log(this.buffer);
-    var encrypted = encrypt(this.buffer);
-    const masterkey = encrypted[0];
-    this.buffer = Buffer(encrypted[1]);
-    console.log(masterkey)
-    console.log(encrypted);
-    let keyObj,m_key,record
+    var recordText = this.buffer;
+    console.log("unencrypted record : "+recordText);
+    let keyObj,record, cipherText
+    let aadhaar = this.state.aadhaar
+    let rtype = this.state.rtype
+    let rname = this.state.rname
+    let storageCon = this.storageContract
+    let gp = this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
 
-    record = this.buffer
+
+    //record = this.buffer
     this.state.web3.eth.getAccounts((error, accounts) => {          
           //transaction to link aadhaar card to address
          this.userContract.methods.getKeyHash(this.state.aadhaar).call(
@@ -122,32 +126,36 @@ class Dashboard extends Component {
                   console.log("key object: "+keyObj)
                   console.log("key object type: "+ typeof keyObj)
                   console.log("public key : "+keyObj.publicKeyArmored)
-                  console.log(Object.getOwnPropertyNames(keyObj))
-                  keyEncrypt(masterkey,keyObj,function(cipher){
+                  //console.log(Object.getOwnPropertyNames(keyObj))
+                  keyEncrypt(recordText,keyObj,function(cipher){
                     //in callback function of keyEncrypt
-                    m_key = cipher
-                    console.log("encrypted masterkey: "+m_key)        
+                    cipherText = cipher
+                    console.log("encrypted record: "+cipherText) 
+                    record = Buffer(cipherText)   
+                    console.log("record type :"+ typeof record)
+                    console.log("record :"+ record)   
+                    ipfs.files.add(record, (error, result) => {
+                      if(error) {
+                        console.error(error)
+                        return
+                      }
+                      else{
+                        alert(result[0].hash + aadhaar+rtype+rname)
+                        //alert(m_key)
+                        storageCon.methods.upload(aadhaar, result[0].hash,rtype,rname).send({from:accounts[0],gasPrice:gp}, function(error, txHash){ 
+                      if(!error)  {
+                        console.log("tx: "+txHash)                   
+                        alert('Transaction Hash:'+txHash)
+                      }
+                      else
+                        console.log(error)
+                      })
+                    }
+                  }) 
                   })
               })                
            })
-            ipfs.files.add(record, (error, result) => {
-              if(error) {
-                console.error(error)
-                return
-              }
-              else{
-                alert(result[0].hash + this.state.aadhaar+this.state.rtype+this.state.rname)
-                alert(m_key)
-                this.storageContract.methods.upload(this.state.aadhaar, result[0].hash,this.state.rtype,this.state.rname,m_key).send({from:accounts[0],gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))}, function(error, txHash){ 
-              if(!error)  {
-                console.log("tx: "+txHash)                   
-                alert('Transaction Hash:'+txHash)
-              }
-              else
-                console.log(error)
-              })
-            }
-          })     
+                
   })
 }
 

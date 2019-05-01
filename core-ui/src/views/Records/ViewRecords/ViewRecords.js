@@ -19,7 +19,7 @@ export class ViewRecords extends Component {
         recordsId : [],
         arr: [],
         selectValue: '',
-        masterkey: '',
+        //masterkey: '',
         newHash: '',
         value: '',
         web3: null,
@@ -137,7 +137,7 @@ export class ViewRecords extends Component {
                         obj['date'] = new Date(f*1000).toLocaleDateString()
                         console.log(y[3])
                         obj['hospital'] = y[4]
-                        obj['masterkey'] = y[5]
+                        //obj['masterkey'] = y[5]
                         
                         //push the record object into array of objects                        
                         myarray.push(obj)
@@ -193,7 +193,7 @@ export class ViewRecords extends Component {
                           {() => 
                             {
                               this.setState({value:row}, function(){
-                              this.view(this.state.arr[index].ipfsHash, this.state.arr[index].masterkey)
+                              this.view(this.state.arr[index].ipfsHash)
 
                             })
                                   
@@ -210,8 +210,8 @@ export class ViewRecords extends Component {
       }
     
     //function to view record - includes decryption after fetching file from IPFS
-    view(ipfs_hash,masterkey) {
-      let un_mkey,keyObj,decrypted,seedphrase
+    view(ipfs_hash) {
+      let keyObj,decrypted,seedphrase
       let myaadhaar = sessionStorage.getItem('aadhaar')
       // call to ipfs api to retrieve file
       seedphrase = this.state.seedphrase
@@ -242,14 +242,10 @@ export class ViewRecords extends Component {
                         console.log("key object: " +keyObj)
                         console.log("key obj properties: "+Object.getOwnPropertyNames(keyObj))
                         //call to function to decrypt masterkey using pgp private key
-                        keyDecrypt(keyObj,masterkey,seedphrase,function(plain){
-                            un_mkey = plain
-                            console.log("unencrypted masterkey : "+un_mkey)
-                            let file_string = Buffer.from(file,'hex')
-                            console.log("file_string: "+file_string)
-                            console.log("file_string type: "+ typeof file_string)
-                            decrypt(file_string,un_mkey,function(decrypted){
-                                console.log("decrypted file: "+decrypted)
+                        keyDecrypt(keyObj,file,seedphrase,function(plain){
+                            decrypted = plain
+                            console.log("decrypted file : "+decrypted)
+                            
                               
                             document.getElementById('itemPreview').innerHTML = '<pre>'+decrypted+'</pre>' // show data in modal
                             })
@@ -258,7 +254,6 @@ export class ViewRecords extends Component {
                     })
                 })
           })
-      })
 
       }
 
@@ -278,10 +273,10 @@ export class ViewRecords extends Component {
               alert('called')
                 this.setState({
                     ipfs : x[0],
-                    masterkey : x[4]
+                    //masterkey : x[4]
                 })
-                alert('ipfs : '+x[0]+ 'masterkey :'+x[4])
-                this.view(this.state.ipfs, this.state.masterkey)
+                alert('ipfs : '+x[0])
+                this.view(this.state.ipfs)
             }.bind(this))
    
     }
