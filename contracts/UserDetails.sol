@@ -61,4 +61,8 @@ contract userDetails{
     function policyMap(uint _aadhaar, address _contract) public {
         ownerToPolicy[_aadhaar] = _contract;
     }
+    
+    function getPolicyMap(uint _aadhaar) external view returns(address){
+        return(ownerToPolicy[_aadhaar]);
+    }
 }
