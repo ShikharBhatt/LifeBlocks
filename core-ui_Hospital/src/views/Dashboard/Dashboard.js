@@ -34,6 +34,12 @@ class Dashboard extends Component {
   componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
+      console.log(localStorage.hosp)
+      if (! localStorage.hosp) {
+          localStorage.setItem("hosp", "true");
+          window.location.reload();
+      }
+  
     getWeb3
       .then(results => {
         this.setState({
