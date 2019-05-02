@@ -6,6 +6,10 @@ contract userDetailsInterface{
     function policyMap(uint _aadhaar, address _contract) public;
 } 
 
+contract permissionInterface{
+    function grant(uint recordID, address _to, string _masterkey) public returns(uint);
+}
+
 contract PolicyTemplate{
      //enter deployed userDetails contract Address here
     address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
@@ -81,6 +85,9 @@ contract Policy{
     uint[] plist;
     string reason = "Records not submitted";
     
+    address permissionInterfaceAddress = 0xafb27a2deb77ca90ed435326904ca257635cbf2f;
+    permissionInterface permissions = permissionInterface(permissionInterfaceAddress);
+    
     
     enum State { AppliedWOR, Applied, AppliedSP, Active, Grace, Lapsed, RenewalWOR, Renewal, Inactive, Defunct}
     State public state;
@@ -110,17 +117,27 @@ contract Policy{
         state = State.AppliedWOR;
     }
     
-    function getRecordsApplied(uint[] _plist) onlyBuyer inState(State.AppliedWOR) public{
-        for(uint i = 0; i < _plist.length; i++)
-            plist.push(_plist[i]);
-        state=State.Applied;
+    function getRecordsApplied(uint recordID, address _to, string _masterkey) onlyBuyer inState(State.AppliedWOR) public{
+        uint pid = permissions.grant(recordID, _to, _masterkey);
+        plist.push(pid);
+    }
+    
+    function applyPolicy() inState(State.AppliedWOR) public {
+        state = State.Applied;
     }
     
     
-    function getRecordsRenewal(uint[] _plist) onlyBuyer inState(State.RenewalWOR) public{
-        for(uint i = 0; i < _plist.length; i++)
-            plist.push(_plist[i]);
-        state=State.Renewal;
+    function getRecordsRenewal(uint recordID, address _to, string _masterkey) onlyBuyer inState(State.RenewalWOR) public{
+        uint pid = permissions.grant(recordID, _to, _masterkey);
+        plist.push(pid);
+    }
+    
+    function renewPolicy() inState(State.RenewalWOR) public {
+        state = State.Renewal;
+    }
+    
+    function getRecords() onlySeller onlyBuyer external view returns(uint[]){
+        return(plist);
     }
     
     function requestRecords(string _reason) onlySeller public{
@@ -223,7 +240,5 @@ contract Policy{
             //set grace date to 4 weeks after grace date
             lapseDate = graceDate + 4 weeks;
             seller.transfer(this.balance);
-    }
-    
-    
+    }  
 }
