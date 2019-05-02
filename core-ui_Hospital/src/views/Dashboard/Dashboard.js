@@ -34,6 +34,7 @@ class Dashboard extends Component {
   componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
+  
     getWeb3
       .then(results => {
         this.setState({
@@ -157,7 +158,13 @@ class Dashboard extends Component {
     } 
     
     //if hospital logged in then render this
-    else
+    else {
+      console.log(localStorage.hosp)
+      if (! localStorage.hosp) {
+          localStorage.setItem("hosp", "true");
+          window.location.reload();
+      }
+  
       return (
         <div className="App">
           <div className="animated fadeIn">
@@ -267,6 +274,8 @@ class Dashboard extends Component {
           </div>
         </div>
       );
+
+    }
   }
 }
 

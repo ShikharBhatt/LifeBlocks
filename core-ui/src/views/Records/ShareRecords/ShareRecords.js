@@ -146,7 +146,6 @@ class ShareRecords extends Component {
                         obj['type'] = y[1]
                         let f = Number(y[3])
                         obj['date'] = new Date(f*1000).toLocaleDateString()
-                        console.log(y[3])
                         obj['hospital'] = y[4]
                         obj['masterkey'] = y[5]
                         
@@ -366,7 +365,22 @@ class ShareRecords extends Component {
                                     function(error, txHash) {
                                       if (!error) {
                                         console.log("tx: " + txHash);
-                                        alert("Transaction Hash:" + txHash);
+
+                                        permissionsContract.events.permissionGranted({fromBlock: 'latest'},
+                                          (error, event) => {
+                                            if(!error)
+                                              console.log(event)
+                                          }
+                                        ).on('data', (event) => {
+                                            console.log(event); // same results as the optional callback above
+                                          })
+                                        // eventListener.watch(function(err, result){
+                                        //   if(!err) {
+                                        //     console.log("PermissionList id:",result.args.id)
+                                        //   }
+                                        //   else
+                                        //   {console.log(err)}
+                                        //})
                                       } else console.log(error);
                                     }
                                   );

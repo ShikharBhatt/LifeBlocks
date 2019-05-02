@@ -40,7 +40,6 @@ export class ViewSharedRecords extends Component {
 
       async componentWillMount() {
 
-       
         // Get network provider and web3 instance.
         // See utils/getWeb3 for more info.
                 await getWeb3
@@ -89,130 +88,6 @@ export class ViewSharedRecords extends Component {
             var permissionsContract = new this.state.web3.eth.Contract(permissionsABI, permissionsContractAddress)
             this.permissionsContract = permissionsContract
 
-            // let keyObjOrg
-
-            // await this.state.web3.eth.getAccounts((error, accounts) => {
-            //     //transaction to link aadhaar card to address
-            //     this.orgContract.methods.getOrgDetails(accounts[0]).call(
-            //         {from: accounts[0]}, (error, details) => {
-            //           if(!error) {
-            //             if(details[2] === sessionStorage.getItem("orgId")) {
-            //                 alert("Identifier and Account used are correct")
-            //                 this.orgContract.methods
-            //                 .getKeyHash(accounts[0])
-            //                 .call({
-            //                   from: accounts[0],
-            //                   gasPrice: this.state.web3.utils.toHex(
-            //                     this.state.web3.utils.toWei("0", "gwei")
-            //                   )
-            //                 }, (error, pgpHash) => {
-                               
-            //                         getKeys(pgpHash, function (key) {
-            //                           //in callback function of getKeys
-            //                           keyObjOrg = JSON.parse(key);
-            //                           //console.log(this.state.aadhaar)
-            //                         //   console.log("key object Organization: " + keyObjOrg);
-            //                         //   console.log("key object type: " + typeof keyObjOrg);
-            //                         //   console.log("public key : " + keyObjOrg.publicKeyArmored);
-            //                         //   console.log(Object.getOwnPropertyNames(keyObjOrg));
-                                        
-            //                         });
-                                 
-            //                 })
-          
-                
-            //             }
-            //             else {
-            //               alert("Incorrect Details! Please re-check the account in your metamask")
-            //             }
-            //           }
-            //         })
-            //     })
-                
-    //   //Get account from metamask
-    //       await this.state.web3.eth.getAccounts((error,account) => {
-    //       if(!error) {
-    //         console.log(account[0])
-    //       }
-
-    //       //get aadhaar value stored in Session
-    //     let aadhaar = sessionStorage.getItem('aadhaar')
-    //     let address = account[0]
-    //     // alert(aadhaar)
-
-    //     //Retrieve record id's for the user
-    //     this.storageContract.methods.retrieve(aadhaar).call(
-    //         {from:account[0]}, function(error, x){
-                
-    //             this.setState({
-    //                 recordsId : x
-    //             })
-    //             console.log(x)
-
-    //             //if there are no records for the user
-    //             if(x === null) {
-    //               alert("No records found")
-    //             }
-
-    //             //if record length is greater than 0
-    //             else if(x.length!=0) {
-    //               let rid = []
-                  
-    //               //convert the record string array to number array
-    //               for(let j = 0;j<x.length; j++) {
-    //                 rid[j] = Number(x[j])
-    //               }
-
-    //               for(let j = 0;j<x.length; j++) {
-    //                 x[j] = rid[j]
-    //               }
-
-    //               //sort the number array in descending order
-    //               x.sort(function(a, b){return b - a});
-
-    //               let myarray = []
-
-    //               //getting data of each record
-    //               for(let i = 0; i<x.length; i++) {
-    //                 this.storageContract.methods.viewRecord(x[i]).call(
-    //                   {from:address}, function(error, y){
-    //                     // alert('called')
-    //                     let obj = {
-
-    //                     }
-    //                     obj['ipfsHash'] = y[0]
-    //                     obj['name'] = y[2]
-    //                     obj['type'] = y[1]
-    //                     let f = Number(y[3])
-    //                     obj['date'] = new Date(f*1000).toLocaleDateString()
-    //                     console.log(y[3])
-    //                     obj['hospital'] = y[4]
-    //                     obj['masterkey'] = y[5]
-                        
-    //                     //push the record object into array of objects                        
-    //                     myarray.push(obj)
-                        
-    //                     // alert("Objec"+myarray[0].name + myarray[0].type)
-                        
-    //                     this.setState({
-    //                       arr: myarray
-    //                     })  
-    //                   }.bind(this))
-      
-    //               }
-                
-    //               // console.log(JSON.parse(myarray))
-                  
-    //               // alert(myarray[0].name)
-    //               // alert(myarray[1].name)
-    //             }
-    //             else {
-    //               alert("No records found")
-    //             }
-
-              
-    //         }.bind(this))
-    //     })              
       }
 
       //function for toggling the modal
@@ -420,7 +295,8 @@ export class ViewSharedRecords extends Component {
 
    render() {
      //don't render if there are no records for the user
-    
+     localStorage.setItem("hosp", "false");
+
       
       return (
         <div className="animated fadeIn">

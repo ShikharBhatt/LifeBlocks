@@ -224,6 +224,10 @@ export class ViewPolicy extends Component {
 
         }
       }
+      // else {
+      //   var btn = document.getElementById("whichButton");
+      //     btn.style.display = "none";
+      // }
     }
 
    render() {
