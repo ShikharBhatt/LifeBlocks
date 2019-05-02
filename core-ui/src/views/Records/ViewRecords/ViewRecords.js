@@ -285,7 +285,9 @@ export class ViewRecords extends Component {
 
         alert(event.target.value)
     }
-  
+    
+
+
    render() {
      //don't render if there are no records for the user
      if(this.state.arr.length === 0) {

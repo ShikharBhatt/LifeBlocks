@@ -281,7 +281,7 @@ export class ApplyPolicy extends Component {
                       alert(this.state.appliedAddress)
 
                       //Creating the policy contract
-                      this.policyTemplateContract.methods.newPolicy(this.state.coverage, sessionStorage.getItem('aadhaar')).send(
+                      this.policyTemplateContract.methods.newPolicy(sessionStorage.getItem('aadhaar')).send(
                         {
                           from: accounts[0],
                           gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),

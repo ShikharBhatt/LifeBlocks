@@ -33,11 +33,14 @@ export class ViewPolicy extends Component {
         web3:null,
         policyAddress: 'NA',
         premium: 'NA',
-        stateMap:{0:'Applied', 1:'Active', 2:'Grace', 3:'Lapsed', 4:'Renewal', 5:'Inactive', 6:'Defunct'},
-        policyDetails:['NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA']
+        stateMap:{0:'AppliedWOR', 1:'Applied', 2:'AppliedSP', 3:'Active', 4:'Grace', 5:'Lapsed', 6:'RenewalWOR', 7:'Renewal', 8:'Inactive', 9:'Defunct', 10:'NA'},
+        policyDetails:['NA', 'NA', 'NA', 10, 'NA', 'NA', 'NA', 'NA', 'NA', 'NA']
       };
   
- 
+      this.getDate = this.getDate.bind(this);
+      this.checkButton = this.checkButton.bind(this);
+       this.giveRecords = this.giveRecords.bind(this);
+
       }
 
 
@@ -68,6 +71,7 @@ export class ViewPolicy extends Component {
      async instantiateContract() {
   
       //User Details Contract Instantiation
+      
       const contractAddress_u = userdetails.contract_address       
       const ABI_u = userdetails.abi              
       var UserContract = new this.state.web3.eth.Contract(ABI_u, contractAddress_u)     
@@ -191,6 +195,36 @@ export class ViewPolicy extends Component {
   
      }
 
+     getDate(number) {
+      let f = Number(number)
+      f = new Date(f*1000).toLocaleDateString()
+      if(f==='01/01/1970')
+        f = "NA"
+      return f                 
+    }
+
+    giveRecords() {
+      alert("goodbye")
+    }
+    checkButton(state) {
+      console.log(state)
+      if(state!=10) {
+        state = 5
+        if(state == 0) {
+          var btn = document.getElementById("whichButton");
+          btn.innerHTML = "Submit Records";
+          btn.addEventListener("click", function (){alert("Hello")});
+          return
+        }
+        else if(state==5) {
+          var btn = document.getElementById("whichButton");
+          btn.innerHTML = "Pay Premium";
+          btn.addEventListener("click", function (){alert("World")});
+          return
+
+        }
+      }
+    }
 
    render() {
     
@@ -216,29 +250,47 @@ export class ViewPolicy extends Component {
               <td>{this.state.policyDetails[0]}</td>
             </tr>
             <tr>
-              <td><strong>Premium</strong></td>
-              <td>{this.state.premium}</td>
-            </tr>
-            <tr>
-              <td><strong>State</strong></td>
-              <td>{this.state.stateMap[this.state.policyDetails[3]]}</td>
-            </tr>
-            <tr>
-              <td><strong>Start Date</strong></td>
-              <td>{this.state.policyDetails[5]}</td>
-            </tr>
-            <tr>
-              <td><strong>End Date</strong></td>
-              <td>{this.state.policyDetails[6]}</td>
-            </tr>
-            <tr>
-              <td><strong>Lapse Date</strong></td>
-              <td>{this.state.policyDetails[7]}</td>
-            </tr>
+                <td><strong>Premium</strong></td>
+                <td>{this.state.premium}</td>
+              </tr>
+              <tr>
+                <td><strong>State</strong></td>
+                <td>{this.state.stateMap[this.state.policyDetails[3]]}</td>
+              </tr>
+              <tr>
+                <td><strong>Applied Date</strong></td>
+                <td>{this.getDate(this.state.policyDetails[5])}</td>
+              </tr>
+              <tr>
+                <td><strong>Start Date</strong></td>
+                <td>{this.getDate(this.state.policyDetails[6])}</td>
+              </tr>
+              <tr>
+                <td><strong>End Date</strong></td>
+                <td>{this.getDate(this.state.policyDetails[7])}</td>
+              </tr>
+              <tr>
+                <td><strong>Lapse Date</strong></td>
+                <td>{this.getDate(this.state.policyDetails[8])}</td>
+              </tr>
+              <tr>
+                <td><strong>Message</strong></td>
+                <td>{this.state.policyDetails[9]}</td>
+              </tr>
+              <tr>
+                <td>
+                  {this.checkButton(this.state.policyDetails[3])}
+                  <Button id="whichButton"
+                              className="btn-facebook mb-1" block
+                              block color="primary" 
+                              size="sm"
+                                ><b><span></span></b></Button>
+                </td>
+              </tr>
           </tbody>
 
           </Table>
-
+         
           </CardBody>         
         </Card>
         </Col>
