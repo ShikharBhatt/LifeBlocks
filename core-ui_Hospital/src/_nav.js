@@ -22,6 +22,11 @@ if(sessionStorage.getItem("orgType") === "Hospital")
         },
         class: ''             // optional class names space delimited list for title item ex: "text-center"
       },
+      {
+        name: 'View Records',
+        url: '/Records/ViewSharedRecords',
+        icon: 'icon-drop',
+      },
     ],
   };
   
@@ -51,11 +56,7 @@ if(sessionStorage.getItem("orgType") === "Hospital")
           url: '/Policy/AcceptPolicy',
           icon: 'icon-drop',
         },
-        {
-          name: 'View Policy',
-          url: '/Policy/ViewPolicy',
-          icon: 'icon-drop',
-        },
+        
       ],
     };
   }

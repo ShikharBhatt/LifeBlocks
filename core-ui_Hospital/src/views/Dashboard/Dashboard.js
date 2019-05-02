@@ -141,6 +141,7 @@ class Dashboard extends Component {
                 if (!error) {
                   console.log("tx: " + txHash);
                   alert("Transaction Hash:" + txHash);
+                  window.location.reload(true);
                 } else console.log(error);
               }
             );
