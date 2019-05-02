@@ -1,0 +1,6 @@
+{
+  "name": "RevokeAccess",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./RevokeAccess.js"
+}

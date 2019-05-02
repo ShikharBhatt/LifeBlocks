@@ -141,7 +141,7 @@ class Dashboard extends Component {
               function (error, txHash) {
                 if (!error) {
                   console.log("tx: " + txHash);
-                  alert("Transaction Hash:" + txHash);
+                  alert("Record Uploaded Successfully");
                   window.location.reload(true);
                 } else console.log(error);
               }

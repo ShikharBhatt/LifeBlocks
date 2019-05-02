@@ -21,22 +21,27 @@ export default {
     },
     {
       name: 'View Records',
-      url: '/records/viewrecords',
+      url: '/records/view-records',
       icon: 'icon-drop',
     },
     {
       name: 'Share Records',
-      url: '/records/sharerecords',
+      url: '/records/share-records',
       icon: 'icon-pencil',
     },
     {
       name: 'Apply Policy',
-      url: '/records/applypolicy',
+      url: '/records/apply-policy',
       icon: 'icon-pencil',
     },
     {
       name: 'View Policy',
-      url: '/records/viewpolicy',
+      url: '/records/view-policy',
+      icon: 'icon-pencil',
+    },
+    {
+      name: 'Revoke Access',
+      url: '/records/revoke-access',
       icon: 'icon-pencil',
     },
   ],

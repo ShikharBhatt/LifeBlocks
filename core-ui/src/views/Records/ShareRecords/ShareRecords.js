@@ -366,14 +366,14 @@ class ShareRecords extends Component {
                                       if (!error) {
                                         console.log("tx: " + txHash);
 
-                                        permissionsContract.events.permissionGranted({fromBlock: 'latest'},
-                                          (error, event) => {
-                                            if(!error)
-                                              console.log(event)
-                                          }
-                                        ).on('data', (event) => {
-                                            console.log(event); // same results as the optional callback above
-                                          })
+                                        // permissionsContract.events.permissionGranted({fromBlock: 'latest'},
+                                        //   (error, event) => {
+                                        //     if(!error)
+                                        //       console.log(event)
+                                        //   }
+                                        // ).on('data', (event) => {
+                                        //     console.log(event); // same results as the optional callback above
+                                        //   })
                                         // eventListener.watch(function(err, result){
                                         //   if(!err) {
                                         //     console.log("PermissionList id:",result.args.id)
