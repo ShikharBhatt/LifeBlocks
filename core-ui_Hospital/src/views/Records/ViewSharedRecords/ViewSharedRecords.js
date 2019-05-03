@@ -4,7 +4,7 @@ import {decrypt} from '../../../Dependencies/crypto'
 import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {userdetails, storage, organization, permissions} from "../../../contract_abi";
-import { Badge, Form, FormGroup, Input, Card, CardBody, CardHeader, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Label, Form, FormGroup, Input, Card, CardBody, CardHeader, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 
 
@@ -101,6 +101,8 @@ export class ViewSharedRecords extends Component {
       //creating table for displaying the records
       TableBody(recordsId) {
         if(recordsId.length>0) {
+         document.getElementById("seedLabel").style.display = "inline-block"
+         document.getElementById("seedPhrase").style.display = "inline-block"
             const rows = recordsId.map((row, index) => {
                 return (
                     <tr key={index}>
@@ -208,6 +210,11 @@ export class ViewSharedRecords extends Component {
    
     }
     
+    // componentDidMount() {
+    //   document.getElementById("seedPhrase").disabled = "true"
+
+    // }
+
     Change(event){
         this.setState({
             value : event.target.value
@@ -310,21 +317,27 @@ export class ViewSharedRecords extends Component {
           <Col xs="12" lg="12">
             <Card>
               <CardHeader>
-                {/* <h2>My Records: {this.state.recordsId.length}
-                </h2> */}
-                <Form
+                <h2>My Records List
+                </h2>
+                
+              </CardHeader>
+             
+              <CardBody>
+              <Form
                     onSubmit={this.getRecords}
                     
                     className="form-horizontal"
                 >
                     <FormGroup row>
-                        <Col xs="12" md="6">
+                        <Col md="2" style={{ marginTop: "0.5%", textAlign: "right" }}>
+                          <Label><b>Enter Patient Aadhaar Number: </b></Label>
+                        </Col>
+                        <Col xs="12" md="3">
                             <Input
-                                style={{border:'1px solid red'}}
+                                style={{border:'1px solid red',backgroundColor:'#f0f3f5'}}
                                 type="text"
                                 pattern=".{10,10}"
                                 min="0000000001"
-                                placeholder="Enter Aadhaar Number of Patient"
                                 onChange={event => this.setState({ aadhaar: event.target.value })}          
                                 required={true}      
                             />
@@ -342,16 +355,15 @@ export class ViewSharedRecords extends Component {
                     </Col>
                     </FormGroup>
                 </Form>
-              </CardHeader>
-             
-              <CardBody>
-              <FormGroup row>
-                        <Col xs="12" md="6">
+              <FormGroup row >
+                        <Col md="2" style={{ marginTop: "0.5%", textAlign: "right" }}>
+                          <Label id="seedLabel" style={{display:'none'}}><b>Enter seedphrase: </b></Label>
+                        </Col>
+                        <Col xs="12" md="3">
                             <Input
-                                style={{border:'1px solid red'}}
+                                id="seedPhrase"
+                                style={{border:'1px solid red',backgroundColor:'#f0f3f5', display:'none'}}
                                 type="password"
-                               
-                                placeholder="Enter your seedphrase"
                                 onChange={event => this.setState({ seedphrase: event.target.value })}          
                                    
                             />

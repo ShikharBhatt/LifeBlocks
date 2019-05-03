@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import ipfs from '../../../Dependencies/ipfs'
-import {decrypt} from '../../../Dependencies/crypto'
-import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
+import SharePolicy from "./SharePolicy"
 import {userdetails, organization, policyTemplate} from "../../../contract_abi";
 import {
   Button,
@@ -31,7 +29,6 @@ export class ApplyPolicy extends Component {
         account: null,
         value:'',
         web3:null,
-        coverage:6000,
         insuranceAdds:[],
         insuranceCompanies: [],
         insurancePolicies: [],
@@ -39,6 +36,7 @@ export class ApplyPolicy extends Component {
         insuranceName:null,
         appliedAddress: '',
         policyDetails: [],
+        policyContract:null,
       };
   
       this.insurancePopulate = this.insurancePopulate.bind(this);
@@ -147,6 +145,7 @@ export class ApplyPolicy extends Component {
      async getPolicyTemplates(insAdd) {
       console.log("in in in in")
       if(insAdd) {
+        this.setState({insuranceAddress: insAdd})
         this.orgContract.methods.returnAllPolicy(insAdd).call(
           {from: this.state.account}, (error, policies) => {
             if(!error) {
@@ -208,10 +207,8 @@ export class ApplyPolicy extends Component {
                 <tr key={index}>
                
                     <td>{row}</td>
-                    <td>{details[index].coverage}</td>
-                    <td>
-                     {details[index].policyName}
-                  </td>
+                    <td>{details[index].policyName}</td>
+                    <td>Rs. {details[index].coverage}</td>
                    
                     <td>
                       <Button
@@ -242,6 +239,8 @@ export class ApplyPolicy extends Component {
 
      applyPolicy() {
       
+      console.log("Insurance address:", this.state.insuranceAddress)
+      sessionStorage.setItem('addressCompany', this.state.insuranceAddress)
 
       this.state.web3.eth.getAccounts((error, accounts) => {
         //get the account from metamask
@@ -254,7 +253,6 @@ export class ApplyPolicy extends Component {
               return;
             }
             if (x === true) {
-              alert("Aadhaar available");
               //get address from aadhaar number
               this.UserContract.methods
                 .getAddress(sessionStorage.getItem('aadhaar'))
@@ -269,16 +267,12 @@ export class ApplyPolicy extends Component {
 
                     //if account is valid
                     if (add === accounts[0]) {
-                      alert("Account address matches aadhaar mapping");
 
                       var policyTemplateContractAddress = this.state.appliedAddress
                       var policyTemplateABI = policyTemplate.abi
                       var policyTemplateContract = new this.state.web3.eth.Contract(policyTemplateABI, policyTemplateContractAddress)
                       this.policyTemplateContract = policyTemplateContract
                       console.log(this.policyTemplateContract)
-                      alert(this.state.coverage)
-                      alert(sessionStorage.getItem('aadhaar'))
-                      alert(this.state.appliedAddress)
 
                       //Creating the policy contract
                       this.policyTemplateContract.methods.newPolicy(sessionStorage.getItem('aadhaar')).send(
@@ -286,6 +280,19 @@ export class ApplyPolicy extends Component {
                           from: accounts[0],
                           gasPrice:this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
                           value:this.state.web3.utils.toHex(this.state.web3.utils.toWei('1','ether'))
+                        }).then((policyContractInstance) => {
+                          console.log("Policy:",policyContractInstance)                     
+              
+                          this.UserContract.methods
+                          .getPolicyMap(sessionStorage.getItem('aadhaar'))
+                          .call(
+                            {from : accounts[0]},
+                            (error, policyAdd) => {
+                              this.setState({policyContract: policyAdd})
+                              sessionStorage.setItem('addressPolicy', policyAdd)
+                            }
+                          )
+                         
                         })
                     } else {
                       alert("Details Incorrect");
@@ -307,8 +314,15 @@ export class ApplyPolicy extends Component {
      if(this.state.insuranceCompanies.length != this.state.insuranceAdds.length) {
       return <div></div>
     }
-
-      //render if loaded
+    else if(this.state.policyContract!=null && this.state.insuranceAddress!=null) {
+      
+      return (      
+        <div>
+          <SharePolicy />
+        </div>
+  )
+    }
+      //render if loaded{policy:this.state.policyContract, company:this.state.insurnaceAddress}
    else {
     return (
       <div className="animated fadeIn">
@@ -339,8 +353,8 @@ export class ApplyPolicy extends Component {
                   <thead>
                   <tr>
                     <th>Policy Address</th>
-                    <th>Coverage</th>
                     <th>PolicyName</th>
+                    <th>Coverage</th>
                     <th></th>
                   </tr>
                   </thead>
