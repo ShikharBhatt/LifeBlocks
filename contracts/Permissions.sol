@@ -32,10 +32,10 @@ contract Permissions{
     address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
 
-    function grant(uint recordID, address _to, string _masterkey) public returns(uint){
-        require(storage_contract.getRecordOwner(recordID) == msg.sender,"You do not have sufficient permissions");
-        uint id = permission_list.push(permission(_to, msg.sender, recordID, _masterkey, true)) -1;
-        permissionFrom[msg.sender].push(id);
+    function grant(uint recordID, address _to, string _masterkey, address _owner) public returns(uint){
+        require(storage_contract.getRecordOwner(recordID) == _owner,"You do not have sufficient permissions");
+        uint id = permission_list.push(permission(_to, _owner, recordID, _masterkey, true)) -1;
+        permissionFrom[_owner].push(id);
         return id;
     }
     

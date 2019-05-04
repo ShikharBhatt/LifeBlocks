@@ -7,7 +7,7 @@ contract userDetailsInterface{
 } 
 
 contract permissionInterface{
-    function grant(uint recordID, address _to, string _masterkey) public returns(uint);
+    function grant(uint recordID, address _to, string _masterkey, address _onwer) public returns(uint);
 }
 
 contract PolicyTemplate{
@@ -50,6 +50,11 @@ contract PolicyTemplate{
     function getContract(uint _position) onlyOwner external view returns(address){
         return policyContracts[_position];
     }
+    
+    function getPolicies() onlyOwner external view returns(address[]){
+        return policyContracts;
+    }
+
     
     function getOwner() external view returns(address){
         return owner;
@@ -117,8 +122,8 @@ contract Policy{
         state = State.AppliedWOR;
     }
     
-    function getRecordsApplied(uint recordID, address _to, string _masterkey) onlyBuyer inState(State.AppliedWOR) public{
-        uint pid = permissions.grant(recordID, _to, _masterkey);
+    function getRecordsApplied(uint recordID, string _masterkey) onlyBuyer inState(State.AppliedWOR) public{
+        uint pid = permissions.grant(recordID, seller, _masterkey, buyer);
         plist.push(pid);
     }
     
@@ -126,9 +131,8 @@ contract Policy{
         state = State.Applied;
     }
     
-    
-    function getRecordsRenewal(uint recordID, address _to, string _masterkey) onlyBuyer inState(State.RenewalWOR) public{
-        uint pid = permissions.grant(recordID, _to, _masterkey);
+    function getRecordsRenewal(uint recordID, string _masterkey) onlyBuyer inState(State.RenewalWOR) public{
+        uint pid = permissions.grant(recordID, seller, _masterkey, buyer);
         plist.push(pid);
     }
     
@@ -177,8 +181,8 @@ contract Policy{
     }
     
     //test function
-    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string){
-        return (seller, buyer, value, state, this.balance, dateApplied, startDate, graceDate, lapseDate, reason);
+    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string, uint[]){
+        return (seller, buyer, value, state, this.balance, dateApplied, startDate, graceDate, lapseDate, reason, plist);
     }
 
     function policyGrace() onlySeller inState(State.Active) public{
@@ -240,5 +244,9 @@ contract Policy{
             //set grace date to 4 weeks after grace date
             lapseDate = graceDate + 4 weeks;
             seller.transfer(this.balance);
-    }  
+    }
+    
+    function getState() external view returns(State){
+        return state;
+    }
 }

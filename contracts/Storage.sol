@@ -61,7 +61,18 @@ contract Storage{
         return recordToOwner[_id];
     }
     
+    
     function getDetails(uint _id) external view returns(string, string, string, uint, string){
         return (records[_id].ipfsHash, records[_id].rname, records[_id].rtype, records[_id].date, records[_id].Hospital);
+    }
+    
+    function reportDate(uint _aadhaar) external view returns(uint[]){
+        address addr = userdetails.getAddress(_aadhaar);
+        uint[] memory ids = ownerToRecord[addr];
+        uint[] memory dates = new uint[](ids.length);
+        for(uint i = 0 ; i < ids.length ; i++){
+           dates[i] = records[ids[i]].date; 
+        }
+        return dates;
     }
 }
