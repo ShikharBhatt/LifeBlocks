@@ -21,6 +21,7 @@ export class ViewPolicy extends Component {
       };
   
       this.getDate = this.getDate.bind(this)
+      this.setPremium = this.setPremium.bind(this)
       }
 
 
@@ -69,25 +70,25 @@ export class ViewPolicy extends Component {
 
       const {data} = this.props.location
       //Get account from metamask
-          
-      await this.viewPolicy(data)
+      const policyContractAddress = data       
+      const policyABI = policy.abi              
+      var policyContract = new this.state.web3.eth.Contract(policyABI, policyContractAddress)     
+      this.policyContract = policyContract
+      await this.viewPolicy()
           
               
       }
   
-    viewPolicy(contractAddress) {
-      
+    viewPolicy() {
+      document.getElementById("premiumButton").style.display = "none"
      this.state.web3.eth.getAccounts((error, accounts) => {
         //get the account from metamask
                         
             //Policy Contract Instantiation
-            const policyContractAddress = contractAddress       
-            const policyABI = policy.abi              
-            var policyContract = new this.state.web3.eth.Contract(policyABI, policyContractAddress)     
             
-            console.log("Address: ",contractAddress)
-            if(policyContract)
-              policyContract.methods.getPremium().call(
+           
+            if(this.policyContract)
+              this.policyContract.methods.getPremium().call(
                 { from: accounts[0] },
                 (error, prem) => {
                   if(prem!=0) {
@@ -99,7 +100,7 @@ export class ViewPolicy extends Component {
                     console.log("Error in premium:", error)
                   console.log("Premium:",prem)
                   console.log("in")
-                  policyContract.methods.getDetails()
+                  this.policyContract.methods.getDetails()
                   .call(
                     {from: accounts[0]},
                     (error, details) => {
@@ -125,6 +126,50 @@ export class ViewPolicy extends Component {
       if(f==='01/01/1970')
         f = "NA"
       return f                 
+    }
+
+    checkButton(state) {
+      console.log(state)
+      if(state!=10) {
+        if(state==1) {
+           
+            var btn = document.getElementById("whichButton");
+            btn.innerHTML = "Set Premium";
+            btn.addEventListener("click",() =>{
+              document.getElementById("premiumButton").style.display = "block"
+              
+              document.getElementById("whichButton").style.display = "none";
+            return
+        }
+            )
+      }
+        else {
+        var btn = document.getElementById("whichButton");
+          btn.style.display = "none";
+      }
+      }
+      
+    }
+
+    setPremium() {
+      this.state.web3.eth.getAccounts((error, accounts) => {
+        //get the account from metamask
+                        
+            //Policy Contract Instantiation
+            
+           
+            if(this.state.premium>0)
+              this.policyContract.methods.setPremium(this.state.premium).send(
+                { from: accounts[0],
+                  gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
+                },
+              ).then((error, txHash) => {
+                alert(txHash)
+              })
+            
+
+      });
+
     }
 
    render() {
@@ -184,6 +229,51 @@ export class ViewPolicy extends Component {
               <tr>
                 <td><strong>Message</strong></td>
                 <td>{this.state.policyDetails[9]}</td>
+              </tr>
+              <tr>
+                <td>
+                  {this.checkButton(this.state.policyDetails[3])}
+                  <Button id="whichButton"
+                              className="btn-facebook mb-1" block
+                              block color="primary" 
+                              size="sm"
+                                ><b><span></span></b></Button>
+                </td>
+              </tr>
+              <tr>
+              <td>
+              <Form
+                    onSubmit={this.setPremium}   
+                    className="form-horizontal"
+                    id="premiumButton"
+                >
+                
+                
+                    
+                       
+                          <Label><b>Enter premium(in ether): </b></Label>
+                       
+                        
+                            <Input
+                                style={{border:'1px solid red',backgroundColor:'#f0f3f5'}}
+                                type="text"
+                                onChange={event => this.setState({ premium: event.target.value })}          
+                                required={true}      
+                            />
+                  
+                      
+                        <Button 
+                              className="btn-facebook mb-1" block
+                              block color="primary" 
+                              size="sm"
+                              type="submit"
+                                ><b><span>Set</span></b></Button>
+                                  </Form> 
+                    </td>
+                   
+                               
+                  
+              
               </tr>
             </tbody>
   

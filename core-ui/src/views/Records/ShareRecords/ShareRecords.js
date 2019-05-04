@@ -348,14 +348,14 @@ class ShareRecords extends Component {
                                 console.log("unencrypted masterkey : "+un_mkey)
                                 await  keyEncrypt(un_mkey, keyObjOrg, async function (cipher) {
                                   //in callback function of keyEncrypt
-                                  m_key.push(cipher);
+
                                   console.log("encrypted masterkey: " + cipher);
                                   console.log(account)
                                   console.log("Record id(----):",data) 
 
 
                                   permissionsContract.methods
-                                  .grant(data, organizationAddress,cipher )
+                                  .grant(data, organizationAddress,cipher, account )
                                   .send(
                                     {
                                       from: account,
