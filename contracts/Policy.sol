@@ -129,6 +129,7 @@ contract Policy{
     
     function applyPolicy() inState(State.AppliedWOR) public {
         state = State.Applied;
+        reason = "Records submitted";
     }
     
     function getRecordsRenewal(uint recordID, string _masterkey) onlyBuyer inState(State.RenewalWOR) public{
@@ -159,8 +160,9 @@ contract Policy{
     }
     
     function setPremium(uint _premium) onlySeller inState(State.Applied) public{
-        premium = _premium;
+        premium = _premium * 1 ether;
         state = State.AppliedSP;
+        reason = "Premium payment pending";
     }
     
     function confirmPolicy() onlyBuyer inState(State.AppliedSP) public payable{
@@ -178,6 +180,7 @@ contract Policy{
         graceDate = startDate + 1 years;
         //set grace date to 4 weeks after grace date
         lapseDate = graceDate + 4 weeks;
+        reason = "Policy Active";
     }
     
     //test function
@@ -195,12 +198,12 @@ contract Policy{
     
     function policyLapse() onlySeller inState(State.Grace) public{
             state = State.Lapsed;
-            penalty = (5 * premium)/100;
+            penalty = ((5 * premium)/100) * 1 ether;
     }
     
     function policyInactive() onlySeller inState(State.Lapsed) public{
             state = State.Inactive;
-            penalty = (10 * premium)/100;
+            penalty = ((10 * premium)/100) * 1 ether;
     }
     
     function renewPolicy(uint _coverage) onlyBuyer public {
