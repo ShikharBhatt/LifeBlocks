@@ -107,7 +107,7 @@ class RevokeAccess extends Component {
                             for(let i=0; i<id.length; i++) {
                               
                                 this.permissionsContract.methods.permissionList(id[i]).call(
-                                {from: accounts[0]}, (error, data) =>{
+                                {from: accounts[0]}, async (error, data) =>{
                                     let obj = { }
                                     obj['permissionID'] = id[i]
                                     obj['recordId'] = data[2]
@@ -122,7 +122,7 @@ class RevokeAccess extends Component {
                                      
                                     }
 
-                                    this.orgContract.methods.getOrgName(data[0]).call(
+                                    await this.orgContract.methods.getOrgName(data[0]).call(
                                       {from:accounts[0]}, function(error, orgname) {
                                         if(!error) {
                                           obj['orgName'] = orgname

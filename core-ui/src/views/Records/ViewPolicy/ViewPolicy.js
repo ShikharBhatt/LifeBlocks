@@ -42,6 +42,7 @@ export class ViewPolicy extends Component {
       this.getDate = this.getDate.bind(this);
       this.checkButton = this.checkButton.bind(this);
        this.giveRecords = this.giveRecords.bind(this);
+       this.payPremium = this.payPremium.bind(this);
 
       }
 
@@ -135,7 +136,7 @@ export class ViewPolicy extends Component {
                         {from : accounts[0]},
                         (error, policyAdd) => {
                           if(policyAdd!="0x0000000000000000000000000000000000000000") {
-
+                  
                             document.getElementById("policy").style.display = "inline-block"
                             document.getElementById("policy").innerText = "Policy Found"
                             document.getElementById("policy").style.color = "green"
@@ -208,6 +209,59 @@ export class ViewPolicy extends Component {
     giveRecords() {
       alert("goodbye")
     }
+
+    payPremium() {
+      alert(this.state.premium)
+      this.state.web3.eth.getAccounts((error, accounts) => {
+        //get the account from metamask
+        this.UserContract.methods.login(sessionStorage.getItem('aadhaar')).call(
+          { from: accounts[0] },
+          (error, x)=> {
+            //check if account exists
+            if (error) {
+              alert("Wrong");
+              return;
+            }
+            if (x === true) {
+              //alert("Aadhaar available");
+              //get address from aadhaar number
+              this.UserContract.methods
+                .getAddress(sessionStorage.getItem('aadhaar'))
+                .call(
+                  { from: accounts[0] },
+                  (error, add) => {
+                    //get account address from SC
+                    if (error) {
+                      alert("Wrong Details");
+                      return;
+                    }
+
+                    //if account is valid
+                    if (add === accounts[0]) {
+                      this.policyContract.methods.confirmPolicy()
+                          .send(
+                            {
+                              from: accounts[0],
+                              gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
+                              value:this.state.web3.utils.toHex(this.state.web3.utils.toWei(this.state.premium,'wei')) 
+                            }).then((err, txHash)=> {
+                              alert(txHash)
+                            })
+                    } else {
+                      alert("Details Incorrect");
+                    }
+                  }
+                );
+            }//end x is true condition 
+            else {
+              alert("Details Incorrect");
+            }
+          }
+        );
+      });
+
+    }
+
     checkButton(state) {
       console.log(state)
       if(state!=10) {
@@ -219,13 +273,25 @@ export class ViewPolicy extends Component {
           btn.addEventListener("click", ()=>{this.setState({share:1})});
           return
         }
-        else if(state==5) {
-          var btn = document.getElementById("whichButton");
-          btn.innerHTML = "Pay Premium";
-          btn.addEventListener("click", function (){});
-          return
-
+        else if(state==1) {
+          if(this.state.premium === "NA")
+          {
+            document.getElementById("whichButton").style.display = 'none';            
+          }
         }
+          else if(state == 2) {
+            var btn = document.getElementById("whichButton");
+            btn.innerHTML = "Pay Premium";
+            btn.addEventListener("click", ()=>{this.payPremium()});
+            return
+  
+          }
+
+          else if(state == 3 ){
+            document.getElementById("whichButton").style.display = "none";
+          }
+
+        
       }
       // else {
       //   var btn = document.getElementById("whichButton");
@@ -289,7 +355,7 @@ export class ViewPolicy extends Component {
               </tr>
               <tr>
                 <td><strong>Message</strong></td>
-                <td>{this.state.policyDetails[9]}</td>
+                <td style={{color:'red'}}>{this.state.policyDetails[9]}</td>
               </tr>
               <tr>
                 <td>
