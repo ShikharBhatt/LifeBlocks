@@ -4,6 +4,7 @@ import {decrypt} from '../../../Dependencies/crypto'
 import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {userdetails, organization, policy} from "../../../contract_abi";
+import SharePolicy from "../ApplyPolicy/SharePolicy"
 import {
   Button,
   Card,
@@ -33,6 +34,7 @@ export class ViewPolicy extends Component {
         web3:null,
         policyAddress: 'NA',
         premium: 'NA',
+        share:0,
         stateMap:{0:'AppliedWOR', 1:'Applied', 2:'AppliedSP', 3:'Active', 4:'Grace', 5:'Lapsed', 6:'RenewalWOR', 7:'Renewal', 8:'Inactive', 9:'Defunct', 10:'NA'},
         policyDetails:['NA', 'NA', 'NA', 10, 'NA', 'NA', 'NA', 'NA', 'NA', 'NA']
       };
@@ -209,17 +211,18 @@ export class ViewPolicy extends Component {
     checkButton(state) {
       console.log(state)
       if(state!=10) {
-        state = 5
         if(state == 0) {
+          sessionStorage.setItem('addressPolicy', this.state.policyAddress)
+          sessionStorage.setItem('addressCompany', this.state.policyDetails[0])
           var btn = document.getElementById("whichButton");
           btn.innerHTML = "Submit Records";
-          btn.addEventListener("click", function (){alert("Hello")});
+          btn.addEventListener("click", ()=>{this.setState({share:1})});
           return
         }
         else if(state==5) {
           var btn = document.getElementById("whichButton");
           btn.innerHTML = "Pay Premium";
-          btn.addEventListener("click", function (){alert("World")});
+          btn.addEventListener("click", function (){});
           return
 
         }
@@ -231,8 +234,15 @@ export class ViewPolicy extends Component {
     }
 
    render() {
-    
-    return (
+    if(this.state.share) {
+      return (      
+        <div>
+          <SharePolicy />
+        </div>
+      )
+    }
+    else 
+      return (
       <div className="animated fadeIn">
            
            <Row>

@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react'
-import ipfs from '../../../Dependencies/ipfs'
+import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
 import { getKeys,keyDecrypt, keyEncrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {userdetails, storage, organization, policy} from "../../../contract_abi";
@@ -276,7 +276,7 @@ class SharePolicy extends Component {
 
 
                                    policyContract.methods
-                                  .getRecordsApplied(data, organizationAddress,cipher )
+                                  .getRecordsApplied(data, cipher )
                                   .send(
                                     {
                                       from: account,
@@ -295,24 +295,24 @@ class SharePolicy extends Component {
                                                
                             })
                             }
-                        // }).then(() => {
+                        }).then(() => {
 
-                        //     policyContract.methods
-                        //     .applyPolicy()
-                        //     .send(
-                        //       {
-                        //         from: account,
-                        //         gasPrice: gp,
-                        //         gas:gasL
-                        //       },
-                        //       function(error, txHash) {
-                        //         if (!error) {
-                        //           console.log("tx: " + txHash);
+                            policyContract.methods
+                            .applyPolicy()
+                            .send(
+                              {
+                                from: account,
+                                gasPrice: gp,
+                                gas:gasL
+                              },
+                              function(error, txHash) {
+                                if (!error) {
+                                  console.log("tx: " + txHash);
 
                                  
-                        //         } else console.log(error);
-                        //       }
-                        //     );
+                                } else console.log(error);
+                              }
+                            );
                         })
                         
                         //end get keys
@@ -351,9 +351,10 @@ class SharePolicy extends Component {
                   >
        <Row>
           <Col xs="12" lg="12">
+          <Button className="icon-arrow-left-circle icons font-2xl d-block mt-4" style={{color:'red', backgroundColor:'transparent', border:'transparent'}} onClick={()=>{window.location.reload(true)}}></Button>
             <Card>
               <CardHeader>
-                <h2>Share Records: {sessionStorage.getItem('addressPolicy')}, {sessionStorage.getItem('addressCompany')}</h2>
+                <h2>Share Records:</h2>
               </CardHeader>
               <CardBody>
                 <Table responsive striped>
