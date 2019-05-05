@@ -29,6 +29,7 @@
     "ipfs-api": "^26.1.2",
     "node-sass": "^4.11.0",
     "openpgp": "^4.4.7",
+    "promise-mysql": "^3.3.1",
     "prop-types": "^15.6.2",
     "react": "^16.7.0",
     "react-app-polyfill": "^0.2.0",
