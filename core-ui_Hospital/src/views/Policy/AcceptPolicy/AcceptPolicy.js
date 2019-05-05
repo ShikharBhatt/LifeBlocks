@@ -262,9 +262,6 @@ class AcceptPolicy extends Component {
                 <thead>
                 <tr>
                   <th>Policy Contract </th>
-                 
-                 
-                  <th><b style={{float:'right'}}>Coverage: {this.coverage}</b></th>
                 </tr>
                 </thead>
                 <tbody>

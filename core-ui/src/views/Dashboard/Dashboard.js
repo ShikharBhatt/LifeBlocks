@@ -58,6 +58,7 @@ class Dashboard extends Component {
       ar: [],
     };
 
+    this.records = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     //this.insurancePopulate = this.insurancePopulate.bind(this);
     //this.showPolicies = this.showPolicies.bind(this);
     //this.getPolicyTemplates = this.getPolicyTemplates.bind(this);
@@ -113,7 +114,7 @@ class Dashboard extends Component {
       let address = account[0]
       // alert(aadhaar)
 
-      this.state.ar = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      
 
       this.storageContract.methods.reportDate(aadhaar).call(
         { from: account[0] }, function (error, xb) {
@@ -144,7 +145,8 @@ class Dashboard extends Component {
               let number = Number(vb[0]) * 10 + Number(vb[4])
               console.log("this is ", vb, " month ", number)
 
-              this.state.ar[number]++;
+              this.records[number]++;
+              this.setState({ar: this.records})
               console.log("array inc", this.state.ar[number])
 
               console.log(this.state.ar)
@@ -180,7 +182,13 @@ class Dashboard extends Component {
     if (sessionStorage.getItem("aadhaar") === null)
       //return (window.location.href = "/dashboard");
       this.props.history.push("/login");
-    if (this.state.ar.length > 0) {
+    
+    if(this.state.ar.length === 0) {
+      return (
+        <div>Hello</div>
+      );
+    }
+    else {
       return (
         <div className="animated fadeIn">
           <h3>Reports</h3>
@@ -222,11 +230,7 @@ class Dashboard extends Component {
       );
 
     }
-    else {
-      return (
-        <div></div>
-      );
-    }
+    
   }
 }
 
