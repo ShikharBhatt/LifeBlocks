@@ -32,10 +32,12 @@ class Dashboard extends Component {
       diffPolicyTemp: [],
       countdiffPolicy: [],
       countdiffPrem: [],
+      policyNames: [],
       stateMap: { 0: 'AppliedWOR', 1: 'Applied', 2: 'AppliedSP', 3: 'Active', 4: 'Grace', 5: 'Lapsed', 6: 'RenewalWOR', 7: 'Renewal', 8: 'Inactive', 9: 'Defunct', 10: 'NA' },
     };
 
     this.status = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    this.pN = []
     this.captureFile = this.captureFile.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -56,8 +58,8 @@ class Dashboard extends Component {
       .catch(() => {
         console.log("Error finding web3.");
       });
-      // Instantiate contract once web3 provided.
-      await this.instantiateContract();
+    // Instantiate contract once web3 provided.
+    await this.instantiateContract();
 
   }
 
@@ -66,12 +68,12 @@ class Dashboard extends Component {
     //Initialize user details contract
     const userContractAddress = userdetails.contract_address;
     const userABI = userdetails.abi;
-    var userContract = new this.state.web3.eth.Contract( userABI, userContractAddress);
+    var userContract = new this.state.web3.eth.Contract(userABI, userContractAddress);
     this.userContract = userContract;
     //Initialize storage contract
     const storageContractAddress = storage.contract_address;
     const storageABI = storage.abi;
-    var storageContract = new this.state.web3.eth.Contract( storageABI, storageContractAddress);
+    var storageContract = new this.state.web3.eth.Contract(storageABI, storageContractAddress);
     this.storageContract = storageContract;
     //Organizaton
     const orgContractAddress = organization.contract_address
@@ -162,6 +164,22 @@ class Dashboard extends Component {
                             }
                           }
                         )
+
+                        templateContract.methods.getPolicyDetails().call(
+                          { from: accounts[0] }, (error, res) => {
+                            if (!error) {
+
+                              this.pN.push(res[1])
+                              console.log("PN", this.pN)
+                              this.setState({
+                                policyNames: this.pN
+                              })
+                              console.log("res for name", this.state.policyNames)
+                            }
+                          }
+                        )
+
+
 
                       }
                       // console.log("this is final ", premiumCount)
@@ -305,6 +323,23 @@ class Dashboard extends Component {
                       ],
                     }
                   } options={{
+                    scales: {
+                      yAxes: [{
+                        stacked: false,
+                        gridLines: {
+                          display: false,
+                          color: "rgba(255,99,132,0.2)"
+                        },
+                        ticks: {
+                          min: 0,
+                          callback: function (value, index, values) {
+                            if (Math.floor(value) === value) {
+                              return value;
+                            }
+                          }
+                        }
+                      }]
+                    },
                     tooltips: {
                       enabled: false,
                       custom: CustomTooltips
@@ -315,14 +350,14 @@ class Dashboard extends Component {
             </Card>
             <Card>
               <CardHeader>
-                Per Policy Template Buyers
+                Per Policy - Buyers
           <div className="card-header-actions" />
               </CardHeader>
               <CardBody>
                 <div className="chart-wrapper">
                   <Bar data={
                     {
-                      labels: this.state.insurancePolicies,//['AppliedWOR', 'Applied', 'AppliedSP', 'Active', 'Grace', 'Lapsed', 'RenewalWOR', 'Renewal', 'Inactive', 'Defunct'],
+                      labels: this.state.policyNames,//['AppliedWOR', 'Applied', 'AppliedSP', 'Active', 'Grace', 'Lapsed', 'RenewalWOR', 'Renewal', 'Inactive', 'Defunct'],
                       datasets: [
                         {
                           label: 'Number',
@@ -336,6 +371,22 @@ class Dashboard extends Component {
                       ],
                     }
                   } options={{
+                    scales: {
+                      yAxes: [{
+                        gridLines: {
+                          display: false,
+                          color: "rgba(255,99,132,0.2)"
+                        },
+                        ticks: {
+                          min: 0,
+                          callback: function (value, index, values) {
+                            if (Math.floor(value) === value) {
+                              return value;
+                            }
+                          }
+                        }
+                      }]
+                    },
                     tooltips: {
                       enabled: false,
                       custom: CustomTooltips
@@ -346,17 +397,17 @@ class Dashboard extends Component {
             </Card>
             <Card>
               <CardHeader>
-                Per Policy Template Pool Amount
+                Per Policy - Pool Amount
           <div className="card-header-actions" />
               </CardHeader>
               <CardBody>
                 <div className="chart-wrapper">
                   <Bar data={
                     {
-                      labels: this.state.insurancePolicies,//['AppliedWOR', 'Applied', 'AppliedSP', 'Active', 'Grace', 'Lapsed', 'RenewalWOR', 'Renewal', 'Inactive', 'Defunct'],
+                      labels: this.state.policyNames,//['AppliedWOR', 'Applied', 'AppliedSP', 'Active', 'Grace', 'Lapsed', 'RenewalWOR', 'Renewal', 'Inactive', 'Defunct'],
                       datasets: [
                         {
-                          label: 'Number',
+                          label: 'Amount',
                           backgroundColor: 'rgba(255,99,132,0.2)',
                           borderColor: 'rgba(255,99,132,1)',
                           borderWidth: 1,
@@ -367,6 +418,23 @@ class Dashboard extends Component {
                       ],
                     }
                   } options={{
+                    scales: {
+                      yAxes: [{
+                        stacked: false,
+                        gridLines: {
+                          display: false,
+                          color: "rgba(255,99,132,0.2)"
+                        },
+                        ticks: {
+                          min: 0,
+                          callback: function (value, index, values) {
+                            if (Math.floor(value) === value) {
+                              return value;
+                            }
+                          }
+                        }
+                      }]
+                    },
                     tooltips: {
                       enabled: false,
                       custom: CustomTooltips
