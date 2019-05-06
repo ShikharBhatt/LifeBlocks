@@ -222,7 +222,7 @@ class Dashboard extends Component {
     });
   }
 
-  onSubmit(event) {
+  async onSubmit(event) {
     event.preventDefault();
     console.log(this.buffer);
     var encrypted = encrypt(this.buffer);
@@ -233,9 +233,9 @@ class Dashboard extends Component {
     let keyObj, m_key, record;
 
     record = this.buffer;
-    this.state.web3.eth.getAccounts((error, accounts) => {
+    await this.state.web3.eth.getAccounts(async (error, accounts) => {
       //transaction to link aadhaar card to address
-      this.userContract.methods
+      await this.userContract.methods
         .getKeyHash(this.state.aadhaar)
         .call({
           from: accounts[0],
@@ -261,7 +261,7 @@ class Dashboard extends Component {
         });
 
       //add the record to ipfs  
-      ipfs.files.add(record, (error, result) => {
+      await ipfs.files.add(record, (error, result) => {
         if (error) {
           console.error(error);
           return;
