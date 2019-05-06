@@ -42,27 +42,38 @@ class Dashboard extends Component {
 
   }
 
-  componentWillMount() {
+  async componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
 
-    getWeb3
+    await getWeb3
       .then(results => {
         this.setState({
           web3: results.web3
         });
 
-        // Instantiate contract once web3 provided.
-        this.instantiateContract();
       })
       .catch(() => {
         console.log("Error finding web3.");
       });
+      // Instantiate contract once web3 provided.
+      await this.instantiateContract();
+
   }
 
-  instantiateContract() {
+  async instantiateContract() {
 
     //Initialize user details contract
+    const userContractAddress = userdetails.contract_address;
+    const userABI = userdetails.abi;
+    var userContract = new this.state.web3.eth.Contract( userABI, userContractAddress);
+    this.userContract = userContract;
+    //Initialize storage contract
+    const storageContractAddress = storage.contract_address;
+    const storageABI = storage.abi;
+    var storageContract = new this.state.web3.eth.Contract( storageABI, storageContractAddress);
+    this.storageContract = storageContract;
+    //Organizaton
     const orgContractAddress = organization.contract_address
     const orgABI = organization.abi
     var orgContract = new this.state.web3.eth.Contract(orgABI, orgContractAddress)
@@ -75,7 +86,7 @@ class Dashboard extends Component {
     //PolicyTemplate Contract Instantitation
     const templateABI = policyTemplate.abi
 
-    this.state.web3.eth.getAccounts((error, accounts) => {
+    await this.state.web3.eth.getAccounts((error, accounts) => {
       if (!error) {
         console.log(accounts[0])
         this.setState({
