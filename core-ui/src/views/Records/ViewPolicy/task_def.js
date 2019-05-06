@@ -2,7 +2,7 @@ const dbConnection = require('../../../Dependencies/dbConnection');
 const queries = require('./queries');
 
 module.exports = class task_def {
-    async insert(task) {
+    async insert(org_address, contract_address) {
         let con = await dbConnection();
         try{
             await con.query("START TRANSACTION");
