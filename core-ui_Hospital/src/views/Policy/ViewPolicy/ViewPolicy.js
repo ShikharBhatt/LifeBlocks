@@ -151,7 +151,8 @@ export class ViewPolicy extends Component {
       
     }
 
-    setPremium() {
+    setPremium(event) {
+      event.preventDefault()
       this.state.web3.eth.getAccounts((error, accounts) => {
         //get the account from metamask
                         
@@ -163,9 +164,13 @@ export class ViewPolicy extends Component {
                 { from: accounts[0],
                   gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
                 },
-              ).then((error, txHash) => {
-                alert(txHash)
-              })
+                (err, txHash) => {
+                  if(!err) {
+                    console.log(txHash)
+                    window.location.reload(true)
+                  }
+                }
+              )
             
 
       });
@@ -228,7 +233,7 @@ export class ViewPolicy extends Component {
               </tr>
               <tr>
                 <td><strong>Message</strong></td>
-                <td>{this.state.policyDetails[9]}</td>
+                <td style={{color:'red'}}>{this.state.policyDetails[9]}</td>
               </tr>
               <tr>
                 <td>
@@ -247,10 +252,7 @@ export class ViewPolicy extends Component {
                     className="form-horizontal"
                     id="premiumButton"
                 >
-                
-                
-                    
-                       
+             
                           <Label><b>Enter premium(in ether): </b></Label>
                        
                         

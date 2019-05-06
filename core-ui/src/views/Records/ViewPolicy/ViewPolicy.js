@@ -1,25 +1,8 @@
 import React, { Component } from 'react'
-import ipfs from '../../../Dependencies/ipfs'
-import {decrypt} from '../../../Dependencies/crypto'
-import { getKeys,keyDecrypt } from '../../../Dependencies/pgp';
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {userdetails, organization, policy} from "../../../contract_abi";
 import SharePolicy from "../ApplyPolicy/SharePolicy"
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Row,
-  Input,
-  FormText,
-  Label,
-  FormGroup,
-  Form,
-  CardFooter,
-  Table
-} from "reactstrap";
+import {Button,Card,CardBody,CardHeader,Col,Row,Table} from "reactstrap";
 const Task = require('./task_def');
 
 export class ViewPolicy extends Component {
