@@ -3,7 +3,7 @@ import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {userdetails, organization, policy} from "../../../contract_abi";
 import SharePolicy from "../ApplyPolicy/SharePolicy"
 import {Button,Card,CardBody,CardHeader,Col,Row,Table} from "reactstrap";
-const Task = require('./task_def');
+//import task_def from './task_def';
 
 export class ViewPolicy extends Component {
     constructor(props) {
@@ -229,9 +229,9 @@ export class ViewPolicy extends Component {
                               value:this.state.web3.utils.toHex(this.state.web3.utils.toWei(this.state.premium,'wei')) 
                             }).then((err, txHash)=> {
                               alert(txHash)
-                              let task = new Task();
-                              let insertTask = task.insert(this.state.policyDetails[0],this.state.policyAddress);
-                              console.log("Inserted Task : ", insertTask);  
+                              // let task = new task_def();
+                              // let insertTask = task.insert(this.state.policyDetails[0],this.state.policyAddress);
+                              // console.log("Inserted Task : ", insertTask);  
                             })
                     } else {
                       alert("Details Incorrect");
