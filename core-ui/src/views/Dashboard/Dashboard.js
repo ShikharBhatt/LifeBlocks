@@ -56,6 +56,8 @@ class Dashboard extends Component {
       policyDetails: [],
       policyContract: null,
       ar: [],
+      number: [],
+      fetched:null
     };
 
     this.records = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -139,14 +141,16 @@ class Dashboard extends Component {
               xb[j] = rid[j]
             }
 
+            this.setState({number: xb.length})
+            let l=0
             // console.log("Oh this ", x);
             for (let kb = 0; kb < xb.length; kb++) {
               let vb = new Date(Number(xb[kb]) * 1000).toLocaleDateString()
               let number = Number(vb[0]) * 10 + Number(vb[4])
               console.log("this is ", vb, " month ", number)
-
+              l++
               this.records[number]++;
-              this.setState({ar: this.records})
+              this.setState({ar: this.records, fetched:l})
               console.log("array inc", this.state.ar[number])
 
               console.log(this.state.ar)
@@ -183,9 +187,9 @@ class Dashboard extends Component {
       //return (window.location.href = "/dashboard");
       this.props.history.push("/login");
     
-    if(this.state.ar.length === 0) {
+    if(this.state.fetched !== this.state.number) {
       return (
-        <div>Hello</div>
+        <div>Loading...</div>
       );
     }
     else {
