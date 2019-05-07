@@ -9,6 +9,7 @@ contract userDetailsInterface{
 
 contract organizationInterface{
     function getOrgName(address _address) external view returns(string);
+    function recordUploaded(address _orgAddress, uint _recordID) public;
 }
 
 contract Storage{
@@ -46,6 +47,7 @@ contract Storage{
        uint id = records.push(Record(_ipfsHash,_type,_name,now,hospitalName,_masterkey)) - 1;
        ownerToRecord[addr].push(id);
        recordToOwner[id] = addr;
+       organization.recordUploaded(msg.sender, id);
     } 
     
     function retrieve(uint _aadhaar) external view returns(uint[]){
