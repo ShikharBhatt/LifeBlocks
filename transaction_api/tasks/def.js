@@ -2,13 +2,13 @@ const dbConnection = require('../dbConnection');
 const queries = require('../queries/queries');
 
 module.exports = class task_def {
-    async insert(task) {
+    async insert(org_address, contract_address) {
         let con = await dbConnection();
         try{
             await con.query("START TRANSACTION");
             let insertTask = await con.query(
                 queries.insert_task,
-                [task]
+                [org_address, contract_address]
             );
             await con.query("COMMIT");
             let id = insertTask.insertId;
@@ -45,27 +45,27 @@ module.exports = class task_def {
         }
     }
 
-    async update(task,id) {
-        let con = await dbConnection();
-        try{
-            await con.query("START TRANSACTION");
-            await con.query(
-                queries.update_task,
-                [task, id]
-            );
-            await con.query("COMMIT");
-            return true;
-        }
-        catch(ex){
-            await con.query("ROLLBACK");
-            console.log(ex);
-            throw ex;
-        }
-        finally{
-            await con.release();
-            await con.destroy();
-        }
-    }
+    // async update(task,id) {
+    //     let con = await dbConnection();
+    //     try{
+    //         await con.query("START TRANSACTION");
+    //         await con.query(
+    //             queries.update_task,
+    //             [task, id]
+    //         );
+    //         await con.query("COMMIT");
+    //         return true;
+    //     }
+    //     catch(ex){
+    //         await con.query("ROLLBACK");
+    //         console.log(ex);
+    //         throw ex;
+    //     }
+    //     finally{
+    //         await con.release();
+    //         await con.destroy();
+    //     }
+    // }
 
     async delete(id) {
         let con = await dbConnection();
