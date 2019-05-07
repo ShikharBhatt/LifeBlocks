@@ -64,7 +64,6 @@ contract PolicyTemplate{
     function newPolicy(uint _aadhaar) public payable returns(address newPolicyContract){
         // check to ensure 1 ether was sent to the function call
         require(msg.value == 1 ether);
-
         Policy p = (new Policy).value(msg.value)(msg.sender,owner,coverage);
         policyContracts.push(p);
         lastContractAddress = address(p);
@@ -137,7 +136,7 @@ contract Policy{
         plist.push(pid);
     }
     
-    function renewPolicy() inState(State.RenewalWOR) public {
+    function renewalPolicy() inState(State.RenewalWOR) public {
         state = State.Renewal;
     }
     
@@ -182,8 +181,7 @@ contract Policy{
         lapseDate = graceDate + 4 weeks;
         reason = "Policy Active";
     }
-    
-    //test function
+
     function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string, uint[]){
         return (seller, buyer, value, state, this.balance, dateApplied, startDate, graceDate, lapseDate, reason, plist);
     }
@@ -206,16 +204,15 @@ contract Policy{
             penalty = ((10 * premium)/100) * 1 ether;
     }
     
-    function renewPolicy(uint _coverage) onlyBuyer public {
+    function renewPolicy() onlyBuyer public {
         renewAppDate = now;
-        coverage = _coverage;
         prevState = state;
         state = State.RenewalWOR;
         reason = "Records not submitted";
     }
     
-    function confirmRenewal() onlyBuyer inState(State.Renewal) public payable{
-        if(prevState == State.Grace){
+    function extendPolicy() onlyBuyer public payable{
+            require(state == State.Active || state == State.Grace, "There is something wrong with your application");
             require(msg.value == premium);
             startDate = now;
             //change policy state to active
@@ -225,8 +222,10 @@ contract Policy{
             //set grace date to 4 weeks after grace date
             lapseDate = graceDate + 4 weeks;
             seller.transfer(this.balance);
-        }
-        else if(prevState == State.Lapsed){
+    }
+    
+    function confirmRenewal() onlyBuyer inState(State.Renewal) public payable{
+        if(prevState == State.Lapsed){
             require(msg.value == premium + penalty);
             startDate = now;
             //change policy state to active
