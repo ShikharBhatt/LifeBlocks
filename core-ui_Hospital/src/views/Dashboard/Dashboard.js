@@ -5,7 +5,7 @@ import { encrypt } from "../../Dependencies/crypto";
 import { getKeys, keyEncrypt } from "../../Dependencies/pgp";
 import { userdetails, storage, policy, organization, policyTemplate } from "../../contract_abi";
 import getWeb3 from "../../Dependencies/utils/getWeb3";
-import { Bar } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 
 //prints on console what type of organization is logged in - hospital or insurance company
@@ -33,11 +33,17 @@ class Dashboard extends Component {
       countdiffPolicy: [],
       countdiffPrem: [],
       policyNames: [],
+      policyRatioReport: [],
+      recordUploadPerMonth: [],
+      noPPM: [],
       stateMap: { 0: 'AppliedWOR', 1: 'Applied', 2: 'AppliedSP', 3: 'Active', 4: 'Grace', 5: 'Lapsed', 6: 'RenewalWOR', 7: 'Renewal', 8: 'Inactive', 9: 'Defunct', 10: 'NA' },
     };
 
     this.status = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     this.pN = []
+    this.pRR = [0, 0, 0]
+    this.noOfPoliciesPerMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    this.rUPM = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     this.captureFile = this.captureFile.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -94,104 +100,246 @@ class Dashboard extends Component {
         this.setState({
           account: accounts[0]
         })
+        if (sessionStorage.getItem("orgType") == "Insurance") {
+          console.log("insurance company logged in")
+          this.orgContract.methods.getOrgDetails(accounts[0]).call(
+            { from: accounts[0] }, (error, details) => {
+              if (!error) {
+                if (details[2] === sessionStorage.getItem("orgId")) {
+                  this.orgContract.methods.returnAllPolicy(accounts[0]).call(
+                    { from: this.state.account }, (error, policies) => {
+                      if (!error) {
+                        console.log("policies :", policies);
+                        this.setState({
+                          insurancePolicies: policies
+                        })
+                        this.state.diffPolicyTemp.push(details.length)
+                        //console.log("this is diff policy", this.state.diffPolicyTemp)
 
-        this.orgContract.methods.getOrgDetails(accounts[0]).call(
-          { from: accounts[0] }, (error, details) => {
-            if (!error) {
-              if (details[2] === sessionStorage.getItem("orgId")) {
-                this.orgContract.methods.returnAllPolicy(accounts[0]).call(
-                  { from: this.state.account }, (error, policies) => {
-                    if (!error) {
-                      console.log("policies :", policies);
-                      this.setState({
-                        insurancePolicies: policies
-                      })
-                      this.state.diffPolicyTemp.push(details.length)
-                      console.log("this is diff policy", this.state.diffPolicyTemp)
+                        const templateABI = policyTemplate.abi
+                        let myarray = []
+                        let m = 0
+                        let z = 0
+                        let premiumCount = []
 
-                      const templateABI = policyTemplate.abi
-                      let myarray = []
-                      let m = 0
-                      let z = 0
-                      let premiumCount = []
+                        for (let i = 0; i < policies.length; i++) {
+                          let obj = {}
+                          premiumCount.push(0);
+                          var templateContractAddress = policies[i]
+                          var templateContract = new this.state.web3.eth.Contract(templateABI, templateContractAddress)
 
-                      for (let i = 0; i < policies.length; i++) {
-                        let obj = {}
-                        premiumCount.push(0);
-                        var templateContractAddress = policies[i]
-                        var templateContract = new this.state.web3.eth.Contract(templateABI, templateContractAddress)
+                          templateContract.methods.getPolicies().call(
+                            { from: accounts[0] }, (error, details) => {
+                              if (!error) {
+                                m = m + details.length
+                                //m = m + details.length
+                                this.state.countdiffPolicy.push(details.length)
+                                //console.log("this is diff policy count", this.state.countdiffPolicy)
+                                //console.log(details)
+                                let prem = 0
+                                for (let t = 0; t < details.length; t++) {
+                                  //console.log(details.getState())
 
-                        templateContract.methods.getPolicies().call(
-                          { from: accounts[0] }, (error, details) => {
-                            if (!error) {
-                              m = m + details.length
-                              //m = m + details.length
-                              this.state.countdiffPolicy.push(details.length)
-                              console.log("this is diff policy count", this.state.countdiffPolicy)
-                              console.log(details)
-                              //let myarray = []
-                              let prem = 0
-                              for (let t = 0; t < details.length; t++) {
-                                //console.log(details.getState())
+                                  var det = new this.state.web3.eth.Contract(policy.abi, details[t])
+                                  det.methods.getState().call({ from: accounts[0] }, (err, state) => {
+                                    if (!error) {
+                                      z++
+                                      this.status[Number(state)]++
+                                      if (Number(state) === 3) this.pRR[1]++
+                                      else if (Number(state) === 9) this.pRR[2]++
+                                      else this.pRR[0]++
+                                      //console.log("pRR array", state, this.pRR)
+                                      //console.log("status array", this.status)
+                                      this.setState({
+                                        x: this.status,
+                                        f: z,
+                                        policiesNo: m,
+                                        policyRatioReport: this.pRR
+                                      })
+                                    }
+                                  })
 
-                                var det = new this.state.web3.eth.Contract(policy.abi, details[t])
-                                det.methods.getState().call({ from: accounts[0] }, (err, state) => {
-                                  if (!error) { //
-                                    z++
-                                    this.status[Number(state)]++
-                                    console.log(this.status)
-                                    this.setState({
-                                      x: this.status,
-                                      f: z,
-                                      policiesNo: m
-                                    })
-                                  }
-                                })
+                                  det.methods.getPremium().call({ from: accounts[0] }, (err, premium) => {
+                                    if (!error) {
+                                      premiumCount[i] += Number(premium)
+                                      //console.log("premium :", premiumCount)
+                                      this.setState({
+                                        countdiffPrem: premiumCount
+                                      })
+                                    }
+                                  })
 
-                                det.methods.getPremium().call({ from: accounts[0] }, (err, premium) => {
-                                  if (!error) { //
-                                    //z++
-                                    premiumCount[i] += Number(premium)
-                                    console.log("premium :", premiumCount)
-                                    this.setState({
-                                      countdiffPrem: premiumCount
-                                    })
-                                  }
-                                })
+                                  det.methods.getDetails().call({ from: accounts[0] }, (err, policyDetails) => {
+                                    if (!error) {
+                                      let date = new Date(Number(policyDetails[5]) * 1000).toLocaleDateString()
+                                      //console.log(" date ", date)
+                                      let number = Number(date[3]) * 10 + Number(date[4])
+                                      //console.log("this is ", date, " month ", number)
+                                      this.noOfPoliciesPerMonth[Number(number) - 1]++;
+                                      //console.log("noPPM ", this.noOfPoliciesPerMonth)
+                                      this.setState({
+                                        noPPM: this.noOfPoliciesPerMonth
+                                      })
+                                    }
+                                  })
+                                }
                               }
-                              // // premiumCount.push(prem)
-                              // console.log("state pre ", premiumCount)
                             }
-                          }
-                        )
+                          )
 
-                        templateContract.methods.getPolicyDetails().call(
-                          { from: accounts[0] }, (error, res) => {
-                            if (!error) {
+                          templateContract.methods.getPolicyDetails().call(
+                            { from: accounts[0] }, (error, res) => {
+                              if (!error) {
 
-                              this.pN.push(res[1])
-                              console.log("PN", this.pN)
-                              this.setState({
-                                policyNames: this.pN
-                              })
-                              console.log("res for name", this.state.policyNames)
+                                this.pN.push(res[1])
+                                //console.log("PN", this.pN)
+                                this.setState({
+                                  policyNames: this.pN
+                                })
+                                //console.log("res for name", this.state.policyNames)
+                              }
                             }
-                          }
-                        )
+                          )
 
-
+                        }
 
                       }
-                      // console.log("this is final ", premiumCount)
-                    }
-                  })
+                    })
 
+                }
+                else {
+                  alert("Incorrect Details! Please re-check the account in your metamask")
+                }
               }
-              else {
-                alert("Incorrect Details! Please re-check the account in your metamask")
+            })
+        }
+        else {
+          console.log("hospital  logged in")
+          this.orgContract.methods.getOrgDetails(accounts[0]).call(
+            { from: accounts[0] }, (error, details) => {
+              if (!error) {
+                if (details[2] === sessionStorage.getItem("orgId")) {
+                  this.orgContract.methods.getOrgRecords(accounts[0]).call(
+                    { from: this.state.account }, (error, recordIDs) => {
+                      if (!error) {
+                        console.log("record IDs : ", recordIDs);
+                        this.setState({
+                        })
+
+                        for (let kk = 0; kk < recordIDs.length; kk++) {
+                          this.storageContract.methods.viewRecord(Number(recordIDs[kk])).call({
+                            from: accounts[0]
+                          }, (error, recDetails) => {
+                            let date = new Date(Number(recDetails[3]) * 1000).toLocaleDateString()
+                            console.log(" date ", date)
+                            let number = Number(date[3]) * 10 + Number(date[4])
+                            this.rUPM[number - 1]++
+                            console.log(" rupm ", this.rUPM)
+                            this.setState({
+                              recordUploadPerMonth: this.rUPM
+                            })
+                          })
+                        }
+                        //console.log("this is diff policy", this.state.diffPolicyTemp)
+
+                        // const templateABI = policyTemplate.abi
+                        // let myarray = []
+                        // let m = 0
+                        // let z = 0
+                        // let premiumCount = []
+
+                        // for (let i = 0; i < policies.length; i++) {
+                        //   let obj = {}
+                        //   premiumCount.push(0);
+                        //   var templateContractAddress = policies[i]
+                        //   var templateContract = new this.state.web3.eth.Contract(templateABI, templateContractAddress)
+
+                        //   templateContract.methods.getPolicies().call(
+                        //     { from: accounts[0] }, (error, details) => {
+                        //       if (!error) {
+                        //         m = m + details.length
+                        //         //m = m + details.length
+                        //         this.state.countdiffPolicy.push(details.length)
+                        //         //console.log("this is diff policy count", this.state.countdiffPolicy)
+                        //         //console.log(details)
+                        //         let prem = 0
+                        //         for (let t = 0; t < details.length; t++) {
+                        //           //console.log(details.getState())
+
+                        //           var det = new this.state.web3.eth.Contract(policy.abi, details[t])
+                        //           det.methods.getState().call({ from: accounts[0] }, (err, state) => {
+                        //             if (!error) {
+                        //               z++
+                        //               this.status[Number(state)]++
+                        //               if (Number(state) === 3) this.pRR[1]++
+                        //               else if (Number(state) === 9) this.pRR[2]++
+                        //               else this.pRR[0]++
+                        //               //console.log("pRR array", state, this.pRR)
+                        //               //console.log("status array", this.status)
+                        //               this.setState({
+                        //                 x: this.status,
+                        //                 f: z,
+                        //                 policiesNo: m,
+                        //                 policyRatioReport: this.pRR
+                        //               })
+                        //             }
+                        //           })
+
+                        //           det.methods.getPremium().call({ from: accounts[0] }, (err, premium) => {
+                        //             if (!error) {
+                        //               premiumCount[i] += Number(premium)
+                        //               //console.log("premium :", premiumCount)
+                        //               this.setState({
+                        //                 countdiffPrem: premiumCount
+                        //               })
+                        //             }
+                        //           })
+
+                        //           det.methods.getDetails().call({ from: accounts[0] }, (err, policyDetails) => {
+                        //             if (!error) {
+                        //               let date = new Date(Number(policyDetails[5]) * 1000).toLocaleDateString()
+                        //               //console.log(" date ", date)
+                        //               let number = Number(date[3]) * 10 + Number(date[4])
+                        //               //console.log("this is ", date, " month ", number)
+                        //               this.noOfPoliciesPerMonth[Number(number) - 1]++;
+                        //               //console.log("noPPM ", this.noOfPoliciesPerMonth)
+                        //               this.setState({
+                        //                 noPPM: this.noOfPoliciesPerMonth
+                        //               })
+                        //             }
+                        //           })
+                        //         }
+                        //       }
+                        //     }
+                        //   )
+
+                        //   templateContract.methods.getPolicyDetails().call(
+                        //     { from: accounts[0] }, (error, res) => {
+                        //       if (!error) {
+
+                        //         this.pN.push(res[1])
+                        //         //console.log("PN", this.pN)
+                        //         this.setState({
+                        //           policyNames: this.pN
+                        //         })
+                        //         //console.log("res for name", this.state.policyNames)
+                        //       }
+                        //     }
+                        //   )
+
+                        // }
+
+                      }
+                    })
+
+                }
+                else {
+                  alert("Incorrect Details! Please re-check the account in your metamask")
+                }
               }
-            }
-          })
+            })
+
+        }
 
       }
       else {
@@ -357,7 +505,7 @@ class Dashboard extends Component {
                 <div className="chart-wrapper">
                   <Bar data={
                     {
-                      labels: this.state.policyNames,//['AppliedWOR', 'Applied', 'AppliedSP', 'Active', 'Grace', 'Lapsed', 'RenewalWOR', 'Renewal', 'Inactive', 'Defunct'],
+                      labels: this.state.policyNames,
                       datasets: [
                         {
                           label: 'Number',
@@ -404,7 +552,7 @@ class Dashboard extends Component {
                 <div className="chart-wrapper">
                   <Bar data={
                     {
-                      labels: this.state.policyNames,//['AppliedWOR', 'Applied', 'AppliedSP', 'Active', 'Grace', 'Lapsed', 'RenewalWOR', 'Renewal', 'Inactive', 'Defunct'],
+                      labels: this.state.policyNames,
                       datasets: [
                         {
                           label: 'Amount',
@@ -414,6 +562,86 @@ class Dashboard extends Component {
                           hoverBackgroundColor: 'rgba(255,99,132,0.4)',
                           hoverBorderColor: 'rgba(255,99,132,1)',
                           data: this.state.countdiffPrem,
+                        },
+                      ],
+                    }
+                  } options={{
+                    scales: {
+                      yAxes: [{
+                        stacked: false,
+                        gridLines: {
+                          display: false,
+                          color: "rgba(255,99,132,0.2)"
+                        },
+                        ticks: {
+                          min: 0,
+                          callback: function (value, index, values) {
+                            if (Math.floor(value) === value) {
+                              return value;
+                            }
+                          }
+                        }
+                      }]
+                    },
+                    tooltips: {
+                      enabled: false,
+                      custom: CustomTooltips
+                    }, maintainAspectRatio: false
+                  }} />
+                </div>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardHeader>
+                Policy Ratio Report
+              </CardHeader>
+              <CardBody>
+                <div className="chart-wrapper">
+                  <Doughnut data={
+                    {
+                      labels: [
+                        'Pending',
+                        'Active',
+                        'Defunct',
+                      ],
+                      datasets: [
+                        {
+                          data: this.state.policyRatioReport,
+                          backgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                          ],
+                          hoverBackgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                          ],
+                        }],
+                    }
+                  } />
+                </div>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardHeader>
+                no of transactions
+          <div className="card-header-actions" />
+              </CardHeader>
+              <CardBody>
+                <div className="chart-wrapper">
+                  <Bar data={
+                    {
+                      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                      datasets: [
+                        {
+                          label: 'Number',
+                          backgroundColor: 'rgba(255,99,132,0.2)',
+                          borderColor: 'rgba(255,99,132,1)',
+                          borderWidth: 1,
+                          hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                          hoverBorderColor: 'rgba(255,99,132,1)',
+                          data: this.state.noPPM,
                         },
                       ],
                     }
@@ -564,6 +792,53 @@ class Dashboard extends Component {
                       </Row>
                     </CardFooter>
                   </Form>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    No. of Records Uploaded
+          <div className="card-header-actions" />
+                  </CardHeader>
+                  <CardBody>
+                    <div className="chart-wrapper">
+                      <Bar data={
+                        {
+                          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                          datasets: [
+                            {
+                              label: 'Number',
+                              backgroundColor: 'rgba(255,99,132,0.2)',
+                              borderColor: 'rgba(255,99,132,1)',
+                              borderWidth: 1,
+                              hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                              hoverBorderColor: 'rgba(255,99,132,1)',
+                              data: this.state.recordUploadPerMonth,
+                            },
+                          ],
+                        }
+                      } options={{
+                        scales: {
+                          yAxes: [{
+                            gridLines: {
+                              display: false,
+                              color: "rgba(255,99,132,0.2)"
+                            },
+                            ticks: {
+                              min: 0,
+                              callback: function (value, index, values) {
+                                if (Math.floor(value) === value) {
+                                  return value;
+                                }
+                              }
+                            }
+                          }]
+                        },
+                        tooltips: {
+                          enabled: false,
+                          custom: CustomTooltips
+                        }, maintainAspectRatio: false
+                      }} />
+                    </div>
+                  </CardBody>
                 </Card>
               </Col>
             </Row>

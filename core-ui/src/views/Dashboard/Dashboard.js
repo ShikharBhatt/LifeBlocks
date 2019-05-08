@@ -57,7 +57,7 @@ class Dashboard extends Component {
       policyContract: null,
       ar: [],
       number: [],
-      fetched:null
+      fetched: null
     };
 
     this.records = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -116,7 +116,7 @@ class Dashboard extends Component {
       let address = account[0]
       // alert(aadhaar)
 
-      
+
 
       this.storageContract.methods.reportDate(aadhaar).call(
         { from: account[0] }, function (error, xb) {
@@ -141,16 +141,16 @@ class Dashboard extends Component {
               xb[j] = rid[j]
             }
 
-            this.setState({number: xb.length})
-            let l=0
+            this.setState({ number: xb.length })
+            let l = 0
             // console.log("Oh this ", x);
             for (let kb = 0; kb < xb.length; kb++) {
               let vb = new Date(Number(xb[kb]) * 1000).toLocaleDateString()
-              let number = Number(vb[0]) * 10 + Number(vb[4])
+              let number = Number(vb[3]) * 10 + Number(vb[4])
               console.log("this is ", vb, " month ", number)
               l++
-              this.records[number]++;
-              this.setState({ar: this.records, fetched:l})
+              this.records[number - 1]++;
+              this.setState({ ar: this.records, fetched: l })
               console.log("array inc", this.state.ar[number])
 
               console.log(this.state.ar)
@@ -186,8 +186,8 @@ class Dashboard extends Component {
     if (sessionStorage.getItem("aadhaar") === null)
       //return (window.location.href = "/dashboard");
       this.props.history.push("/login");
-    
-    if(this.state.fetched !== this.state.number) {
+
+    if (this.state.fetched !== this.state.number) {
       return (
         <div>Loading...</div>
       );
@@ -234,7 +234,7 @@ class Dashboard extends Component {
       );
 
     }
-    
+
   }
 }
 
