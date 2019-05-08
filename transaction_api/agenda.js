@@ -9,6 +9,7 @@ const abi = [{"constant":false,"inputs":[{"name":"_premium","type":"uint256"}],"
 //const recv = '0xa577C9d2BA3bB4aD1e09df6dFf697Cb3A639eB7a';
 
 const Agenda = require('agenda');
+const agenda = new Agenda({db:{address:'mongodb://localhost:27017/agenda-test'}});
 
 async function getTransactionCount(data){
   let raw;
@@ -51,12 +52,12 @@ module.exports = async(org_address, contract_address) => {
 
   // Agenda will use the given mongodb connection to persist data, so jobs
   // will go in the "agendatest" database's "jobs" collection.
-  const agenda = new Agenda({db:{address:'mongodb://localhost:27017/agendatest'}});
+  let job_name = `transact${contract_address}`
 
   // Define a "job", an arbitrary function that agenda can execute
-  agenda.define('transact', async (job,done) => {
+  agenda.define(job_name, async (job,done) => {
     console.log('transact : in job');
-    console.log(job.attrs.data.contract);
+    //console.log(job.attrs.data.contract);
     await getTransactionCount(job.attrs.data, () => {
       console.log("done")
     })
@@ -70,9 +71,8 @@ module.exports = async(org_address, contract_address) => {
   // Schedule a job for 1 second from now and persist it to mongodb.
   // Jobs are uniquely defined by their name, in this case "hello"
 
-  agenda.schedule(new Date(Date.now() + 20000), 'transact',{contract : contract_address, worker : '0x917F5a04E325317960a645F967041ED4C25cc918'});
+  agenda.schedule(new Date(Date.now() + 20000), job_name,{contract : contract_address, worker : '0x917F5a04E325317960a645F967041ED4C25cc918'});
   agenda.start();
-  return true;
 }
 
 // run().catch(error => {
