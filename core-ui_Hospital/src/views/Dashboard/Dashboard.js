@@ -36,13 +36,17 @@ class Dashboard extends Component {
       policyRatioReport: [],
       recordUploadPerMonth: [],
       noPPM: [],
+      mM: [],
+      nForRisk: [],
       stateMap: { 0: 'AppliedWOR', 1: 'Applied', 2: 'AppliedSP', 3: 'Active', 4: 'Grace', 5: 'Lapsed', 6: 'RenewalWOR', 7: 'Renewal', 8: 'Inactive', 9: 'Defunct', 10: 'NA' },
     };
 
     this.status = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     this.pN = []
+    this.minMax = []
     this.pRR = [0, 0, 0]
     this.noOfPoliciesPerMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    this.namesforRisk = []
     this.rUPM = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     this.captureFile = this.captureFile.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -122,9 +126,15 @@ class Dashboard extends Component {
                         let z = 0
                         let premiumCount = []
 
-                        for (let i = 0; i < policies.length; i++) {
+
+                        for (let i = 0; i < policies.length; i++) {     //all templates 
                           let obj = {}
+                          let min = 1000000000000000000000000000000
+                          let max = 0
                           premiumCount.push(0);
+                          this.minMax.push(0);
+                          this.minMax.push(0);
+                          console.log("refreshing")
                           var templateContractAddress = policies[i]
                           var templateContract = new this.state.web3.eth.Contract(templateABI, templateContractAddress)
 
@@ -137,7 +147,9 @@ class Dashboard extends Component {
                                 //console.log("this is diff policy count", this.state.countdiffPolicy)
                                 //console.log(details)
                                 let prem = 0
-                                for (let t = 0; t < details.length; t++) {
+                                min = 1000000000000000000000000000000
+                                max = 0
+                                for (let t = 0; t < details.length; t++) {    //for each policy in template
                                   //console.log(details.getState())
 
                                   var det = new this.state.web3.eth.Contract(policy.abi, details[t])
@@ -159,12 +171,28 @@ class Dashboard extends Component {
                                     }
                                   })
 
-                                  det.methods.getPremium().call({ from: accounts[0] }, (err, premium) => {
+                                  det.methods.getPremium().call({ from: accounts[0] }, (error, premium) => {
                                     if (!error) {
                                       premiumCount[i] += Number(premium)
-                                      //console.log("premium :", premiumCount)
+                                      console.log("premium :", premium)
+                                      if (Number(premium) < Number(min)) {
+                                        min = Number(premium)
+                                        this.minMax[2 * i] = min
+                                      }
+                                      else {
+                                        console.log(" this for min -->", premium, "<", min)
+                                      }
+                                      if (Number(premium) > Number(max)) {
+                                        max = Number(premium)
+                                        this.minMax[2 * i + 1] = max
+                                      }
+                                      else {
+                                        console.log(" this for max-->", premium, ">", max)
+                                      }
+                                      console.log(" hello ", this.minMax)
                                       this.setState({
-                                        countdiffPrem: premiumCount
+                                        countdiffPrem: premiumCount,
+                                        mM: this.minMax
                                       })
                                     }
                                   })
@@ -183,6 +211,7 @@ class Dashboard extends Component {
                                     }
                                   })
                                 }
+                                console.log("min max", min, max)
                               }
                             }
                           )
@@ -192,9 +221,12 @@ class Dashboard extends Component {
                               if (!error) {
 
                                 this.pN.push(res[1])
+                                this.namesforRisk.push(res[1] + "(min)")
+                                this.namesforRisk.push(res[1] + "(max)")
                                 //console.log("PN", this.pN)
                                 this.setState({
-                                  policyNames: this.pN
+                                  policyNames: this.pN,
+                                  nForRisk: this.namesforRisk
                                 })
                                 //console.log("res for name", this.state.policyNames)
                               }
@@ -649,6 +681,53 @@ class Dashboard extends Component {
                     scales: {
                       yAxes: [{
                         stacked: false,
+                        gridLines: {
+                          display: false,
+                          color: "rgba(255,99,132,0.2)"
+                        },
+                        ticks: {
+                          min: 0,
+                          callback: function (value, index, values) {
+                            if (Math.floor(value) === value) {
+                              return value;
+                            }
+                          }
+                        }
+                      }]
+                    },
+                    tooltips: {
+                      enabled: false,
+                      custom: CustomTooltips
+                    }, maintainAspectRatio: false
+                  }} />
+                </div>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardHeader>
+                Risk Factor
+          <div className="card-header-actions" />
+              </CardHeader>
+              <CardBody>
+                <div className="chart-wrapper">
+                  <Bar data={
+                    {
+                      labels: this.state.nForRisk,
+                      datasets: [
+                        {
+                          label: 'Number',
+                          backgroundColor: 'rgba(255,99,132,0.2)',
+                          borderColor: 'rgba(255,99,132,1)',
+                          borderWidth: 1,
+                          hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                          hoverBorderColor: 'rgba(255,99,132,1)',
+                          data: this.state.mM,
+                        },
+                      ],
+                    }
+                  } options={{
+                    scales: {
+                      yAxes: [{
                         gridLines: {
                           display: false,
                           color: "rgba(255,99,132,0.2)"
