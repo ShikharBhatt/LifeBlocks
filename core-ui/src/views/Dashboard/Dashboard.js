@@ -108,7 +108,7 @@ class Dashboard extends Component {
     e.preventDefault();
     await this.setState({
       orgAddress:"0xB77A7aEc62ABE912A87cc27966806e846C7A126F",
-      contractAddress :"0x1C48060F0eAeb380495755aa9E5F98Cdde7be14E"
+      contractAddress :"0x17AEBEc803b1Ee1BB693cB6A9391a07CD234512F  "
     })
     const response = await fetch('/api/insert', {
       method: 'POST',
