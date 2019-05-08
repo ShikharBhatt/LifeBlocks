@@ -57,7 +57,11 @@ class Dashboard extends Component {
       policyContract: null,
       ar: [],
       number: [],
-      fetched: null
+      fetched: null,
+      response: '',
+      orgAddress: '',
+      contractAddress: '',
+      responseToPost: '',
     };
 
     this.records = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -86,9 +90,38 @@ class Dashboard extends Component {
       })
 
     await this.instantiateContract()
-
-
+    await this.callApi()
+      .then(res => this.setState({ response: res.express }))
+      .catch(err => console.log(err));
+    console.log("Response from API : ", this.state.response)
   }
+
+
+  callApi = async () => {
+    const response = await fetch('/api/hello');
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    return body;
+  };
+
+  handleSubmit = async e => {
+    e.preventDefault();
+    await this.setState({
+      orgAddress: "0xB77A7aEc62ABE912A87cc27966806e846C7A126F",
+      contractAddress: "0x17AEBEc803b1Ee1BB693cB6A9391a07CD234512F  "
+    })
+    const response = await fetch('/api/insert', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orgAddress: this.state.orgAddress, contractAddress: this.state.contractAddress }),
+    });
+    const body = await response.text();
+    this.setState({ responseToPost: body });
+    console.log("Response from API : ", this.state.responseToPost)
+  };
+
   async instantiateContract() {
 
     //User Details Contract Instantiation
@@ -227,6 +260,7 @@ class Dashboard extends Component {
                     }, maintainAspectRatio: false
                   }} />
                 </div>
+                <Button onClick={this.handleSubmit}>Submit</Button>
               </CardBody>
             </Card>
           </CardColumns>

@@ -226,7 +226,7 @@ export class ViewPolicy extends Component {
                             {
                               from: accounts[0],
                               gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
-                              value:this.state.web3.utils.toHex(this.state.web3.utils.toWei(this.state.premium,'ether')) 
+                              value:this.state.web3.utils.toHex(this.state.web3.utils.toWei(this.state.premium,'wei')) 
                             }).then((err, txHash)=> {
                               alert(txHash)
                               // let task = new task_def();
