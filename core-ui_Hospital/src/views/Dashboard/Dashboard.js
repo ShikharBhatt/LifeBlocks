@@ -94,6 +94,8 @@ class Dashboard extends Component {
     //PolicyTemplate Contract Instantitation
     const templateABI = policyTemplate.abi
 
+    const weiToEther = 1000000000000000000
+
     await this.state.web3.eth.getAccounts((error, accounts) => {
       if (!error) {
         console.log(accounts[0])
@@ -161,7 +163,7 @@ class Dashboard extends Component {
 
                                   det.methods.getPremium().call({ from: accounts[0] }, (err, premium) => {
                                     if (!error) {
-                                      premiumCount[i] += Number(premium)
+                                      premiumCount[i] += (Number(premium))/weiToEther
                                       //console.log("premium :", premiumCount)
                                       this.setState({
                                         countdiffPrem: premiumCount
