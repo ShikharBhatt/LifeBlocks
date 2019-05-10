@@ -227,8 +227,26 @@ export class ViewPolicy extends Component {
                               from: accounts[0],
                               gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
                               value:this.state.web3.utils.toHex(this.state.web3.utils.toWei(this.state.premium,'wei')) 
-                            }).then((err, txHash)=> {
+                            }).then(async (err, txHash)=> {
                               alert(txHash)
+                             
+                               
+                                await this.setState({
+                                  orgAddress: this.state.policyDetails[0],
+                                  contractAddress: this.state.policyAddress 
+                                })
+                                const response = await fetch('/api/insert', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({ orgAddress: this.state.orgAddress, contractAddress: this.state.contractAddress }),
+                                });
+                                const body = await response.text();
+                                this.setState({ responseToPost: body });
+                                console.log("Response from API : ", this.state.responseToPost)
+                                
+                              
                               // let task = new task_def();
                               // let insertTask = task.insert(this.state.policyDetails[0],this.state.policyAddress);
                               // console.log("Inserted Task : ", insertTask);  
@@ -286,6 +304,7 @@ export class ViewPolicy extends Component {
     }
 
    render() {
+    const weiToEther = 1000000000000000000
     if(this.state.share) {
       return (      
         <div>
@@ -317,7 +336,7 @@ export class ViewPolicy extends Component {
             </tr>
             <tr>
                 <td><strong>Premium</strong></td>
-                <td>{this.state.premium} ether</td>
+                <td>{this.state.premium/weiToEther} ether</td>
               </tr>
               <tr>
                 <td><strong>State</strong></td>

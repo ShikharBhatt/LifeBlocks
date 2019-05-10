@@ -98,6 +98,8 @@ class Dashboard extends Component {
     //PolicyTemplate Contract Instantitation
     const templateABI = policyTemplate.abi
 
+    const weiToEther = 1000000000000000000
+
     await this.state.web3.eth.getAccounts((error, accounts) => {
       if (!error) {
         console.log(accounts[0])
@@ -171,25 +173,32 @@ class Dashboard extends Component {
                                     }
                                   })
 
+                                  var toEther
                                   det.methods.getPremium().call({ from: accounts[0] }, (error, premium) => {
                                     if (!error) {
-                                      premiumCount[i] += Number(premium)
-                                      console.log("premium :", premium)
-                                      if (Number(premium) < Number(min)) {
-                                        min = Number(premium)
+
+                                      toEther = (Number(premium))/weiToEther
+
+                                      premiumCount[i] += toEther
+                                      //console.log("premium :", premiumCount)
+
+                                      
+                                      if (toEther < Number(min)) {
+                                        min = toEther
                                         this.minMax[2 * i] = min
                                       }
                                       else {
                                         console.log(" this for min -->", premium, "<", min)
                                       }
-                                      if (Number(premium) > Number(max)) {
-                                        max = Number(premium)
+                                      if (toEther > Number(max)) {
+                                        max = toEther
                                         this.minMax[2 * i + 1] = max
                                       }
                                       else {
                                         console.log(" this for max-->", premium, ">", max)
                                       }
                                       console.log(" hello ", this.minMax)
+
                                       this.setState({
                                         countdiffPrem: premiumCount,
                                         mM: this.minMax

@@ -179,6 +179,7 @@ export class ViewPolicy extends Component {
 
    render() {
     const {data} = this.props.location
+    const weiToEther = 1000000000000000000
     console.log(data)
     if(data==null) {
       return(
@@ -209,7 +210,7 @@ export class ViewPolicy extends Component {
               </tr>
               <tr>
                 <td><strong>Premium</strong></td>
-                <td>{this.state.premium}</td>
+                <td>{this.state.premium/weiToEther} ether</td>
               </tr>
               <tr>
                 <td><strong>State</strong></td>
