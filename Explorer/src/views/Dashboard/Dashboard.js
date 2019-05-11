@@ -41,7 +41,7 @@ class Dashboard extends Component {
       h = 12;
     }
     // ie: 2014-03-24, 3:00 PM
-    var time1 = yyyy + "-" + mm + "-" + dd + ", " + h + ":" + min + " " + ampm;
+    var time1 = dd + "-" + mm + "-" + yyyy + ", " + h + ":" + min + " " + ampm;
     return time1;
   };
 
@@ -112,29 +112,38 @@ class Dashboard extends Component {
             var time = this.convertTimestamp(block.timestamp);
             console.log("time=", time);
             this.state.web3.eth.getTransaction(hash).then(sender => {
-              console.log(sender.from);
+
               //console.log(this.state.web3.utils.hexToUtf8(sender.input))
               const decodedData = abiDecoder.decodeMethod(sender.input);
               console.log(JSON.stringify(decodedData))
-              $("tbody").append(
-                "<tr><td>" +
-                sender.from +
-                "<br>" +
-                sender.to +
-                "</td><td>" +
-                number +
-                "</td><td>" +
-                time +
-                "</td><td>" +
-                hash +
-                "</tr>"
-              );
+              console.log(sender.to);
+              // $("tbody").append(
+              //   "<tr><td>" +
+              //   sender.from +
+              //   "<br>" +
+              //   sender.to +
+              //   "</td><td>" +
+              //   number +
+              //   "</td><td>" +
+              //   time +
+              //   "</td><td>" +
+              //   hash +
+              //   "</tr>"
+              // );
               // $(".display").append(
               console.log("bacl")
               this.blocks.push(
                 <Card>
                   <CardHeader>
-                    {hash}
+                    <Row>
+                      <Col><pre>Block Number: {number}</pre> </Col>
+                      <Col><pre>Block Number  : {hash}</pre></Col>
+                      <Col><pre>{time}</pre></Col>
+                    </Row>
+                    <Row>
+                      <Col><pre>Sender Address : {sender.from}</pre></Col>
+                      <Col><pre>Receiver Address : {sender.to}</pre></Col>
+                    </Row>
                     <div className="card-header-actions">
                       {/* eslint-disable-next-line */}
                       {/* <a href="#" className="card-header-action btn btn-setting"><i className="icon-settings"></i></a> */}
@@ -223,9 +232,9 @@ class Dashboard extends Component {
     return (
       <div className="App">
         <div className="animated fadeIn">
-          <Row className="justify-content-center">
+          {/* <Row className="justify-content-center">
             <Col xs="12" sm="6" md="12">
-              {/* <Card>
+              <Card>
                 <CardHeader>
                   Card actions
                   <div className="card-header-actions">
@@ -239,10 +248,10 @@ class Dashboard extends Component {
                     ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
                   </CardBody>
                 </Collapse>
-              </Card> */}
+              </Card>
             </Col>
-          </Row>
-          <Row>
+          </Row> */}
+          {/* <Row>
             <table className="table">
               <thead>
                 <tr>
@@ -254,10 +263,12 @@ class Dashboard extends Component {
               </thead>
               <tbody />
             </table>
-          </Row>
+          </Row> */}
+
           <div className="display">
             {this.state.bloc}
           </div>
+
         </div>
       </div>
     );
