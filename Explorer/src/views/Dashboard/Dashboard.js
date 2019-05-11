@@ -2,6 +2,9 @@ import React, { Component } from "react";
 import { Button, Card, Collapse, Fade, CardBody, CardColumns, CardHeader, Col, Row, Input, FormText, Label, FormGroup, Form, CardFooter } from "reactstrap";
 import getWeb3 from "../../Dependencies/utils/getWeb3";
 import $ from "jquery";
+import { userdetails, storage, organization, permissions, policy, policyTemplate } from "../../contract_abi";
+const abiDecoder = require('abi-decoder'); // NodeJS
+
 class Dashboard extends Component {
   constructor(props) {
     super(props);
@@ -42,7 +45,6 @@ class Dashboard extends Component {
     return time1;
   };
 
-
   componentDidMount() {
     var intervalId = setInterval(this.timer, 1000);
     // store intervalId in the state so it can be accessed later:
@@ -55,6 +57,7 @@ class Dashboard extends Component {
 
   toggle() {
     this.setState({ collapse: !this.state.collapse });
+    console.log("toggle pressed")
   }
 
   toggleFade() {
@@ -65,15 +68,30 @@ class Dashboard extends Component {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
 
+    const userABI = userdetails.abi
+    const orgABI = organization.abi
+    const storageABI = storage.abi
+    const policyABI = policy.abi;
+    const templateABI = policyTemplate.abi
+    const permissionABI = permissions.abi
+
+    abiDecoder.addABI(userABI);
+    abiDecoder.addABI(orgABI);
+    abiDecoder.addABI(storageABI);
+    abiDecoder.addABI(policyABI);
+    abiDecoder.addABI(templateABI);
+    abiDecoder.addABI(permissionABI);
+
     await getWeb3
       .then(results => {
         this.setState({
           web3: results.web3
         });
-
+        // console.log(results.web3.utils.hexToAscii('0x4920686176652031303021'));
       })
-      .catch(() => {
+      .catch((results) => {
         console.log("Error finding web3.");
+        // console.log(results.web3.utils.hexToAscii('0x4920686176652031303021'));
       });
     // Instantiate contract once web3 provided.
     //await this.instantiateContract();
@@ -81,7 +99,8 @@ class Dashboard extends Component {
   }
   timer = () => {
     this.state.web3.eth.getBlockNumber().then(latestBlock => {
-      console.log(latestBlock);
+      console.log(latestBlock, " ", this.state.bloc.length);
+
       if (this.state.blockNumber !== latestBlock) {
         // List blocks in table
         for (var i = this.state.blockNumber + 1; i <= latestBlock; i++) {
@@ -94,6 +113,9 @@ class Dashboard extends Component {
             console.log("time=", time);
             this.state.web3.eth.getTransaction(hash).then(sender => {
               console.log(sender.from);
+              //console.log(this.state.web3.utils.hexToUtf8(sender.input))
+              const decodedData = abiDecoder.decodeMethod(sender.input);
+              console.log(JSON.stringify(decodedData))
               $("tbody").append(
                 "<tr><td>" +
                 sender.from +
@@ -112,7 +134,7 @@ class Dashboard extends Component {
               this.blocks.push(
                 <Card>
                   <CardHeader>
-                    {sender.from}
+                    {hash}
                     <div className="card-header-actions">
                       {/* eslint-disable-next-line */}
                       {/* <a href="#" className="card-header-action btn btn-setting"><i className="icon-settings"></i></a> */}
@@ -123,10 +145,8 @@ class Dashboard extends Component {
                   </CardHeader>
                   <Collapse isOpen={this.state.collapse} id="collapseExample">
                     <CardBody>
-                      Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                      laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation
-                      ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
-                  </CardBody>
+                      {JSON.stringify(decodedData)}
+                    </CardBody>
                   </Collapse>
                 </Card >
               )
@@ -205,15 +225,11 @@ class Dashboard extends Component {
         <div className="animated fadeIn">
           <Row className="justify-content-center">
             <Col xs="12" sm="6" md="12">
-              <Card>
+              {/* <Card>
                 <CardHeader>
                   Card actions
                   <div className="card-header-actions">
-                    {/* eslint-disable-next-line */}
-                    {/* <a href="#" className="card-header-action btn btn-setting"><i className="icon-settings"></i></a> */}
-                    {/*eslint-disable-next-line*/}
                     <a className="card-header-action btn btn-minimize" data-target="#collapseExample" onClick={this.toggle}><i className="icon-arrow-up"></i></a>
-                    {/*eslint-disable-next-line*/}
                   </div>
                 </CardHeader>
                 <Collapse isOpen={this.state.collapse} id="collapseExample">
@@ -223,7 +239,7 @@ class Dashboard extends Component {
                     ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
                   </CardBody>
                 </Collapse>
-              </Card>
+              </Card> */}
             </Col>
           </Row>
           <Row>
@@ -239,8 +255,9 @@ class Dashboard extends Component {
               <tbody />
             </table>
           </Row>
-          <div className="display"></div>
-          {this.state.bloc}
+          <div className="display">
+            {this.state.bloc}
+          </div>
         </div>
       </div>
     );
