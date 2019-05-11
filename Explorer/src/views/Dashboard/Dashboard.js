@@ -87,7 +87,7 @@ class Dashboard extends Component {
         this.setState({
           web3: results.web3
         });
-        // console.log(results.web3.utils.hexToAscii('0x4920686176652031303021'));
+        console.log("desp", results.web3.utils.hexToAscii('0xae76bf7d000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000008bd03835000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000084578706c6f7265720000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009496e737572616e63650000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002e516d53514d4c344761507445705a7a7a35713954706f5279573172506950424d57436e714475634333506b386239000000000000000000000000000000000000'));
       })
       .catch((results) => {
         console.log("Error finding web3.");
@@ -133,16 +133,16 @@ class Dashboard extends Component {
               // $(".display").append(
               console.log("bacl")
               this.blocks.push(
-                <Card>
+                <Card key={number}>
                   <CardHeader>
                     <Row>
-                      <Col><pre>Block Number: {number}</pre> </Col>
-                      <Col><pre>Block Number  : {hash}</pre></Col>
-                      <Col><pre>{time}</pre></Col>
+                      <Col><pre><strong>Block Number:</strong> {number}</pre> </Col>
+                      <Col><pre><strong>Block Number:</strong> {hash}</pre></Col>
+                      <Col><pre><strong>Time :</strong>{time}</pre></Col>
                     </Row>
                     <Row>
-                      <Col><pre>Sender Address : {sender.from}</pre></Col>
-                      <Col><pre>Receiver Address : {sender.to}</pre></Col>
+                      <Col><pre><strong>Sender Address :</strong> {sender.from}</pre></Col>
+                      <Col><pre><strong>Receiver Address :</strong> {sender.to}</pre></Col>
                     </Row>
                     <div className="card-header-actions">
                       {/* eslint-disable-next-line */}
