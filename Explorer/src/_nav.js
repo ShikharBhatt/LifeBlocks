@@ -6,7 +6,7 @@ let j = {
       icon: 'icon-speedometer',
       badge: {
         variant: 'info',
-        text: 'Ins',
+        text: 'Explorer',
       },
     },
   ],

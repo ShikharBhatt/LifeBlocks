@@ -145,9 +145,9 @@ class Dashboard extends Component {
               var sr = JSON.stringify(decodedData, undefined, 5);
               console.log((sr) => { console.log(this.syntaxHighlight(sr)) })
               // console.log("sender : ", sender);
-              $("#newname").append(
-                <div>hllo</div>
-              );
+              // $("#newname").append(
+              //   <div>hllo</div>
+              // );
               // $(".display").append(
 
               console.log("bacl")
@@ -158,15 +158,15 @@ class Dashboard extends Component {
                 <Card key={number}>
                   <CardHeader>
                     <Row>
-                      <Col><pre><strong>Block Number:</strong> {number}</pre> </Col>
-                      <Col><pre><strong>Block Hash:</strong> {hash}</pre></Col>
-                      <Col><pre><strong>Time: </strong>{time}</pre></Col>
+                      <Col><pre><strong className="number">Block Number:</strong> {number}</pre> </Col>
+                      <Col><pre><strong className="null">Block Hash:</strong> {hash}</pre></Col>
+                      <Col><pre><strong className="key">Time: </strong>{time}</pre></Col>
                       <pre>{this.tog[number]}</pre>
                     </Row>
                     <Row>
-                      <Col><pre><strong>Sender Address: </strong> {sender.from}</pre></Col>
-                      <Col><pre><strong>Value: </strong>{sender.value / 1000000000000000000} <strong>ethers</strong></pre></Col>
-                      <Col><pre><strong>Receiver Address: </strong> {sender.to}</pre></Col>
+                      <Col><pre><strong className="string">Sender Address: </strong> {sender.from}</pre></Col>
+                      <Col><pre><strong className="boolean">Value: </strong>{sender.value / 1000000000000000000} <strong>ethers</strong></pre></Col>
+                      <Col><pre><strong className="string">Receiver Address: </strong> {sender.to}</pre></Col>
                     </Row>
                     <div className="card-header-actions">
                       {/* eslint-disable-next-line */}
