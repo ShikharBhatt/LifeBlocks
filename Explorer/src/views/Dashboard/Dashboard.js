@@ -16,12 +16,17 @@ class Dashboard extends Component {
     this.blocks = [];
     this.state = {
       collapse: [],
+      collap: [],
       fadeIn: true,
       timeout: 300,
       web3: null,
-      bloc: []
+      bloc: [],
+      mapToggle: [],
+      col: false
     };
     this.tog = [];
+    this.mapT = [];
+    this.num = 0;
   }
 
   convertTimestamp = time => {
@@ -59,9 +64,15 @@ class Dashboard extends Component {
   }
 
   toggle = l => {
-    console.log("l = ", l, " tog[]", this.tog[l])
-    this.tog[l] = !this.tog[l]
-    this.setState({ collapse: this.tog });
+    const newCounters = [...this.state.collap];
+    //const index = this.state.counters.indexOf(counter);
+    //newCounters[index].value = false;
+    this.setState({ collap: newCounters });
+
+    console.log("console l = ", l, " tog[", l, "]", this.tog[l])
+    const newtog = [...this.tog]
+    newtog[l] = !this.tog[l]
+    this.setState({ collapse: newtog });
     console.log("toggle pressed ", this.tog)
   }
 
@@ -142,18 +153,20 @@ class Dashboard extends Component {
               //console.log(this.state.web3.utils.hexToUtf8(sender.input))
               const decodedData = abiDecoder.decodeMethod(sender.input);
               console.log(JSON.stringify(decodedData, undefined, 4))
-              var sr = JSON.stringify(decodedData, undefined, 5);
-              console.log((sr) => { console.log(this.syntaxHighlight(sr)) })
+              //var sr = JSON.stringify(decodedData, undefined, 5);
+              // console.log((sr) => { console.log(this.syntaxHighlight(sr)) })
               // console.log("sender : ", sender);
               // $("#newname").append(
               //   <div>hllo</div>
               // );
               // $(".display").append(
 
+              //  console.log("bacl")
+              this.num = number;
               console.log("bacl")
-              //this.tog.push({ id: number, value: true })
+              this.mapT.push({ id: number, value: true })
               this.tog.push(true)
-              this.setState({ collapse: this.tog })
+              this.setState({ collapse: this.tog, collap: this.mapT })
               this.blocks.push(
                 <Card key={number}>
                   <CardHeader>
@@ -172,11 +185,29 @@ class Dashboard extends Component {
                       {/* eslint-disable-next-line */}
                       {/* <a href="#" className="card-header-action btn btn-setting"><i className="icon-settings"></i></a> */}
                       {/*eslint-disable-next-line*/}
-                      <a className="card-header-action btn btn-minimize" data-target="#collapseExample" onClick={(number) => this.toggle(number)}><i className="icon-arrow-up"></i></a>
+                      <a className="card-header-action btn btn-minimize" data-target="#collapseExample"
+                        onClick={(number) => {
+                          console.log("toggle depressed ", this.tog)
+                          // this.tog[number] = !this.tog[number]
+                          // this.setState({ collapse: this.tog });
+
+                          //const newCounters = [...this.state.collap];
+                          //const index = this.state.counters.indexOf(counter);
+                          //newCounters[index].value = false;
+                          //this.setState({ collap: newCounters });
+
+                          console.log("console l = ", number, " tog[", number, "]", this.tog[number])
+                          const newtog = [...this.tog]
+                          newtog[number] = !this.tog[number]
+                          this.setState({ collapse: newtog });
+                          console.log("collapse after ", this.tog)
+
+                        }}>
+                        <i className="icon-arrow-up"></i></a>
                       {/*eslint-disable-next-line*/}
                     </div>
                   </CardHeader>
-                  <Collapse isOpen={this.state.collapse[number]} id="collapseExample{number}">
+                  <Collapse isOpen={/*this.state.collapse[number]*/true} id="collapseExample{number}">
                     <CardBody>
                       <pre>{JSON.stringify(decodedData, undefined, 2)}</pre>
                     </CardBody>
@@ -295,8 +326,9 @@ class Dashboard extends Component {
             {this.state.bloc}
 
           </div>
-          <div >
+          <div>
             {console.log("this is impor", this.state.collapse.length, this.tog.length)}
+            {console.log("IMPORTANT", this.state.collap)}
           </div>
 
         </div>
