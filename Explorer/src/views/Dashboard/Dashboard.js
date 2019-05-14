@@ -22,7 +22,8 @@ class Dashboard extends Component {
       web3: null,
       bloc: [],
       mapToggle: [],
-      col: false
+      col: false,
+      blockNumber: 0,
     };
     this.tog = [];
     this.mapT = [];
@@ -135,15 +136,14 @@ class Dashboard extends Component {
 
   timer = () => {
     this.state.web3.eth.getBlockNumber().then(latestBlock => {
-      console.log(latestBlock, " ", this.state.bloc.length);
-
+      console.log("--->", latestBlock, " ", this.state.bloc.length, " ", this.state.blockNumber);
       if (this.state.blockNumber !== latestBlock) {
         // List blocks in table
         for (var i = this.state.blockNumber + 1; i <= latestBlock; i++) {
           this.state.web3.eth.getBlock(i).then(block => {
             var number = block.number;
             var hash = block.transactions[0];
-            console.log(block.transactions)
+            console.log(block.transactions) 
             var time = block.timestamp;
             var gas = block.gasUsed;
             var time = this.convertTimestamp(block.timestamp);
@@ -167,7 +167,7 @@ class Dashboard extends Component {
               this.mapT.push({ id: number, value: true })
               this.tog.push(true)
               this.setState({ collapse: this.tog, collap: this.mapT })
-              this.blocks.push(
+              this.blocks.unshift(
                 <Card key={number}>
                   <CardHeader>
                     <Row>
