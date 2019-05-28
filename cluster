@@ -93,4 +93,8 @@ parity config
 mysql config
 
 ----------------------------------------------------------------------------------------------------------------
+ipfs config 
+cluster secret - 992bc353613691dbf85cb1b66ef96084b4d0ee5864730fceb8c2d16e3d8936aa
 
+echo 'export CLUSTER_SECRET=992bc353613691dbf85cb1b66ef96084b4d0ee5864730fceb8c2d16e3d8936aa' >> ~/.bashrc
+echo 'export LIBP2P_FORCE_PNET=1' >> ~/.bashrc

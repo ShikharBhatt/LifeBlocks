@@ -131,7 +131,7 @@ contract Policy{
     function getPremium() external view returns(uint){
         return(premium);
     }
-
+    
     function getPenalty() external view returns(uint){
         return penalty;
     }
@@ -211,7 +211,7 @@ contract Policy{
 
     function policyLapse() onlySeller inState(State.Grace) public{
             state = State.Lapsed;
-            penalty = ((5 * premium)/100) * 1 ether;
+            penalty = (5 * premium)/100;
     }
 
     function renewPolicy() onlyBuyer public {
