@@ -2,6 +2,8 @@ import React, { Component, lazy, Suspense } from 'react';
 import { Link, BrowserRouter, Route, Redirect } from "react-router-dom";
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import getWeb3 from "../../Dependencies/utils/getWeb3";
+import { firebaseApp } from "../../Dependencies/firebase";
+import * as firebase from "firebase";
 import { userdetails, storage, organization, permissions } from "../../contract_abi";
 
 import {
@@ -62,6 +64,8 @@ class Dashboard extends Component {
       orgAddress: '',
       contractAddress: '',
       responseToPost: '',
+      userInfo: null,
+      count:0
     };
 
     this.records = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -149,7 +153,21 @@ class Dashboard extends Component {
       let address = account[0]
       // alert(aadhaar)
 
-
+      firebaseApp
+      .database()
+      .ref("/uidai/")
+      .orderByChild("aadhaar_no")
+      .equalTo(aadhaar)
+      .once("value")
+      .then(function(snapshot) {
+        snapshot.forEach(function(child) {
+          this.setState({
+            userInfo: child.val(),
+            count:1
+          })
+          console.log(child.val())
+        }.bind(this));
+      }.bind(this));
 
       this.storageContract.methods.reportDate(aadhaar).call(
         { from: account[0] }, function (error, xb) {
@@ -220,7 +238,7 @@ class Dashboard extends Component {
       //return (window.location.href = "/dashboard");
       this.props.history.push("/login");
 
-    if (this.state.fetched !== this.state.number) {
+    if ((this.state.fetched !== this.state.number) || (this.state.count===0) ) {
       return (
         <div>Loading...</div>
       );
@@ -228,9 +246,61 @@ class Dashboard extends Component {
     else {
       return (
         <div className="animated fadeIn">
-          <h3>Reports</h3>
-          <br />
-          <CardColumns className="cols-2">
+      <Row>
+          <Col md="9" lg="12" xl="12">
+        <Card>
+       
+          <CardHeader>
+            <strong>Your Information<b id="policy" > </b></strong>
+          </CardHeader>
+          <CardBody>
+          <Table responsive striped>
+          <tbody>
+            <tr>
+              <td><strong>Aadhaar Number</strong></td>
+              <td>{this.state.userInfo.aadhaar}</td>
+            </tr>
+            <tr>
+                <td><strong>Name</strong></td>
+                <td>{this.state.userInfo.name}</td>
+            </tr>
+            <tr>
+                <td><strong>Phone Number</strong></td>
+                <td>{this.state.userInfo.phone}</td>
+            </tr>
+            <tr>
+              <td><strong>Correspondence Address</strong></td>
+              <td>{this.state.userInfo.address}</td>
+            </tr>
+            <tr>
+                <td><strong>Date of birth</strong></td>
+                <td>{this.state.userInfo.dob}</td>
+            </tr>
+            <tr>
+                <td><strong>Gender</strong></td>
+                <td>{this.state.userInfo.gender}</td>
+            </tr>
+            <tr>
+                <td><strong>Email id</strong></td>
+                <td>{this.state.userInfo.email}</td>
+            </tr>
+            <tr>
+                <td><strong>Father's Name</strong></td>
+                <td>{this.state.userInfo.fathers_name}</td>
+            </tr>
+          </tbody>
+
+          </Table>
+         
+          </CardBody>         
+        </Card>
+        </Col>
+        </Row>
+        <Row>
+          <h3>Statistics</h3>        
+          </Row>
+          <Row>
+          <Col md="6" lg="9" xl="9">
             <Card>
               <CardHeader>
                 Number of Hospital Visits per Month
@@ -263,7 +333,8 @@ class Dashboard extends Component {
                 <Button onClick={this.handleSubmit}>Submit</Button>
               </CardBody>
             </Card>
-          </CardColumns>
+          </Col>
+          </Row>
         </div>
       );
 

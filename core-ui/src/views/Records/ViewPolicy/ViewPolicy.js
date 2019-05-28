@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import getWeb3 from "../../../Dependencies/utils/getWeb3";
 import {userdetails, organization, policy} from "../../../contract_abi";
 import SharePolicy from "../ApplyPolicy/SharePolicy"
+import ShareRecordsRenewal from "./ShareRecordsRenewal"
 import {Button,Card,CardBody,CardHeader,Col,Row,Table} from "reactstrap";
 //import task_def from './task_def';
 
@@ -18,15 +19,18 @@ export class ViewPolicy extends Component {
         policyAddress: 'NA',
         premium: 'NA',
         share:0,
-        stateMap:{0:'AppliedWOR', 1:'Applied', 2:'AppliedSP', 3:'Active', 4:'Grace', 5:'Lapsed', 6:'RenewalWOR', 7:'Renewal', 8:'Inactive', 9:'Defunct', 10:'NA'},
+        penalty:0,
+        stateMap:{0:'AppliedWOR', 1:'Applied', 2:'AppliedSP', 3:'Active', 4:'Grace', 5:'Lapsed', 6:'RenewalWOR', 7:'Renewal',8: 'RenewalSP', 9:'Inactive', 10:'Defunct', 11:'NA'},
         policyDetails:['NA', 'NA', 'NA', 10, 'NA', 'NA', 'NA', 'NA', 'NA', 'NA']
       };
   
       this.getDate = this.getDate.bind(this);
       this.checkButton = this.checkButton.bind(this);
-       this.giveRecords = this.giveRecords.bind(this);
-       this.payPremium = this.payPremium.bind(this);
-
+      this.giveRecords = this.giveRecords.bind(this);
+      this.payPremium = this.payPremium.bind(this);
+      this.payPremiumGrace = this.payPremiumGrace.bind(this);
+      this.payPremiumLapse = this.payPremiumLapse.bind(this);
+      this.renewPolicy = this.renewPolicy.bind(this);
       }
 
 
@@ -141,6 +145,7 @@ export class ViewPolicy extends Component {
                           .call(
                             {from: accounts[0]},
                             (error, prem) => {
+                              console.log(prem)
                               if(prem!=0) {
                                 this.setState({
                                   premium: prem
@@ -150,13 +155,37 @@ export class ViewPolicy extends Component {
                               .call(
                                 {from: accounts[0]},
                                 (error, details) => {
+                                  this.policyContract.methods.getPenalty()
+                              .call(
+                                {from: accounts[0]},
+                                (error, pen) => {
+                                  console.log(error)
+                                  console.log(pen)
+                                  this.setState({
+                                    penalty: pen
+                                  })
+                                }
+                              )
                                   this.setState({
                                     policyDetails: details
                                   })
                                 }
                               )
+
+                              
                             }
                           )
+
+                          // this.policyContract.methods.getPenalty()
+                          //     .call(
+                          //       {from: accounts[0]},
+                          //       (error, pen) => {
+                          //         console.log(pen)
+                          //         this.setState({
+                          //           penalty: pen
+                          //         })
+                          //       }
+                          //     )
                         }
 
                           }
@@ -266,6 +295,178 @@ export class ViewPolicy extends Component {
 
     }
 
+    payPremiumGrace() {
+      alert(this.state.premium)
+      this.state.web3.eth.getAccounts((error, accounts) => {
+        //get the account from metamask
+        this.UserContract.methods.login(sessionStorage.getItem('aadhaar')).call(
+          { from: accounts[0] },
+          (error, x)=> {
+            //check if account exists
+            if (error) {
+              alert("Wrong");
+              return;
+            }
+            if (x === true) {
+              //alert("Aadhaar available");
+              //get address from aadhaar number
+              this.UserContract.methods
+                .getAddress(sessionStorage.getItem('aadhaar'))
+                .call(
+                  { from: accounts[0] },
+                  (error, add) => {
+                    //get account address from SC
+                    if (error) {
+                      alert("Wrong Details");
+                      return;
+                    }
+
+                    //if account is valid
+                    if (add === accounts[0]) {
+                      this.policyContract.methods.extendPolicy()
+                          .send(
+                            {
+                              from: accounts[0],
+                              gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
+                              value:this.state.web3.utils.toHex(this.state.web3.utils.toWei(this.state.premium,'wei')) 
+                            }).then(async (err, txHash)=> {
+                              alert(txHash)
+                             
+                               
+                                await this.setState({
+                                  orgAddress: this.state.policyDetails[0],
+                                  contractAddress: this.state.policyAddress 
+                                })
+                                const response = await fetch('/api/insert', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({ orgAddress: this.state.orgAddress, contractAddress: this.state.contractAddress }),
+                                });
+                                const body = await response.text();
+                                this.setState({ responseToPost: body });
+                                console.log("Response from API : ", this.state.responseToPost)
+                                
+                              
+                              // let task = new task_def();
+                              // let insertTask = task.insert(this.state.policyDetails[0],this.state.policyAddress);
+                              // console.log("Inserted Task : ", insertTask);  
+                            })
+                    } else {
+                      alert("Details Incorrect");
+                    }
+                  }
+                );
+            }//end x is true condition 
+            else {
+              alert("Details Incorrect");
+            }
+          }
+        );
+      });
+
+    }
+
+    payPremiumLapse() {
+      alert(this.state.premium)
+      var totalPayment = (Number(this.state.premium) + Number(this.state.penalty)).toString()
+      //totalPayment = totalPayment.toString()
+
+      this.state.web3.eth.getAccounts((error, accounts) => {
+        //get the account from metamask
+        this.UserContract.methods.login(sessionStorage.getItem('aadhaar')).call(
+          { from: accounts[0] },
+          (error, x)=> {
+            //check if account exists
+            if (error) {
+              alert("Wrong");
+              return;
+            }
+            if (x === true) {
+              //alert("Aadhaar available");
+              //get address from aadhaar number
+              this.UserContract.methods
+                .getAddress(sessionStorage.getItem('aadhaar'))
+                .call(
+                  { from: accounts[0] },
+                  (error, add) => {
+                    //get account address from SC
+                    if (error) {
+                      alert("Wrong Details");
+                      return;
+                    }
+
+                    //if account is valid
+                    if (add === accounts[0]) {
+                      this.policyContract.methods.confirmRenewal()
+                          .send(
+                            {
+                              from: accounts[0],
+                              gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei')),
+                              value:this.state.web3.utils.toHex(this.state.web3.utils.toWei(totalPayment,'wei')) 
+                            }).then(async (err, txHash)=> {
+                              alert(txHash)
+                             
+                               
+                                await this.setState({
+                                  orgAddress: this.state.policyDetails[0],
+                                  contractAddress: this.state.policyAddress 
+                                })
+                                const response = await fetch('/api/insert', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({ orgAddress: this.state.orgAddress, contractAddress: this.state.contractAddress }),
+                                });
+                                const body = await response.text();
+                                this.setState({ responseToPost: body });
+                                console.log("Response from API : ", this.state.responseToPost)
+                                
+                              
+                              // let task = new task_def();
+                              // let insertTask = task.insert(this.state.policyDetails[0],this.state.policyAddress);
+                              // console.log("Inserted Task : ", insertTask);  
+                            })
+                    } else {
+                      alert("Details Incorrect");
+                    }
+                  }
+                );
+            }//end x is true condition 
+            else {
+              alert("Details Incorrect");
+            }
+          }
+        );
+      });
+
+    }
+
+    renewPolicy() {
+      this.state.web3.eth.getAccounts((error, accounts) => {
+        //get the account from metamask
+              this.policyContract.methods.renewPolicy().send(
+                { from: accounts[0],
+                  gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
+                },
+                (err, txHash) => {
+                  if(!err) {
+                    console.log(txHash)
+                    
+                    this.setState({
+                      share:2
+                    })
+                    
+                  }
+                }
+              )
+            
+
+      });
+    }
+
     checkButton(state) {
       console.log(state)
       if(state!=10) {
@@ -295,6 +496,35 @@ export class ViewPolicy extends Component {
             document.getElementById("whichButton").style.display = "none";
           }
 
+          else if(state == 4) {
+            var btn = document.getElementById("whichButton");
+            btn.innerHTML = "Pay Premium to renew policy";
+            btn.addEventListener("click", ()=>{this.payPremiumGrace()});
+            return
+
+          }
+          else if(state == 5) {
+            sessionStorage.setItem('addressPolicy', this.state.policyAddress)
+            sessionStorage.setItem('addressCompany', this.state.policyDetails[0])
+            var btn = document.getElementById("whichButton");
+            btn.innerHTML = "Renew";
+            btn.addEventListener("click", ()=>{this.renewPolicy()});
+            return
+          }
+          else if(state == 6) {
+            sessionStorage.setItem('addressPolicy', this.state.policyAddress)
+            sessionStorage.setItem('addressCompany', this.state.policyDetails[0])
+            var btn = document.getElementById("whichButton");
+            btn.innerHTML = "Submit Records for Renewal";
+            btn.addEventListener("click", ()=>{this.setState({share:2})});
+            return
+          }
+          else if(state == 8) {
+            var btn = document.getElementById("whichButton");
+            btn.innerHTML = "Pay Premium to renew policy";
+            btn.addEventListener("click", ()=>{this.payPremiumLapse()});
+            return
+          }
         
       }
       // else {
@@ -305,10 +535,17 @@ export class ViewPolicy extends Component {
 
    render() {
     const weiToEther = 1000000000000000000
-    if(this.state.share) {
+    if(this.state.share == 1) {
       return (      
         <div>
           <SharePolicy />
+        </div>
+      )
+    }
+    else if(this.state.share == 2) {
+      return (      
+        <div>
+          <ShareRecordsRenewal />
         </div>
       )
     }
@@ -336,7 +573,7 @@ export class ViewPolicy extends Component {
             </tr>
             <tr>
                 <td><strong>Premium</strong></td>
-                <td>{this.state.premium/weiToEther} ether</td>
+                <td>{this.state.premium/weiToEther} ether {this.state.penalty/weiToEther}</td>
               </tr>
               <tr>
                 <td><strong>State</strong></td>

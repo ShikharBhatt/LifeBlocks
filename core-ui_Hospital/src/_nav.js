@@ -23,6 +23,11 @@ if(sessionStorage.getItem("orgType") === "Hospital")
         class: ''             // optional class names space delimited list for title item ex: "text-center"
       },
       {
+        name: 'Upload Records',
+        url: '/Records/UploadRecords',
+        icon: 'icon-drop',
+      },
+      {
         name: 'View Records',
         url: '/Records/ViewSharedRecords',
         icon: 'icon-drop',

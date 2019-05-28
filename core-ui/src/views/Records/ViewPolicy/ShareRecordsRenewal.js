@@ -7,7 +7,7 @@ import {userdetails, storage, organization, policy} from "../../../contract_abi"
 import { FormGroup, Input, Form, Card, CardBody, CardHeader, CardFooter, Col, Row, Table, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 
-class SharePolicy extends Component {
+class ShareRecordsRenewal extends Component {
     constructor(props) {
       super(props)
   
@@ -276,7 +276,7 @@ class SharePolicy extends Component {
 
 
                                    policyContract.methods
-                                  .getRecordsApplied(data, cipher )
+                                  .getRecordsRenewal(data, cipher )
                                   .send(
                                     {
                                       from: account,
@@ -329,7 +329,7 @@ class SharePolicy extends Component {
          
 
             policyContract.methods
-            .applyPolicy()
+            .renewalPolicy()
             .send(
               {
                 from: account,
@@ -436,4 +436,4 @@ class SharePolicy extends Component {
   }
   
 
-  export default SharePolicy; 
+  export default ShareRecordsRenewal; 

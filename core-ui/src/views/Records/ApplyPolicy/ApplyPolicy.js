@@ -241,6 +241,7 @@ export class ApplyPolicy extends Component {
 
     console.log("Insurance address:", this.state.insuranceAddress)
     sessionStorage.setItem('addressCompany', this.state.insuranceAddress)
+    sessionStorage.setItem('policyState', 0)            
 
     this.state.web3.eth.getAccounts((error, accounts) => {
       //get the account from metamask

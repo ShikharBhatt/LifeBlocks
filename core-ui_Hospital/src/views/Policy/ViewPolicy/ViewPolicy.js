@@ -16,12 +16,13 @@ export class ViewPolicy extends Component {
         web3:null,
         policyAddress: 'NA',
         premium: 'NA',
-        stateMap:{0:'AppliedWOR', 1:'Applied', 2:'AppliedSP', 3:'Active', 4:'Grace', 5:'Lapsed', 6:'RenewalWOR', 7:'Renewal', 8:'Inactive', 9:'Defunct', 10:'NA'},
+        stateMap:{0:'AppliedWOR', 1:'Applied', 2:'AppliedSP', 3:'Active', 4:'Grace', 5:'Lapsed', 6:'RenewalWOR', 7:'Renewal',8: 'RenewalSP', 9:'Inactive', 10:'Defunct', 11:'NA'},
         policyDetails:['NA', 'NA', 'NA', 10, 'NA', 'NA', 'NA', 'NA', 'NA', 'NA']
       };
   
       this.getDate = this.getDate.bind(this)
       this.setPremium = this.setPremium.bind(this)
+      this.changeToGrace = this.changeToGraceLapse.bind(this)
       }
 
 
@@ -143,6 +144,18 @@ export class ViewPolicy extends Component {
         }
             )
       }
+      else if(state==7) {
+           
+        var btn = document.getElementById("whichButton");
+        btn.innerHTML = "Set Premium for Renewal";
+        btn.addEventListener("click",() =>{
+          document.getElementById("premiumButton").style.display = "block"
+          
+          document.getElementById("whichButton").style.display = "none";
+        return
+    }
+        )
+  }
         else {
         var btn = document.getElementById("whichButton");
           btn.style.display = "none";
@@ -175,6 +188,44 @@ export class ViewPolicy extends Component {
 
       });
 
+    }
+
+    
+    changeToGraceLapse(state) {  //change the policy status to grace
+      console.log(state)
+      this.state.web3.eth.getAccounts((error, accounts) => {
+        //get the account from metamask
+                        
+            //Policy Contract Instantiation
+        
+            if(state == 3) {
+              alert("inside")
+              this.policyContract.methods.policyGrace().send(
+                { from: accounts[0],
+                  gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
+                },
+                (err, txHash) => {
+                  if(!err) {
+                    console.log(txHash)
+                    alert("Set to Grace")
+                  }
+                }
+              )
+            }
+            else if(state == 4) {
+              this.policyContract.methods.policyLapse().send(
+                { from: accounts[0],
+                  gasPrice: this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
+                },
+                (err, txHash) => {
+                  if(!err) {
+                    console.log(txHash)
+                    alert("Set to Grace")
+                  }
+                }
+              )
+            }
+      });
     }
 
    render() {
@@ -244,6 +295,33 @@ export class ViewPolicy extends Component {
                               block color="primary" 
                               size="sm"
                                 ><b><span></span></b></Button>
+                </td>
+                
+              </tr>
+              <tr>
+              <td>
+                  <Button id="graceButton"
+                              className="btn-facebook mb-1" block
+                              block color="primary" 
+                              size="sm"
+                              onClick={()=>{
+                                this.changeToGraceLapse(this.state.policyDetails[3])
+                              }
+                            }
+                                ><b><span>Grace</span></b></Button>
+                </td>
+              </tr>
+              <tr>
+              <td>
+                  <Button id="graceButton"
+                              className="btn-facebook mb-1" block
+                              block color="primary" 
+                              size="sm"
+                              onClick={()=>{
+                                this.changeToGraceLapse(this.state.policyDetails[3])
+                              }
+                            }
+                                ><b><span>Lapse</span></b></Button>
                 </td>
               </tr>
               <tr>
