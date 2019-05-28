@@ -84,7 +84,6 @@ contract Policy{
     uint startDate;
     uint graceDate;
     uint lapseDate;
-    uint renewAppDate;
     uint penalty;
     uint[] plist;
     string reason = "Records not submitted";
@@ -95,7 +94,6 @@ contract Policy{
     
     enum State { AppliedWOR, Applied, AppliedSP, Active, Grace, Lapsed, RenewalWOR, Renewal, RenewalSP, Inactive, Defunct}
     State public state;
-    State public prevState;
     
     modifier onlyBuyer(){
         require(msg.sender == buyer);
@@ -123,6 +121,11 @@ contract Policy{
     
     function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string, uint[]){
         return (seller, buyer, value, state, this.balance, dateApplied, startDate, graceDate, lapseDate, reason, plist);
+    }
+    
+    
+    function getState() external view returns(State){
+        return state;
     }
 
     function getPremium() external view returns(uint){
@@ -208,8 +211,7 @@ contract Policy{
     }
 
     function renewPolicy() onlyBuyer public {
-        renewAppDate = now;
-        prevState = state;
+        dateApplied = now;
         state = State.RenewalWOR;
         reason = "Records not submitted";
     }
@@ -223,19 +225,7 @@ contract Policy{
         state = State.Renewal;
     }
     
-    function confirmRenewal() onlyBuyer inState(State.Renewal) public payable{
-        if(prevState == State.Lapsed){
-            require(msg.value == premium + penalty);
-            startDate = now;
-            //change policy state to active
-            state = State.Active;
-            //set grace date to 1 year after start date
-            graceDate = startDate + 1 years;
-            //set grace date to 4 weeks after grace date
-            lapseDate = graceDate + 4 weeks;
-            seller.transfer(this.balance);
-        }
-        else if(prevState == State.Inactive)
+    function confirmRenewal() onlyBuyer inState(State.RenewalSP) public payable{
             require(msg.value == premium + penalty);
             startDate = now;
             //change policy state to active
@@ -247,12 +237,13 @@ contract Policy{
             seller.transfer(this.balance);
     }
     
-    function policyInactive() onlySeller inState(State.Lapsed) public{
-            state = State.Inactive;
-            penalty = ((10 * premium)/100) * 1 ether;
+    function policyDefunct() onlySeller public{
+            require(state == State.Applied || state == State.Lapsed);
+            state = State.Defunct;
     }
-
-    function getState() external view returns(State){
-        return state;
+    
+    function rejectApplication(string _reason) onlySeller inState(State.Applied) public {
+            reason = _reason;
+            policyDefunct();
     }
 }
