@@ -132,6 +132,10 @@ contract Policy{
         return(premium);
     }
 
+    function getPenalty() external view returns(uint){
+        return penalty;
+    }
+
     function getRecordsApplied(uint recordID, string _masterkey) onlyBuyer inState(State.AppliedWOR) public{
         uint pid = permissions.grant(recordID, seller, _masterkey, buyer);
         plist.push(pid);
