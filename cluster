@@ -98,3 +98,6 @@ cluster secret - 992bc353613691dbf85cb1b66ef96084b4d0ee5864730fceb8c2d16e3d8936a
 
 echo 'export CLUSTER_SECRET=992bc353613691dbf85cb1b66ef96084b4d0ee5864730fceb8c2d16e3d8936aa' >> ~/.bashrc
 echo 'export LIBP2P_FORCE_PNET=1' >> ~/.bashrc
+
+/ip4/139.59.3.216/tcp/9096/ipfs/QmczBznR4yM7SuPzBXc8zbCC83RnGsTuGtHw9GbUfoMtHF
+ipfs-cluster-service daemon --bootstrap /ip4/139.59.3.216/tcp/9096/ipfs/QmczBznR4yM7SuPzBXc8zbCC83RnGsTuGtHw9GbUfoMtHF
