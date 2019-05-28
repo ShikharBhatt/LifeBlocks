@@ -121,6 +121,14 @@ contract Policy{
         state = State.AppliedWOR;
     }
     
+    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string, uint[]){
+        return (seller, buyer, value, state, this.balance, dateApplied, startDate, graceDate, lapseDate, reason, plist);
+    }
+
+    function getPremium() external view returns(uint){
+        return(premium);
+    }
+
     function getRecordsApplied(uint recordID, string _masterkey) onlyBuyer inState(State.AppliedWOR) public{
         uint pid = permissions.grant(recordID, seller, _masterkey, buyer);
         plist.push(pid);
@@ -131,19 +139,10 @@ contract Policy{
         reason = "Records submitted";
     }
     
-    function getRecordsRenewal(uint recordID, string _masterkey) onlyBuyer inState(State.RenewalWOR) public{
-        uint pid = permissions.grant(recordID, seller, _masterkey, buyer);
-        plist.push(pid);
-    }
-    
-    function renewalPolicy() inState(State.RenewalWOR) public {
-        state = State.Renewal;
-    }
-    
     function getRecords() onlySeller onlyBuyer external view returns(uint[]){
         return(plist);
     }
-    
+
     function requestRecords(string _reason) onlySeller public{
         require(state == State.Applied || state == State.Renewal, "Invalid State");
         
@@ -157,7 +156,7 @@ contract Policy{
             state = State.RenewalWOR;
         }
     }
-    
+
     function setPremium(uint _premium) onlySeller public{
         premium = _premium * 1 ether;
         if(state == State.Applied)
@@ -167,7 +166,7 @@ contract Policy{
         
         reason = "Premium payment pending";
     }
-    
+
     function confirmPolicy() onlyBuyer inState(State.AppliedSP) public payable{
         //check if sent value is equal to premium set by insurance company 
         require(msg.value == premium);
@@ -186,33 +185,8 @@ contract Policy{
         reason = "Policy Active";
     }
 
-    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string, uint[]){
-        return (seller, buyer, value, state, this.balance, dateApplied, startDate, graceDate, lapseDate, reason, plist);
-    }
-
     function policyGrace() onlySeller inState(State.Active) public{
             state = State.Grace;
-    }
-    
-    function getPremium() external view returns(uint){
-        return(premium);
-    }
-    
-    function policyLapse() onlySeller inState(State.Grace) public{
-            state = State.Lapsed;
-            penalty = ((5 * premium)/100) * 1 ether;
-    }
-    
-    function policyInactive() onlySeller inState(State.Lapsed) public{
-            state = State.Inactive;
-            penalty = ((10 * premium)/100) * 1 ether;
-    }
-    
-    function renewPolicy() onlyBuyer public {
-        renewAppDate = now;
-        prevState = state;
-        state = State.RenewalWOR;
-        reason = "Records not submitted";
     }
     
     function extendPolicy() onlyBuyer public payable{
@@ -226,6 +200,27 @@ contract Policy{
             //set grace date to 4 weeks after grace date
             lapseDate = graceDate + 4 weeks;
             seller.transfer(this.balance);
+    }
+
+    function policyLapse() onlySeller inState(State.Grace) public{
+            state = State.Lapsed;
+            penalty = ((5 * premium)/100) * 1 ether;
+    }
+
+    function renewPolicy() onlyBuyer public {
+        renewAppDate = now;
+        prevState = state;
+        state = State.RenewalWOR;
+        reason = "Records not submitted";
+    }
+
+    function getRecordsRenewal(uint recordID, string _masterkey) onlyBuyer inState(State.RenewalWOR) public{
+        uint pid = permissions.grant(recordID, seller, _masterkey, buyer);
+        plist.push(pid);
+    }
+    
+    function renewalPolicy() inState(State.RenewalWOR) public {
+        state = State.Renewal;
     }
     
     function confirmRenewal() onlyBuyer inState(State.Renewal) public payable{
@@ -252,6 +247,11 @@ contract Policy{
             seller.transfer(this.balance);
     }
     
+    function policyInactive() onlySeller inState(State.Lapsed) public{
+            state = State.Inactive;
+            penalty = ((10 * premium)/100) * 1 ether;
+    }
+
     function getState() external view returns(State){
         return state;
     }
