@@ -93,7 +93,7 @@ contract Policy{
     permissionInterface permissions = permissionInterface(permissionInterfaceAddress);
     
     
-    enum State { AppliedWOR, Applied, AppliedSP, Active, Grace, Lapsed, RenewalWOR, Renewal, Inactive, Defunct}
+    enum State { AppliedWOR, Applied, AppliedSP, Active, Grace, Lapsed, RenewalWOR, Renewal, RenewalSP, Inactive, Defunct}
     State public state;
     State public prevState;
     
@@ -158,9 +158,13 @@ contract Policy{
         }
     }
     
-    function setPremium(uint _premium) onlySeller inState(State.Applied) public{
+    function setPremium(uint _premium) onlySeller public{
         premium = _premium * 1 ether;
-        state = State.AppliedSP;
+        if(state == State.Applied)
+            state = State.AppliedSP;
+        else if(state == State.Renewal)
+            state = State.RenewalSP;
+        
         reason = "Premium payment pending";
     }
     
