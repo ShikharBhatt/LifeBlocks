@@ -40,7 +40,7 @@ contract Storage{
     organizationInterface organization = organizationInterface(organizationInterfaceAddress);
     
 
-    function upload(uint _aadhaar, string _ipfsHash, string _type, string _name, string _masterkey) public{
+    function upload(uint _aadhaar, string _ipfsHash, string _type, string _name, string _masterkey) public returns(uint){
         //add require condition to check if address is of type hospital
        address addr = userdetails.getAddress(_aadhaar);
        string memory hospitalName = organization.getOrgName(msg.sender);
@@ -48,6 +48,7 @@ contract Storage{
        ownerToRecord[addr].push(id);
        recordToOwner[id] = addr;
        organization.recordUploaded(msg.sender, id);
+       return id;
     } 
     
     function retrieve(uint _aadhaar) external view returns(uint[]){

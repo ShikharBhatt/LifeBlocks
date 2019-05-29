@@ -11,7 +11,7 @@ const run = require('./agenda');
 
 var dbConfig = {
     user : "root",
-    password : "12345",
+    password : "306051",
     host : "localhost",
 }
 

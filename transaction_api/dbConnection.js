@@ -2,7 +2,7 @@ const mysql = require('promise-mysql');
 
 const dbConfig = {
     user : "root",
-    password : "12345",
+    password : "306051",
     database : "agenda_tasks",
     host : "localhost",
     connectionLimit : 10

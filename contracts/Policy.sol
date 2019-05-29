@@ -10,6 +10,11 @@ contract permissionInterface{
     function grant(uint recordID, address _to, string _masterkey, address _onwer) public returns(uint);
 }
 
+contract storageInterface{
+    function upload(uint _aadhaar, string _ipfsHash, string _type, string _name, string _masterkey) public returns(uint);
+    function getDetails(uint _id) external view returns(string, string, string, uint, string);
+}
+
 contract PolicyTemplate{
      //enter deployed userDetails contract Address here
     address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
@@ -87,12 +92,21 @@ contract Policy{
     uint penalty;
     uint[] plist;
     string reason = "Records not submitted";
-    
+    uint coverage_amt;
+    uint claim_count;
+    uint current_claim;
+    uint claim_amt;
+    uint claim_record_id;
+    string claim_reason;
+
     address permissionInterfaceAddress = 0xafb27a2deb77ca90ed435326904ca257635cbf2f;
     permissionInterface permissions = permissionInterface(permissionInterfaceAddress);
     
+    address storageInterfaceAddress = 0xf3f0fac080e7babdc06dc5a2e2f68f36116a31c0;
+    storageInterface storage_contract = storageInterface(storageInterfaceAddress); 
     
-    enum State { AppliedWOR, Applied, AppliedSP, Active, Grace, Lapsed, RenewalWOR, Renewal, RenewalSP, Inactive, Defunct}
+    
+    enum State { AppliedWOR, Applied, AppliedSP, Active, Grace, Lapsed, RenewalWOR, Renewal, RenewalSP, Defunct}
     State public state;
     
     modifier onlyBuyer(){
@@ -115,12 +129,17 @@ contract Policy{
         value = msg.value;
         seller = contractSeller;
         dateApplied = now;
-        coverage = _coverage;
+        coverage = _coverage * 1 ether;
+        coverage_amt = _coverage;
         state = State.AppliedWOR;
     }
     
-    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string, uint[]){
-        return (seller, buyer, value, state, this.balance, dateApplied, startDate, graceDate, lapseDate, reason, plist);
+    function getDetails() external view returns(address, address, uint, State, uint, uint, uint, uint, uint, string, uint[], uint, uint){
+        return (seller, buyer, value, state, coverage, dateApplied, startDate, graceDate, lapseDate, reason, plist, penalty, current_claim);
+    }
+    
+    function getClaimDetails() external view returns(uint, uint, uint, string){
+        return(claim_amt, claim_count, claim_record_id, claim_reason);
     }
     
     
@@ -194,6 +213,7 @@ contract Policy{
 
     function policyGrace() onlySeller inState(State.Active) public{
             state = State.Grace;
+            reason = "Policy Expired";
     }
     
     function extendPolicy() onlyBuyer public payable{
@@ -207,11 +227,17 @@ contract Policy{
             //set grace date to 4 weeks after grace date
             lapseDate = graceDate + 4 weeks;
             seller.transfer(this.balance);
+            reason = "Policy Active";
+            if(claim_count == 0)
+                coverage = (coverage_amt + ((5 * coverage_amt)/100)) * 1 ether;
+            else
+                coverage = coverage_amt * 1 ether;
     }
 
     function policyLapse() onlySeller inState(State.Grace) public{
             state = State.Lapsed;
             penalty = (5 * premium)/100;
+            reason = "Policy Lapsed. Please follow the policy renewal procedure to continue recieving health coverage";
     }
 
     function renewPolicy() onlyBuyer public {
@@ -227,6 +253,7 @@ contract Policy{
     
     function renewalPolicy() inState(State.RenewalWOR) public {
         state = State.Renewal;
+        reason = "Records submitted";
     }
     
     function confirmRenewal() onlyBuyer inState(State.RenewalSP) public payable{
@@ -239,15 +266,39 @@ contract Policy{
             //set grace date to 4 weeks after grace date
             lapseDate = graceDate + 4 weeks;
             seller.transfer(this.balance);
+            reason = "Policy Active";
+            coverage = coverage_amt * 1 ether;
     }
     
     function policyDefunct() onlySeller public{
             require(state == State.Applied || state == State.Lapsed);
             state = State.Defunct;
+            if(state == State.Lapsed)
+                reason = "Policy Defunct. Please apply for a new policy to continue recieving health coverage";
     }
     
     function rejectApplication(string _reason) onlySeller inState(State.Applied) public {
             reason = _reason;
             policyDefunct();
     }
+    
+    function claim(uint _claim_amt, uint _aadhaar, string _ipfsHash, string _type, string _name, string _masterkey){
+        claim_amt = _claim_amt * 1 ether;
+        claim_record_id = storage_contract.upload(_aadhaar,_ipfsHash,_type,_name,_masterkey);
+        claim_count++;
+        current_claim = 1;
+    }
+    
+    function acceptClaim() onlySeller public payable{
+        require(msg.value == claim_amt);
+        buyer.transfer(msg.value);
+        current_claim = 0;
+        coverage = coverage - claim_amt;
+    }
+    
+    function rejectClaim(string _claim_reason) onlySeller public{
+        current_claim = 0;
+        claim_reason = _claim_reason;
+    }
+    
 }
