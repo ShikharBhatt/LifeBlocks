@@ -48,15 +48,12 @@ async function getTransactionCount(data){
 }
 
 async function run(org_address, contract_address){
-  //const db = await MongoClient.connect('mongodb://localhost:27017/agendatest');
   let orgz_address = '0x1C48060F0eAeb380495755aa9E5F98Cdde7be14E' 
   let contractz_address = '0x267339697f3D6cdFa2C099f58Fa4c6eca0a9F602'
-  // Agenda will use the given mongodb connection to persist data, so jobs
-  // will go in the "agendatest" database's "jobs" collection.
+ 
   console.log("in run: ", orgz_address, contractz_address);
   let job_name = `transact${contractz_address}`
   console.log(job_name);
-  // Define a "job", an arbitrary function that agenda can execute
   agenda.define(job_name, async (job,done) => {
     console.log('transact : in job');
     //console.log(job.attrs.data.contract);
@@ -66,12 +63,8 @@ async function run(org_address, contract_address){
     return true;
   });
   
-  // Wait for agenda to connect. Should never fail since connection failures
-  // should happen in the `await MongoClient.connect()` call.
   await new Promise(resolve => agenda.once('ready', resolve));
 
-  // Schedule a job for 1 second from now and persist it to mongodb.
-  // Jobs are uniquely defined by their name, in this case "hello"
 
   agenda.schedule(new Date(Date.now() + 20000), job_name,{contract : contractz_address, worker : orgz_address});
   agenda.start();
