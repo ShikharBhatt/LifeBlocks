@@ -63,6 +63,8 @@ module.exports = async(contract_address) => {
 }
 
 async function define_job(job_name,contract_address){
+  let worker = '0x1C48060F0eAeb380495755aa9E5F98Cdde7be14E'
+  let contract = '0x1C48060F0eAeb380495755aa9E5F98Cdde7be14E'
   console.log("job definition")
   agenda.on('ready',function(){
     console.log("in job definition")
@@ -70,7 +72,7 @@ async function define_job(job_name,contract_address){
       console.log('transact : in job');  
       // console.log(job.attrs.data.contract,job.attrs.data.worker)
     });
-    agenda.schedule(new Date(Date.now() + 10000), job_name,{contract : contract_address, worker : '0x1C48060F0eAeb380495755aa9E5F98Cdde7be14E'});
-    agenda.start();
   })
+  agenda.schedule(new Date(Date.now() + 10000), job_name,{contract : contract, worker : worker});
+  agenda.start();
 }
