@@ -7,7 +7,7 @@ const mySqlEvents = require('mysql-events');
 
 
 //var agenda = new Agenda({db: {address: 'localhost:27017/agenda-test'}});
-const run = require('./test');
+const run = require('./agenda');
 
 var dbConfig = {
     user : "root",
@@ -25,10 +25,9 @@ var listener = connection.add(
             taskobj = event.rows
             
             if(taskobj[0].task == "DEFAULT_TASK"){
-                
                 console.log(taskobj[0].task_id,taskobj[0].date,taskobj[0].org_address,taskobj[0].contract_address)
-                let func = run(taskobj[0].org_address,taskobj[0].contract_address)
-                console.log(func)
+                run(taskobj[0].contract_address)
+                //console.log(func)
             }
             else
                 console.log("false")

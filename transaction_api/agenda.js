@@ -19,7 +19,7 @@ async function getTransactionCount(data){
   //await web3.eth.getBlockNumber().then(console.log);
   await web3.eth.getTransactionCount(worker, async (err, txCount) => {
     var data = new web3.eth.Contract(abi, contract);
-    var x = data.methods.policyLapsed().encodeABI();
+    var x = data.methods.policyGrace().encodeABI();
     console.log("ABI:",x)
     const txObject = {
       nonce : web3.utils.toHex(txCount),
@@ -47,31 +47,30 @@ async function getTransactionCount(data){
   // return count;
 }
 
-module.exports = async(org_address, contract_address) => {
+
+module.exports = async(contract_address) => {
   //const db = await MongoClient.connect('mongodb://localhost:27017/agendatest');
 
   // Agenda will use the given mongodb connection to persist data, so jobs
   // will go in the "agendatest" database's "jobs" collection.
-  console.log("in run: ", org_address, contract_address);
-  let job_name = `transact${contract_address}`
+  console.log("in run: ", contract_address);
+  let job_name = `transact${contract_address}${new Date(Date.now())}`
   console.log(job_name);
-  // Define a "job", an arbitrary function that agenda can execute
-  agenda.define(job_name, async (job,done) => {
-    console.log('transact : in job');
-    //console.log(job.attrs.data.contract);
-    await getTransactionCount(job.attrs.data, () => {
-      console.log("done")
-    })
-    return true;
+  await define_job(job_name,contract_address).then(()=>{
+    console.log("done");
   });
-  
-  // Wait for agenda to connect. Should never fail since connection failures
-  // should happen in the `await MongoClient.connect()` call.
-  await new Promise(resolve => agenda.once('ready', resolve));
- 
-  // Schedule a job for 1 second from now and persist it to mongodb.
-  // Jobs are uniquely defined by their name, in this case "hello"
+  // Define a "job", an arbitrary function that agenda can execute
+}
 
-  agenda.schedule(new Date(Date.now() + 10000), job_name,{contract : contract_address, worker : org_address});
-  agenda.start();
+async function define_job(job_name,contract_address){
+  console.log("job definition")
+  agenda.on('ready',function(){
+    console.log("in job definition")
+    agenda.define(job_name, async (job,done) => {
+      console.log('transact : in job');  
+      // console.log(job.attrs.data.contract,job.attrs.data.worker)
+    });
+    agenda.schedule(new Date(Date.now() + 10000), job_name,{contract : contract_address, worker : '0x1C48060F0eAeb380495755aa9E5F98Cdde7be14E'});
+    agenda.start();
+  })
 }
