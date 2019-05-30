@@ -28,6 +28,11 @@ if(sessionStorage.getItem("orgType") === "Hospital")
         icon: 'icon-drop',
       },
       {
+        name: 'Upload Claim',
+        url: '/Records/UploadClaimRecords',
+        icon: 'icon-drop',
+      },
+      {
         name: 'View Records',
         url: '/Records/ViewSharedRecords',
         icon: 'icon-drop',
@@ -61,11 +66,11 @@ if(sessionStorage.getItem("orgType") === "Hospital")
           url: '/Policy/AcceptPolicy',
           icon: 'icon-drop',
         },
-        {
-          name: 'View Records',
-          url: '/Records/ViewSharedRecords',
-          icon: 'icon-drop',
-        },
+        // {
+        //   name: 'View Records',
+        //   url: '/Records/ViewSharedRecords',
+        //   icon: 'icon-drop',
+        // },
   
         
       ],
