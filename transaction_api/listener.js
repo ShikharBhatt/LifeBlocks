@@ -8,6 +8,8 @@ const mySqlEvents = require('mysql-events');
 
 //var agenda = new Agenda({db: {address: 'localhost:27017/agenda-test'}});
 const run = require('./agenda');
+let Scheduler = require('./test');
+const scheduler = new Scheduler();
 
 var dbConfig = {
     user : "root",
@@ -26,8 +28,9 @@ var listener = connection.add(
             
             if(taskobj[0].task == "DEFAULT_TASK"){
                 console.log(taskobj[0].task_id,taskobj[0].date,taskobj[0].org_address,taskobj[0].contract_address)
-                run(taskobj[0].contract_address)
+                //run(taskobj[0].contract_address)
                 //console.log(func)
+                await scheduler.run(taskobj[0].org_address, taskobj[0].contract_address);
             }
             else
                 console.log("false")

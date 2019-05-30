@@ -9,7 +9,6 @@ const abi = [{"constant":false,"inputs":[{"name":"_premium","type":"uint256"}],"
 //const recv = '0xa577C9d2BA3bB4aD1e09df6dFf697Cb3A639eB7a';
 
 const Agenda = require('agenda');
-const agenda = new Agenda({db:{address:'mongodb://localhost:27017/agenda-test',options:{useNewUrlParser: true,}}});
 
 async function getTransactionCount(data){
   let raw;
@@ -19,7 +18,7 @@ async function getTransactionCount(data){
   //await web3.eth.getBlockNumber().then(console.log);
   await web3.eth.getTransactionCount(worker, async (err, txCount) => {
     var data = new web3.eth.Contract(abi, contract);
-    var x = data.methods.policyGrace().encodeABI();
+    var x = data.methods.policyLapse().encodeABI();
     console.log("ABI:",x)
     const txObject = {
       nonce : web3.utils.toHex(txCount),
@@ -52,7 +51,10 @@ async function test(data) {
     console.log(data.worker)
 }
 
-module.exports = async function(org_address, contract_address){
+module.exports = class job{
+async run(org_address, contract_address){
+  const agenda = new Agenda({db:{address:'mongodb://localhost:27017/agenda-test',options:{useNewUrlParser: true,}}});
+
   //const db = await MongoClient.connect('mongodb://localhost:27017/agendatest');
   
   // Agenda will use the given mongodb connection to persist data, so jobs
@@ -66,13 +68,14 @@ module.exports = async function(org_address, contract_address){
   agenda.on('ready', function(){
     agenda.define(job_name, async(job,done) =>{
         console.log('transact : in job');
-        // await getTransactionCount(job.attrs.data, () =>{
-        //     console.log("done");
-        // }).then(done,done);
+        await getTransactionCount(job.attrs.data, () =>{
+            console.log("done");
+        }).then(done,done);
         });
         agenda.schedule(new Date(Date.now() + 20000), job_name,{contract : contract, worker : org});
 
         agenda.start();
     })
+  }
 }
 
