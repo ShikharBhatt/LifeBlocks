@@ -176,19 +176,10 @@ export class ViewPolicy extends Component {
                               .call(
                                 {from: accounts[0]},
                                 (error, details) => {
-                                  this.policyContract.methods.getPenalty()
-                              .call(
-                                {from: accounts[0]},
-                                (error, pen) => {
-                                  console.log(error)
-                                  console.log(pen)
+                                  
                                   this.setState({
-                                    penalty: pen
-                                  })
-                                }
-                              )
-                                  this.setState({
-                                    policyDetails: details
+                                    policyDetails: details,
+                                    penalty: details[11]
                                   })
                                 }
                               )
@@ -594,7 +585,11 @@ export class ViewPolicy extends Component {
             </tr>
             <tr>
                 <td><strong>Premium</strong></td>
-                <td>{this.state.premium/weiToEther} ether {this.state.penalty/weiToEther}</td>
+                <td>{this.state.premium/weiToEther} ether </td>
+              </tr>
+              <tr>
+                <td><strong>Penalty</strong></td>
+                <td>{this.state.penalty/weiToEther} ether </td>
               </tr>
               <tr>
                 <td><strong>State</strong></td>
