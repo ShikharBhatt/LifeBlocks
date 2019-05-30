@@ -11,6 +11,8 @@ export class ViewPolicy extends Component {
       super(props)
   
       this.state = {
+        orgAddress : '',
+        contractAddress : '',
         userAddress : '',
         selectValue: '',
         account: null,
@@ -31,6 +33,7 @@ export class ViewPolicy extends Component {
       this.payPremiumGrace = this.payPremiumGrace.bind(this);
       this.payPremiumLapse = this.payPremiumLapse.bind(this);
       this.renewPolicy = this.renewPolicy.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
       }
 
 
@@ -56,6 +59,24 @@ export class ViewPolicy extends Component {
 
     
       }
+
+      handleSubmit = async e => {
+        e.preventDefault();
+        await this.setState({
+          orgAddress: this.state.policyDetails[0],
+          contractAddress: this.state.policyAddress
+        })
+        const response = await fetch('/api/insert', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ orgAddress: this.state.orgAddress, contractAddress: this.state.contractAddress }),
+        });
+        const body = await response.text();
+        this.setState({ responseToPost: body });
+        console.log("Response from API : ", this.state.responseToPost)
+      };
 
 
      async instantiateContract() {
@@ -608,6 +629,7 @@ export class ViewPolicy extends Component {
                               size="sm"
                                 ><b><span></span></b></Button>
                 </td>
+                <Button onClick={this.handleSubmit}>Submit</Button>
               </tr>
           </tbody>
 

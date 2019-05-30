@@ -7,7 +7,7 @@ const mySqlEvents = require('mysql-events');
 
 
 //var agenda = new Agenda({db: {address: 'localhost:27017/agenda-test'}});
-const run = require('./agenda');
+const run = require('./test');
 
 var dbConfig = {
     user : "root",
