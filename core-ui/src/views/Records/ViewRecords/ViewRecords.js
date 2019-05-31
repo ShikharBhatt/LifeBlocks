@@ -137,13 +137,17 @@ export class ViewRecords extends Component {
                         obj['date'] = new Date(f*1000).toLocaleDateString()
                         obj['hospital'] = y[4]
                         obj['masterkey'] = y[5]
+                        if(y[4] != "")
+                        {
+                          myarray.push(obj)
                         
+                          this.setState({
+                            arr: myarray
+                          })  
+                            
+                        }
+                        console.log("hosp:",y[4])
                         //push the record object into array of objects                        
-                        myarray.push(obj)
-                        
-                        this.setState({
-                          arr: myarray
-                        })  
                       }.bind(this))
       
                   }
