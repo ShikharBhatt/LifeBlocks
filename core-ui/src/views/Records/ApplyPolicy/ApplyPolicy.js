@@ -209,7 +209,7 @@ export class ApplyPolicy extends Component {
 
           <td>{row}</td>
           <td>{details[index].policyName}</td>
-          <td>Rs. {details[index].coverage}</td>
+          <td>{details[index].coverage} ether</td>
 
           <td>
             <Button

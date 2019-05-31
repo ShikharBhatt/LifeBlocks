@@ -25,7 +25,7 @@ import { CoreUIIcons, Flags, FontAwesome, SimpleLineIcons } from './Icons';
 import { Alerts, Badges, Modals } from './Notifications';
 import { Login, Page404, Page500, Register } from './Pages';
 import { DeployPolicy, AcceptPolicy, ViewPolicy } from './Policy';
-import { ViewSharedRecords, UploadRecords} from './Records';
+import { ViewSharedRecords, UploadRecords, UploadClaimRecords} from './Records';
 import Widgets from './Widgets';
 
 export {
@@ -35,6 +35,7 @@ export {
   ViewPolicy,
   ViewSharedRecords,
   UploadRecords,
+  UploadClaimRecords,
   CoreUIIcons,
   Page404,
   Page500,

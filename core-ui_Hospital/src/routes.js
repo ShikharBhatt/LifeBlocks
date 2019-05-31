@@ -36,6 +36,7 @@ const AcceptPolicy = React.lazy(() => import('./views/Policy/AcceptPolicy'));
 const ViewPolicy = React.lazy(() => import('./views/Policy/ViewPolicy'));
 const ViewSharedRecords = React.lazy(() => import('./views/Records/ViewSharedRecords'));
 const UploadRecords = React.lazy(() => import('./views/Records/UploadRecords'));
+const UploadClaimRecords = React.lazy(() => import('./views/Records/UploadClaimRecords'));
 const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
@@ -50,6 +51,7 @@ const routes = [
   { path: '/Policy/ViewPolicy', name: 'View Policy', component: ViewPolicy },
   { path: '/Records/ViewSharedRecords', name: 'View Shared Records', component: ViewSharedRecords },
   { path: '/Records/UploadRecords', name: 'Upload Records', component: UploadRecords },
+  { path: '/Records/UploadClaimRecords', name: 'Upload Claim Records', component: UploadClaimRecords },
   { path: '/base', exact: true, name: 'Base', component: Cards },
   { path: '/base/cards', name: 'Cards', component: Cards },
   { path: '/base/forms', name: 'Forms', component: Forms },
