@@ -26,11 +26,10 @@ var listener = connection.add(
             //console.log("insert : ",event.rows);
             taskobj = event.rows
             
-            if(taskobj[0].task == "DEFAULT_TASK"){
+            if(taskobj[0].org_address == process.env.PUBLIC_KEY){
                 console.log(taskobj[0].task_id,taskobj[0].date,taskobj[0].org_address,taskobj[0].contract_address)
-                //run(taskobj[0].contract_address)
-                //console.log(func)
                 await scheduler.run(taskobj[0].org_address, taskobj[0].contract_address);
+                //await scheduler.plapse(taskobj[0].org_address, taskobj[0].contract_address);
             }
             else
                 console.log("false")
