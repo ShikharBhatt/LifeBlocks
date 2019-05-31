@@ -1,3 +1,4 @@
+
 const Web3 = require('web3');
 const web3 = new Web3("http://127.0.0.1:7545");
 const Tx = require("ethereumjs-tx");
@@ -9,9 +10,8 @@ const abi = [{"constant":false,"inputs":[{"name":"_premium","type":"uint256"}],"
 //const recv = '0xa577C9d2BA3bB4aD1e09df6dFf697Cb3A639eB7a';
 
 const Agenda = require('agenda');
-const agenda = new Agenda({db:{address:'mongodb://localhost:27017/agenda-test',options:{useNewUrlParser: true,}}});
 
-async function getTransactionCount(data){
+async function grace(data){
   let raw;
   const contract = data.contract
   const worker = data.worker
@@ -24,7 +24,7 @@ async function getTransactionCount(data){
     const txObject = {
       nonce : web3.utils.toHex(txCount),
       to : contract,   
-      gasLimit : web3.utils.toHex(60000000),
+      gasLimit : web3.utils.toHex(600000),
       gasPrice : web3.utils.toHex(web3.utils.toWei('0','gwei')),
       data : x,
     }
@@ -47,32 +47,92 @@ async function getTransactionCount(data){
   // return count;
 }
 
+async function lapse(data){
+  let raw;
+  const contract = data.contract
+  const worker = data.worker
+  console.log("Inside: ",contract,worker)
+  //await web3.eth.getBlockNumber().then(console.log);
+  await web3.eth.getTransactionCount(worker, async (err, txCount) => {
+    var data = new web3.eth.Contract(abi, contract);
+    var x = data.methods.policyLapse().encodeABI();
+    console.log("ABI:",x)
+    const txObject = {
+      nonce : web3.utils.toHex(txCount),
+      to : contract,   
+      gasLimit : web3.utils.toHex(600000),
+      gasPrice : web3.utils.toHex(web3.utils.toWei('0','gwei')),
+      data : x,
+    }
 
-module.exports = async(contract_address) => {
+    //Sign a transaction
+  const tx = new Tx(txObject);
+  tx.sign(u_priv);
+
+  const serializedTransaction = tx.serialize();
+  raw = "0x" + serializedTransaction.toString("hex");
+  console.log("raw:",raw);
+  //Broadcast a transaction
+  });
+  await web3.eth.sendSignedTransaction(raw, (err, txHash) => {
+    if(err)
+      console.log(err)
+    else
+      console.log("txHash : ", txHash);
+    });
+  // return count;
+}
+
+module.exports = class job{
+async policygrace(org_address, contract_address){
+  const agenda = new Agenda({db:{address:'mongodb://localhost:27017/agenda-test',options:{useNewUrlParser: true,}}});
+
   //const db = await MongoClient.connect('mongodb://localhost:27017/agendatest');
-
+  
   // Agenda will use the given mongodb connection to persist data, so jobs
   // will go in the "agendatest" database's "jobs" collection.
-  console.log("in run: ", contract_address);
-  let job_name = `transact${contract_address}${new Date(Date.now())}`
+  const org = org_address;
+  const contract = contract_address;
+  console.log("in run: ", org, contract);
+  let job_name = `transactgrace${contract}${new Date(Date.now())}`
   console.log(job_name);
-  await define_job(job_name,contract_address).then(()=>{
-    console.log("done");
-  });
   // Define a "job", an arbitrary function that agenda can execute
+  agenda.on('ready', function(){
+    agenda.define(job_name, async(job,done) =>{
+        console.log('transact : in job');
+        await grace(job.attrs.data, () =>{
+            console.log("done");
+        }).then(done,done);
+        });
+        agenda.schedule(new Date(Date.now() + 20000), job_name,{contract : contract, worker : org});
+
+        agenda.start();
+    })
+  }
+  async policylapse(org_address, contract_address){
+    const agenda = new Agenda({db:{address:'mongodb://localhost:27017/agenda-test',options:{useNewUrlParser: true,}}});
+  
+    //const db = await MongoClient.connect('mongodb://localhost:27017/agendatest');
+    
+    // Agenda will use the given mongodb connection to persist data, so jobs
+    // will go in the "agendatest" database's "jobs" collection.
+    const org = org_address;
+    const contract = contract_address;
+    console.log("in run: ", org, contract);
+    let job_name = `transactlapse${contract}${new Date(Date.now())}`
+    console.log(job_name);
+    // Define a "job", an arbitrary function that agenda can execute
+    agenda.on('ready', function(){
+      agenda.define(job_name, async(job,done) =>{
+          console.log('transact : in job');
+          await lapse(job.attrs.data, () =>{
+              console.log("done");
+          }).then(done,done);
+          });
+          agenda.schedule(new Date(Date.now() + 40000), job_name,{contract : contract, worker : org});
+  
+          agenda.start();
+      })
+    }
 }
 
-async function define_job(job_name,contract_address){
-  let worker = '0x1C48060F0eAeb380495755aa9E5F98Cdde7be14E'
-  let contract = '0x1C48060F0eAeb380495755aa9E5F98Cdde7be14E'
-  console.log("job definition")
-  agenda.on('ready',function(){
-    console.log("in job definition")
-    agenda.define(job_name, async (job,done) => {
-      console.log('transact : in job');  
-      // console.log(job.attrs.data.contract,job.attrs.data.worker)
-    });
-  })
-  agenda.schedule(new Date(Date.now() + 10000), job_name,{contract : contract, worker : worker});
-  agenda.start();
-}

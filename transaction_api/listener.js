@@ -7,8 +7,7 @@ const mySqlEvents = require('mysql-events');
 
 
 //var agenda = new Agenda({db: {address: 'localhost:27017/agenda-test'}});
-const run = require('./agenda');
-let Scheduler = require('./test');
+let Scheduler = require('./agenda');
 const scheduler = new Scheduler();
 
 var dbConfig = {
@@ -26,11 +25,14 @@ var listener = connection.add(
             //console.log("insert : ",event.rows);
             taskobj = event.rows
             
-            if(taskobj[0].org_address == process.env.PUBLIC_KEY){
+            if(taskobj[0].task == "DEFAULT_TASK"){
                 console.log(taskobj[0].task_id,taskobj[0].date,taskobj[0].org_address,taskobj[0].contract_address)
-                await scheduler.pgrace(taskobj[0].org_address, taskobj[0].contract_address);
-                //setTimeout(()=>{},10000);
-                //await scheduler.plapse(taskobj[0].org_address, taskobj[0].contract_address);
+                //run(taskobj[0].contract_address)
+                //console.log(func)
+                await scheduler.policygrace(taskobj[0].org_address, taskobj[0].contract_address);
+                setTimeout(async()=>{
+                    await scheduler.policylapse(taskobj[0].org_address, taskobj[0].contract_address)}
+                ,20000);
             }
             else
                 console.log("false")
@@ -40,4 +42,3 @@ var listener = connection.add(
 );
 
 console.log("listener : ",listener);
-
