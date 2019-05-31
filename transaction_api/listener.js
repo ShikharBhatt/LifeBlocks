@@ -32,7 +32,10 @@ var listener = connection.add(
                 await scheduler.policygrace(taskobj[0].org_address, taskobj[0].contract_address);
                 setTimeout(async()=>{
                     await scheduler.policylapse(taskobj[0].org_address, taskobj[0].contract_address)}
-                ,20000);
+                ,30000);
+                setTimeout(async()=>{
+                    await scheduler.policydefunct(taskobj[0].org_address, taskobj[0].contract_address)}
+                ,60000);
             }
             else
                 console.log("false")
