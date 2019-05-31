@@ -63,7 +63,7 @@ class Register extends Component {
   }
   
   componentDidMount() {
-    //document.getElementById("OTP").style.display="none"
+    document.getElementById("OTP").style.display="none"
   }
 
   instantiateContract() {
@@ -176,20 +176,20 @@ class Register extends Component {
   validateOTP = function(event) {
     event.preventDefault();
     let callLinkAadhaar = this.linkAadhaar;
-    callLinkAadhaar();
-    // window.confirmationResult
-    //   .confirm(document.getElementById("verificationcode").value)
-    //   .then(
-    //     function(result) {
-    //       callLinkAadhaar();
-    //       //window.location.href = '/signin'
-    //       alert("success");
-    //     },
+    //callLinkAadhaar();
+    window.confirmationResult
+      .confirm(document.getElementById("verificationcode").value)
+      .then(
+        function(result) {
+          callLinkAadhaar();
+          //window.location.href = '/signin'
+          alert("success");
+        },
 
-    //     function(error) {
-    //       alert(error);
-    //     }
-    //   );
+        function(error) {
+          alert(error);
+        }
+      );
   };
 
   render() {

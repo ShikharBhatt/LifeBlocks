@@ -624,7 +624,7 @@ export class ViewPolicy extends Component {
                               size="sm"
                                 ><b><span></span></b></Button>
                 </td>
-                <Button onClick={this.handleSubmit}>Submit</Button>
+                {/* <Button onClick={this.handleSubmit}>Submit</Button> */}
               </tr>
           </tbody>
 
