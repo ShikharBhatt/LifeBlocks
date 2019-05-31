@@ -111,7 +111,7 @@ class Dashboard extends Component {
           this.orgContract.methods.getOrgDetails(accounts[0]).call(
             { from: accounts[0] }, (error, details) => {
               if (!error) {
-                console.log("Fetched org ID:", details[0])
+                console.log("Fetched org ID:", details[2])
                 if (details[2] === sessionStorage.getItem("orgId")) {
                   this.orgContract.methods.returnAllPolicy(accounts[0]).call(
                     { from: this.state.account }, (error, policies) => {
@@ -260,7 +260,7 @@ class Dashboard extends Component {
           this.orgContract.methods.getOrgDetails(accounts[0]).call(
             { from: accounts[0] }, (error, details) => {
               if (!error) {
-                console.log("Fetched org ID:", details[0])
+                console.log("Fetched org ID:", details[2])
                 if (details[2] === sessionStorage.getItem("orgId")) {
                   this.orgContract.methods.getOrgRecords(accounts[0]).call(
                     { from: this.state.account }, (error, recordIDs) => {
