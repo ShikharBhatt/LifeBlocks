@@ -28,7 +28,8 @@ var listener = connection.add(
             
             if(taskobj[0].org_address == process.env.PUBLIC_KEY){
                 console.log(taskobj[0].task_id,taskobj[0].date,taskobj[0].org_address,taskobj[0].contract_address)
-                await scheduler.run(taskobj[0].org_address, taskobj[0].contract_address);
+                await scheduler.pgrace(taskobj[0].org_address, taskobj[0].contract_address);
+                //setTimeout(()=>{},10000);
                 //await scheduler.plapse(taskobj[0].org_address, taskobj[0].contract_address);
             }
             else
