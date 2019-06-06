@@ -9,19 +9,14 @@ contract storageInterface{
 
 contract Permissions{
     
-    address storageInterfaceAddress = 0xf5e9037a2412db50c74d5a1642d6d3b99dd90f20;
+    address storageInterfaceAddress = 0xf3f0fac080e7babdc06dc5a2e2f68f36116a31c0;
     storageInterface storage_contract = storageInterface(storageInterfaceAddress);
     
-    modifier recordOwner(uint _rid){
-        require(storage_contract.getRecordOwner(_rid) == msg.sender);
+    modifier permission_participants(uint _id){
+        require(permission_list[_id].from == msg.sender || permission_list[_id].to == msg.sender,"Invalid operation");
         _;
     }
     
-    modifier permission_participants(uint _pid){
-        require(permission_list[_pid].from == msg.sender || permission_list[_pid].to == msg.sender);
-        _;
-    }
-
     struct permission{
         address to;
         address from;
@@ -37,9 +32,11 @@ contract Permissions{
     address userDetailsInterfaceAddress = 0x78478e7666bcb38b2ddeddfe7cb0ba152301df07; 
     userDetailsInterface userdetails = userDetailsInterface(userDetailsInterfaceAddress);
 
-    function grant(uint recordID, address _to, string _masterkey) recordOwner(recordID) public{
-        uint id = permission_list.push(permission(_to, msg.sender, recordID, _masterkey, true)) -1;
-        permissionFrom[msg.sender].push(id);
+    function grant(uint recordID, address _to, string _masterkey, address _owner) public returns(uint){
+        require(storage_contract.getRecordOwner(recordID) == _owner,"You do not have sufficient permissions");
+        uint id = permission_list.push(permission(_to, _owner, recordID, _masterkey, true)) -1;
+        permissionFrom[_owner].push(id);
+        return id;
     }
     
     function revoke(uint _id) public {
@@ -52,16 +49,24 @@ contract Permissions{
     }
     
     function filterList(uint _aadhaar) external view returns(uint[]){
-        uint[] memory filtered;
         address _from = userdetails.getAddress(_aadhaar);
         uint count = 0;
         uint[] memory tofilter = permissionFrom[_from];
-        for(uint i=0; i<tofilter.length; i++)
+        for(uint i = 0; i < tofilter.length; i++)
         {
-            if(permission_list[tofilter[i]].to == msg.sender)
+            if(permission_list[tofilter[i]].to == msg.sender && permission_list[tofilter[i]].status == true)
             {
-                filtered[count] = tofilter[i];
                 count++;
+            }
+        }
+        uint[] memory filtered = new uint[](count);
+        uint k =0;
+        for(uint j = 0; j < tofilter.length; j++)
+        {
+            if(permission_list[tofilter[j]].to == msg.sender && permission_list[tofilter[j]].status == true)
+            {
+                filtered[k] = tofilter[j];
+                k++;
             }
         }
         return(filtered);

@@ -135,26 +135,23 @@ export class ViewRecords extends Component {
                         obj['type'] = y[1]
                         let f = Number(y[3])
                         obj['date'] = new Date(f*1000).toLocaleDateString()
-                        console.log(y[3])
                         obj['hospital'] = y[4]
                         obj['masterkey'] = y[5]
+                        if(y[4] != "")
+                        {
+                          myarray.push(obj)
                         
+                          this.setState({
+                            arr: myarray
+                          })  
+                            
+                        }
+                        console.log("hosp:",y[4])
                         //push the record object into array of objects                        
-                        myarray.push(obj)
-                        
-                        // alert("Objec"+myarray[0].name + myarray[0].type)
-                        
-                        this.setState({
-                          arr: myarray
-                        })  
                       }.bind(this))
       
                   }
                 
-                  // console.log(JSON.parse(myarray))
-                  
-                  // alert(myarray[0].name)
-                  // alert(myarray[1].name)
                 }
                 else {
                   alert("No records found")
@@ -285,7 +282,9 @@ export class ViewRecords extends Component {
 
         alert(event.target.value)
     }
-  
+    
+
+
    render() {
      //don't render if there are no records for the user
      if(this.state.arr.length === 0) {

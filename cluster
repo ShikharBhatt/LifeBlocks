@@ -1,0 +1,121 @@
+apt-get install build-essential cmake libudev-dev
+bash <(curl https://get.parity.io -L)
+---------------------------------------------------------------------------------------------------------------
+curl --data '{"jsonrpc":"2.0","method":"parity_newAccountFromPhrase","params":["I1", "I1"],"id":0}' -H "Content-Type: application/json" -X POST localhost:7545
+curl --data '{"method":"parity_addReservedPeer","params":["enode://a979fb575495b8d6db44f750317d0f4622bf4c2aa3365d6af7c284339968eef29b69ad0dce72a4d8db5ebb4968de0e3bec910127f134779fbcb0cb6d3331163c@22.99.55.44:7770"],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:8545
+
+---------------------------------------------------------------------------------------------------------------
+Address List :
+H2 - "0x0062b5a1d7b9f607e01057c71968908f1a3dc880"
+H1 - "0x00fbe91ac230841243cfb0a9c4fa2201310736f1" 
+GOV - "0x00a06e9d56e1459fe0dfdf4c7db382425cc09448"
+I2 - "0x00e81d5bedbf57d3b7c22bc368e86b66bef8b08b"
+I1 -"0x00edb55942d75eef1d88fabf6e0190b582386a80"
+----------------------------------------------------------------------------------------------------------------
+
+genesis.json
+
+{
+    "name": "LifeBlocks",
+    "engine": {
+        "authorityRound": {
+            "params": {
+                "stepDuration": "5",
+                "validators" : {
+                    "list": [
+                        "0x0062b5a1d7b9f607e01057c71968908f1a3dc880",
+                        "0x00fbe91ac230841243cfb0a9c4fa2201310736f1",
+                        "0x00a06e9d56e1459fe0dfdf4c7db382425cc09448",
+                        "0x00e81d5bedbf57d3b7c22bc368e86b66bef8b08b",
+                        "0x00edb55942d75eef1d88fabf6e0190b582386a80"
+                    ]
+                }
+            }
+        }
+    },
+    "params": {
+        "gasLimitBoundDivisor": "0x400",
+        "maximumExtraDataSize": "0x20",
+        "minGasLimit": "0x1388",
+        "networkID" : "0x2323",
+        "eip155Transition": 0,
+        "validateChainIdTransition": 0,
+        "eip140Transition": 0,
+        "eip211Transition": 0,
+        "eip214Transition": 0,
+        "eip658Transition": 0
+      },
+    "genesis": {
+        "seal": {
+            "authorityRound": {
+                "step": "0x0",
+                "signature": "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            }
+        },
+        "difficulty": "0x20000",
+        "gasLimit": "0x5B8D80"
+    },
+    "accounts": {
+        "0x0000000000000000000000000000000000000001": { "balance": "1", "builtin": { "name": "ecrecover", "pricing": { "linear": { "base": 3000, "word": 0 } } } },
+        "0x0000000000000000000000000000000000000002": { "balance": "1", "builtin": { "name": "sha256", "pricing": { "linear": { "base": 60, "word": 12 } } } },
+        "0x0000000000000000000000000000000000000003": { "balance": "1", "builtin": { "name": "ripemd160", "pricing": { "linear": { "base": 600, "word": 120 } } } },
+        "0x0000000000000000000000000000000000000004": { "balance": "1", "builtin": { "name": "identity", "pricing": { "linear": { "base": 15, "word": 3 } } } }
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------------------
+
+config.toml
+[parity]
+chain = "genesis.json"
+base_path = "/home//parity/LifeBlocks"
+[network]
+port = 30300
+[rpc]
+port = 7545
+apis = ["web3", "eth", "net", "personal", "parity", "parity_set", "traces", "rpc", "parity_accounts"]
+cors = ["all"]
+[websockets]
+port = 7455
+[account]
+password = ["account.pwds"]
+[mining]
+engine_signer = ""
+reseal_on_txs = "none"
+
+----------------------------------------------------------------------------------------------------------------
+
+parity config
+parity --config config.toml --unsafe-expose &
+----------------------------------------------------------------------------------------------------------------
+
+curl --data '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0x004ec07d2329997267Ec62b4166639513386F32E", "latest"],"id":1}' -H "Content-Type: application/json" -X POST localhost:7545
+curl --data '{"jsonrpc":"2.0","method":"personal_sendTransaction","params":[{"from":"0x00a06e9d56e1459fe0dfdf4c7db382425cc09448","to":"0xD3509B510002b38f453bCE699278F61ED2e0BAC1","value":"0x64"}, "GOV"],"id":0}' -H "Content-Type: application/json" -X POST localhost:7545
+
+curl --data '{"jsonrpc":"2.0","method":"parity_newAccountFromPhrase","params":["user", "user"],"id":0}' -H "Content-Type: application/json" -X POST localhost:7545
+0x004ec07d2329997267ec62b4166639513386f32e
+
+----------------------------------------------------------------------------------------------------------------
+ipfs config 
+
+-------------------------------
+GOV
+0xac7837d7059cd789dc60165f3b72130b6adc765a1f60de15ec59e1fb51a7d558
+I1
+0x4ba940b73a4a0fff3931ca77eec1fa900c91fa2d0f130cd64c652527baf1163e
+I2
+0xe6d63676c65ac9f815eb546a8575fbbaaf793f21b762d7f6cd23e878ab49fda8
+H1
+0x095ba6950290757ca301a3616c41bfa709db040178391f10410607b1799a2f09
+H2
+0xc42f0d7769ffbb63b591a97de1c870cbb044dfcd361eed54567be4b5992d8bd2
+user
+0x3df8095dfbae93d8c7f1143b217a483d57a7f745e2542425dfe2fa25264cb2e8
+
+w3.eth.accounts.decrypt({"id":"d2a86976-6764-245c-c554-d4e1a048f1f6","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"7ad37cd082cda3941e35f349be094b6d"},"ciphertext":"a00e18ab3b09ceaf1a4f7c7631b9b1ff385633d6fdfbe3dc20c188ac9a02a216","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"3a0bb5204d0ef7f027be24e1a5ae77a9455cf76b9c9e5ef9c56da85f553a4376"},"mac":"561bf29805c864d3c3499755df1ec8dfb00480c63e7537df713a9c0ac9e12a3b"},"address":"00edb55942d75eef1d88fabf6e0190b582386a80","name":"","meta":"{}"},'I1')
+w3.eth.accounts.decrypt({"id":"7688003d-0392-14c1-9440-ac7223c0755c","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"7a8d38de8e1239d741163c894ab77758"},"ciphertext":"0f6d1419bc33854136be481dc39622bc9cd09ac6cd4a6c3d60b06597a4972a60","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"b778ecdc4cb8c173e806a7280f0e14e6c058e7f747b92cc4c201363a2dbc09c0"},"mac":"17d496eec2d5a68c14ebd174518637e29cf04a1830122920e56de1dce744c4ed"},"address":"00e81d5bedbf57d3b7c22bc368e86b66bef8b08b","name":"","meta":"{}"},'I2')
+w3.eth.accounts.decrypt({"id":"935ed70d-e96b-fb1d-ef99-844150dfc21f","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"835d9ed0f4779ba7795f4f2786433b0a"},"ciphertext":"e3dd8b610c216ff8ace8c6253cb80e6270fc4d43f421310689b9c00363c26ea0","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"6dd17659e4ff3e43bef53119cd35c3a376eb6f151a9d7190bcfb7508ccf00d06"},"mac":"d5df0caa76790fa58dc9e482a5fe125dc8086b803609ff5162e97e182bfbcad3"},"address":"00fbe91ac230841243cfb0a9c4fa2201310736f1","name":"","meta":"{}"},'H1')
+w3.eth.accounts.decrypt({"id":"1fcb478f-7631-3e0a-ba6b-dd95abf87816","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"cd62be2f26604b2cf73051cff75d08d6"},"ciphertext":"cd6c1210c94215b70f715766c36e38334ebcd215c04248cfa653e83efa009792","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"af5d0895afe55f3c0c36fa0637442ea5fb3828cbfe7c86f31af1f82c872347cf"},"mac":"7337175d55fa262e156d39be777e8e4e2e53f09428797579340c6fb55388cd9b"},"address":"0062b5a1d7b9f607e01057c71968908f1a3dc880","name":"","meta":"{}"},'H2')
+w3.eth.accounts.decrypt({"id":"28745d67-5965-9a8c-46ba-5c2b1a44cb66","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"6fedeb874fd754d23601395505cd25cc"},"ciphertext":"400249939496ec2c30a2dd453c0b175a2f01a827bca7e7b74bd6057a6a610bd3","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"b997bba6bf96b69e01dd33ecf94f04096b0ac2a94ec9435569f8cb283f2effa0"},"mac":"e9859c4961797b605e1a87d33289b7da1db2956e9450067fa37b0063a4c72398"},"address":"004ec07d2329997267ec62b4166639513386f32e","name":"","meta":"{}"},'user')
+

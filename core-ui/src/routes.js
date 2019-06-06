@@ -35,6 +35,7 @@ const ViewRecords = React.lazy(() => import('./views/Records/ViewRecords'));
 const ShareRecords = React.lazy(() => import('./views/Records/ShareRecords'));
 const ApplyPolicy = React.lazy(() => import('./views/Records/ApplyPolicy'));
 const ViewPolicy = React.lazy(() => import('./views/Records/ViewPolicy'));
+const RevokeAccess = React.lazy(() => import('./views/Records/RevokeAccess'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
@@ -43,10 +44,11 @@ const routes = [
   { path: '/', exact: true, name: 'Home', component: DefaultLayout },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/records', exact: true, name: 'Records', component: ViewRecords },
-  { path: '/records/ViewRecords', name: 'View Records', component: ViewRecords },
-  { path: '/records/ShareRecords', name: 'Share Records', component: ShareRecords },
-  { path: '/records/ApplyPolicy', name: 'Apply Policy', component: ApplyPolicy },
-  { path: '/records/ViewPolicy', name: 'View Policy', component: ViewPolicy },
+  { path: '/records/view-records', name: 'View Records', component: ViewRecords },
+  { path: '/records/share-records', name: 'Share Records', component: ShareRecords },
+  { path: '/records/apply-policy', name: 'Apply Policy', component: ApplyPolicy },
+  { path: '/records/view-policy', name: 'View Policy', component: ViewPolicy },
+  { path: '/records/revoke-access', name: 'Revoke Access', component: RevokeAccess },
   { path: '/base', exact: true, name: 'Base', component: Cards },
   { path: '/base/cards', name: 'Cards', component: Cards },
   { path: '/base/forms', name: 'Forms', component: Forms },

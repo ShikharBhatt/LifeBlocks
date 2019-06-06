@@ -1,0 +1,7 @@
+{
+    "name": "UploadRecords",
+    "version": "0.0.0",
+    "private": true,
+    "main": "./UploadRecords.js"
+  }
+  

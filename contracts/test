@@ -1,0 +1,1 @@
+curl --data '{"method":"eth_getCode","params":["0x78478e7666bcb38b2ddeddfe7cb0ba152301df07","0x2"],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:7545

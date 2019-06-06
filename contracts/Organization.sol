@@ -13,6 +13,7 @@ contract Organization{
     mapping(address => organization) public orgToAddress;
     mapping(address => string) public orgToKey;
     mapping(address => address[]) public sellerToPolicy;
+    mapping(address => uint[]) recordUploader;
     uint hospitalCount;
     uint insuranceCount;
     
@@ -82,11 +83,18 @@ contract Organization{
     
     function addPolicy(address _contractAddress) public{
         sellerToPolicy[msg.sender].push(_contractAddress);
-    }
+    } 
     
     function returnAllPolicy(address _orgAddress) external view returns(address[]){
         return sellerToPolicy[_orgAddress];
     }
 
+    function recordUploaded(uint _recordID) public {
+        recordUploader[msg.sender].push(_recordID);
+    }
     
+    function getOrgRecords(address _orgAddress) external view returns(uint[]){
+        require(_orgAddress == msg.sender, "You do not have sufficient permissions to access these records");
+        return recordUploader[_orgAddress];
+    }
 }

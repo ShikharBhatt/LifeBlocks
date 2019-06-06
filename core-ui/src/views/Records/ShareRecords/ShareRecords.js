@@ -146,7 +146,6 @@ class ShareRecords extends Component {
                         obj['type'] = y[1]
                         let f = Number(y[3])
                         obj['date'] = new Date(f*1000).toLocaleDateString()
-                        console.log(y[3])
                         obj['hospital'] = y[4]
                         obj['masterkey'] = y[5]
                         
@@ -216,6 +215,7 @@ class ShareRecords extends Component {
 
 
       insurancePopulate(insuranceAdds) {
+        console.log(insuranceAdds)
         if(insuranceAdds.length===this.state.insuranceCompanies.length) {
           const rows =  insuranceAdds.map((row, index) => {
             return (
@@ -297,12 +297,13 @@ class ShareRecords extends Component {
         if(this.state.selectedRecords.length>0) {
           let keyObj, un_mkey, keyObjOrg,seedphrase, selectedRecords
           let recordData = []
-          let data
+          
           let  m_key = []
           let myaadhaar = sessionStorage.getItem('aadhaar')
           let permissionsContract = this.permissionsContract
           let UserContract = this.UserContract
           let organizationAddress = this.state.insuranceAddress
+          console.log("Organization:", organizationAddress)
           let account 
           let gp = this.state.web3.utils.toHex(this.state.web3.utils.toWei('0','gwei'))
           let gasL = this.state.web3.utils.toHex(4700000)
@@ -334,24 +335,27 @@ class ShareRecords extends Component {
                     {from:account,gasPrice:gp}).then((pgpIpfsHash) => {
                         //get pgp key from ipfs
                          
-                          getKeys(pgpIpfsHash, function(key){
+                          getKeys(pgpIpfsHash, async function(key){
                             keyObj = JSON.parse(key)
                             console.log("key object: " +keyObj)
                             console.log("key obj properties: "+Object.getOwnPropertyNames(keyObj))
                             //call to function to decrypt masterkey using pgp private key
                             for(let i=0;i<selectedRecords.length;i++) {
-                              data = recordData[selectedRecords[i]].recordId
-                              console.log(data)
-                              keyDecrypt(keyObj,recordData[selectedRecords[i]].masterkey,seedphrase,function(plain){
+                              let data = recordData[selectedRecords[i]].recordId
+                              console.log("Record id(-):",data)
+                              await keyDecrypt(keyObj,recordData[selectedRecords[i]].masterkey,seedphrase, async function(plain){
                                 un_mkey = (plain)
                                 console.log("unencrypted masterkey : "+un_mkey)
-                                keyEncrypt(un_mkey, keyObjOrg, function (cipher) {
+                                await  keyEncrypt(un_mkey, keyObjOrg, async function (cipher) {
                                   //in callback function of keyEncrypt
-                                  m_key.push(cipher);
+
                                   console.log("encrypted masterkey: " + cipher);
                                   console.log(account)
+                                  console.log("Record id(----):",data) 
+
+
                                   permissionsContract.methods
-                                  .grant(data, organizationAddress,cipher )
+                                  .grant(data, organizationAddress,cipher, account )
                                   .send(
                                     {
                                       from: account,
@@ -361,13 +365,28 @@ class ShareRecords extends Component {
                                     function(error, txHash) {
                                       if (!error) {
                                         console.log("tx: " + txHash);
-                                        alert("Transaction Hash:" + txHash);
+
+                                        // permissionsContract.events.permissionGranted({fromBlock: 'latest'},
+                                        //   (error, event) => {
+                                        //     if(!error)
+                                        //       console.log(event)
+                                        //   }
+                                        // ).on('data', (event) => {
+                                        //     console.log(event); // same results as the optional callback above
+                                        //   })
+                                        // eventListener.watch(function(err, result){
+                                        //   if(!err) {
+                                        //     console.log("PermissionList id:",result.args.id)
+                                        //   }
+                                        //   else
+                                        //   {console.log(err)}
+                                        //})
                                       } else console.log(error);
                                     }
                                   );
-                                })                
+                                })
+                                               
                             })
-      
                             }
                         })//end get keys
                         
