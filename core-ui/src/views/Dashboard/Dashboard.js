@@ -173,7 +173,7 @@ class Dashboard extends Component {
         { from: account[0] }, function (error, xb) {
 
           console.log(xb)
-
+          alert(aadhaar)
           //if there are no records for the user
           if (xb === null) {
             alert("No records found for Report Date")

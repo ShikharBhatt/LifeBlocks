@@ -43,18 +43,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Switch>
-          <Route exact path="/login" name="Login Page" component={Login} />
-          <Route
-            exact
-            path="/"
-            name="Dashboard"
-            component={DefaultLayout}
-          />
-          <Route exact path="/register" name="Register Page" component={DefaultLayout} />
-          <Route exact path="/404" name="Page 404" component={Page404} />
-          <Route exact path="/500" name="Page 500" component={Page500} />
-          <Route exact path="/Cards" name="Cards" component={Cards} />
-          <Route path="/" name="Login Page" component={DefaultLayout} />
+          <Route exact path="/dashboard" name="Dashboard" component={DefaultLayout} />
         </Switch>
       </BrowserRouter>
     );
